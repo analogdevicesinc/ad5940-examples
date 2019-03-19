@@ -1,0 +1,3 @@
+[submodule "examples/ad5940lib"]
+	path = examples/ad5940lib
+	url = https://github.com/analogdevicesinc/ad5940lib.git
