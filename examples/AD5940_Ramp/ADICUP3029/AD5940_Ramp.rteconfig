@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<configuration xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
+
+  <packages/>
+
+  <device Dclock="26000000" Dcore="Cortex-M3" DcoreVersion="r2p1" Dendian="Little-endian" Dfamily="ADuCM302x Series" Dfpu="NO_FPU" Dmpu="NO_MPU" Dname="ADuCM3029" Dvendor="Analog Devices:1" Pname="">
+
+    <url>http://www.keil.com/dd2/analogdevices/aducm3029</url>
+
+    <package info="Analog Devices ADuCM302x Device Support. (Subject to the Software License Agreement referred to in the Release Notes.)" name="ADuCM302x_DFP" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+
+  </device>
+
+  <toolchain Tcompiler="IAR" Toutput="exe"/>
+
+  <components>
+
+    <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.1.2">
+
+      <package name="CMSIS" url="http://www.keil.com/pack/" vendor="ARM" version="5.4.0"/>
+
+      <file category="doc" name="CMSIS/Documentation/Core/html/index.html"/>
+
+      <file category="include" name="CMSIS/Core/Include/"/>
+
+    </component>
+
+    <component Cclass="Device" Cgroup="Global Configuration" Cvendor="AnalogDevices" Cversion="3.2.0" deviceDependent="1">
+
+      <package name="ADuCM302x_DFP" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+
+      <file attr="config" category="header" deviceDependent="1" name="Include/config/adi_cycle_counting_config.h" version="3.2.0"/>
+
+      <file attr="config" category="header" deviceDependent="1" name="Include/config/adi_global_config.h" version="3.2.0"/>
+
+    </component>
+
+    <component Cclass="Device" Cgroup="Startup" Cvendor="AnalogDevices" Cversion="3.2.0" deviceDependent="1">
+
+      <package name="ADuCM302x_DFP" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+
+      <file category="include" deviceDependent="1" name="Include/"/>
+
+      <file attr="config" category="source" condition="ADuCM3029_IAR" deviceDependent="1" name="Source/IAR/startup_ADuCM3029.s" version="3.2.0"/>
+
+      <file attr="config" category="source" condition="ADuCM3029" deviceDependent="1" name="Source/system_ADuCM3029.c" version="3.2.0"/>
+
+    </component>
+
+  </components>
+
+  <apis/>
+
+</configuration>
+

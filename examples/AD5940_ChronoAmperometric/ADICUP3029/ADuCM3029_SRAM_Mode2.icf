@@ -1,0 +1,183 @@
+/*###ICF### Section handled by ICF editor, don't touch! ****/
+/*-Editor annotation file-*/
+/* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
+
+/*-Sizes-*/
+define symbol __ICFEDIT_size_cstack__ = 0x400;
+define symbol __ICFEDIT_size_heap__   = 0x200;
+
+/**** End of ICF editor section. ###ICF###*/
+
+define memory mem with size        = 4G;
+
+// symbols
+define symbol USE_PARITY = 1;
+
+define symbol FLASH                               = 0x00000000;  // flash address
+define symbol FLASH_SIZE                          = 256K;        // 128k flash size
+define symbol FLASH_PAGE_SIZE                     = 2K;          // 2k flash page size
+define symbol PAGE0_ROM_START                     = 0x1A0;
+
+
+define symbol SIZE_OF_INTVEC                      = 384;
+define symbol START_OF_READ_PROTECT_KEY_HASH       = FLASH+SIZE_OF_INTVEC;
+define symbol SIZE_OF_READ_PROTECT_KEY_HASH       = 16;
+define symbol START_OF_CRC_READ_PROTECT_KEY_HASH   = FLASH+SIZE_OF_INTVEC+SIZE_OF_READ_PROTECT_KEY_HASH;
+define symbol SIZE_OF_CRC_READ_PROTECT_KEY_HASH   = 4;
+define symbol START_OF_NUM_CRC_PAGES              = FLASH+SIZE_OF_INTVEC+SIZE_OF_READ_PROTECT_KEY_HASH+SIZE_OF_CRC_READ_PROTECT_KEY_HASH;
+define symbol NUM_OF_CRC_PAGES                    = 4;
+
+
+
+// user-selectable SRAM mode
+// SRAM Banks 1 & 2 are dynamically configurable for hibernation retention at runtime
+// referred to here as "xRAM_bank#_retained_region", where x = i (instruction) or d (data) and # = 1 or 2
+define symbol USER_SRAM_MODE = 2;
+
+// RAM bank sizes sizes are invariant... locations vary by RAM Mode#
+define symbol RAM_BANK0_SIZE   =  8K;
+define symbol RAM_BANK1_SIZE   =  8K;
+define symbol RAM_BANK2_SIZE   = 16K;
+define symbol RAM_BANK3_SIZE   = 16K;
+define symbol RAM_BANK4_SIZE   = 12K;
+define symbol RAM_BANK5_SIZE   =  4K;
+
+//MODE0 0kB CACHE 32kB ISRAM 32kB DSRAM
+if(USER_SRAM_MODE == 0)
+{
+	define symbol RAM_BANK0 = 0x20000000;   // Always Retained
+	define symbol RAM_BANK1 = 0x20002000;   // Retained during Hibernate if SRAMRET.BANK1EN=1
+	define symbol RAM_BANK2 = 0x10000000;   // Retained during Hibernate if SRAMRET.BANK2EN=1
+	define symbol RAM_BANK3 = 0x20040000;   // Not retained
+	define symbol RAM_BANK4 = 0x10004000;   // Not retained
+
+	define region iRAM_bank2_retained_region  = mem:[from RAM_BANK2 size RAM_BANK2_SIZE];
+	define region iRAM_never_retained_region  = mem:[from RAM_BANK4 size (RAM_BANK4_SIZE + RAM_BANK5_SIZE)];
+
+	define region dRAM_always_retained_region = mem:[from RAM_BANK0 size RAM_BANK0_SIZE];
+	define region dRAM_bank1_retained_region  = mem:[from RAM_BANK1 size RAM_BANK1_SIZE];
+	define region dRAM_never_retained_region  = mem:[from RAM_BANK3 size RAM_BANK3_SIZE];
+}
+
+//MODE1 4kB CACHE 28kB ISRAM 32kB DSRAM
+else if(USER_SRAM_MODE == 1)
+{
+	define symbol RAM_BANK0 = 0x20000000;   // Always Retained
+	define symbol RAM_BANK1 = 0x20002000;   // Retained during Hibernate if SRAMRET.BANK1EN=1
+	define symbol RAM_BANK2 = 0x10000000;   // Retained during Hibernate if SRAMRET.BANK2EN=1
+	define symbol RAM_BANK3 = 0x20040000;   // Not retained
+
+	define region iRAM_bank2_retained_region  = mem:[from RAM_BANK2 size RAM_BANK2_SIZE];
+	define region iRAM_never_retained_region  = mem:[from RAM_BANK4 size RAM_BANK4_SIZE];
+
+	define region dRAM_always_retained_region = mem:[from RAM_BANK0 size RAM_BANK0_SIZE];
+	define region dRAM_bank1_retained_region  = mem:[from RAM_BANK1 size RAM_BANK1_SIZE];
+	define region dRAM_never_retained_region  = mem:[from RAM_BANK3 size RAM_BANK3_SIZE];
+}
+
+//MODE2 0kB CACHE 0kB ISRAM 64kB DSRAM
+else if(USER_SRAM_MODE == 2)
+{
+	define symbol RAM_BANK0 = 0x20000000;   // Always Retained
+	define symbol RAM_BANK1 = 0x20002000;   // Retained during Hibernate if SRAMRET.BANK1EN=1
+	define symbol RAM_BANK2 = 0x20004000;   // Retained during Hibernate if SRAMRET.BANK2EN=1
+	define symbol RAM_BANK3 = 0x20040000;   // Not retained
+
+	define region dRAM_always_retained_region = mem:[from RAM_BANK0 size RAM_BANK0_SIZE];
+	define region dRAM_bank1_retained_region  = mem:[from RAM_BANK1 size RAM_BANK1_SIZE];
+	define region dRAM_bank2_retained_region  = mem:[from RAM_BANK2 size RAM_BANK2_SIZE];
+	define region dRAM_never_retained_region  = mem:[from RAM_BANK3 size (RAM_BANK3_SIZE + RAM_BANK4_SIZE + RAM_BANK5_SIZE)];
+}
+
+//MODE3 4kB CACHE 0kB ISRAM 60kB DSRAM
+else if(USER_SRAM_MODE == 3)
+{
+	define symbol RAM_BANK0 = 0x20000000;   // Always Retained
+	define symbol RAM_BANK1 = 0x20002000;   // Retained during Hibernate if SRAMRET.BANK1EN=1
+	define symbol RAM_BANK2 = 0x20004000;   // Retained during Hibernate if SRAMRET.BANK2EN=1
+	define symbol RAM_BANK3 = 0x20040000;   // Not retained
+
+	define region dRAM_always_retained_region = mem:[from RAM_BANK0 size RAM_BANK0_SIZE];
+	define region dRAM_bank1_retained_region  = mem:[from RAM_BANK1 size RAM_BANK1_SIZE];
+	define region dRAM_bank2_retained_region  = mem:[from RAM_BANK2 size RAM_BANK2_SIZE];
+	define region dRAM_never_retained_region  = mem:[from RAM_BANK3 size (RAM_BANK3_SIZE + RAM_BANK4_SIZE)];
+}
+
+// ROM regions
+define region ROM_PAGE0_INTVEC              = mem:[from FLASH size SIZE_OF_INTVEC];
+define region START_OF_PAGE0_REGION         = mem:[from (PAGE0_ROM_START) size (FLASH_PAGE_SIZE - PAGE0_ROM_START)];
+define region ROM_REGION                    = mem:[from (FLASH + FLASH_PAGE_SIZE) size (FLASH_SIZE - FLASH_PAGE_SIZE)];
+define region SRAM_CODE                     = mem:[from (RAM_BANK2) size (RAM_BANK2_SIZE)];
+
+place at address mem: START_OF_READ_PROTECT_KEY_HASH        { readonly section ReadProtectedKeyHash };
+place at address mem: START_OF_CRC_READ_PROTECT_KEY_HASH    { readonly section CRC_ReadProtectedKeyHash };
+place at address mem: START_OF_NUM_CRC_PAGES                { readonly section NumCRCPages };
+
+// C-Runtime blocks
+define block CSTACK with alignment = 8, size = __ICFEDIT_size_cstack__ { };
+define block HEAP   with alignment = 8, size = __ICFEDIT_size_heap__   { };
+
+
+// Flash Page0 contains an optional checksum block, as verified by the boot kernel at startup.
+// If generating a checksum ("Checksum" linker dialogue box) during the build, it is also
+// required to add "--keep __checksum" to the linker "Extra Options" dialogue to preserve the
+// linker-generated "__checksum" symbol.
+define block CHECKSUM      with alignment = 4, size = 4 { ro section .checksum };
+
+// force manditory placement of the CHECKSUM block within Page0
+place at address 0x000007FC { block CHECKSUM };
+
+
+// KEEP these blocks, avoiding linker elimination...
+keep {
+    block CHECKSUM,
+};
+
+
+// initializations...
+do not initialize                                { section .noinit };
+
+// expand encoded initialized data variables from flash image into RAM during C-Runtime Startup
+initialize by copy                               { rw };
+
+//initialize by copy with packing = none         { section __DLIB_PERTHREAD }; // Required in a multi-threaded application
+
+// ROM: place IVT at start of flash, page zero (ahead of the "meta-data")
+place at start of ROM_PAGE0_INTVEC               { ro section .intvec };
+place in  START_OF_PAGE0_REGION                  { ro section Page0_region };
+
+// ROM: place remaining read-only code/data in flash, starting at flash page1
+place in          ROM_REGION                     { ro };
+
+
+// Create as large a gap as possible between the stack and the heap to avoid collision...
+
+// RAM: place stack @ end (high-address) of always-retained dRAM because stack "grows" towards low addresses
+place at end of   dRAM_always_retained_region    { block CSTACK };
+
+// RAM: place heap, etc., into low-address, always-retained dRAM
+place in          dRAM_always_retained_region    { rw, block HEAP };
+
+// ISRAM section for placing code in SRAM
+place in  SRAM_CODE                              {section ISRAM_REGION};
+
+initialize by copy {section  ISRAM_REGION };
+
+// NOTE: To direct data to reside in specifically named memory regions
+// (suce as into specific banks or non-hibernation-retained memory),
+// use either of the IAR directives:
+//    '#pragma location="named_region"' directive prefix, or the
+//    '@ "named_region"' suffix with the data declarations.
+
+// place data declared as bank1-hibernation-retained
+place in          dRAM_bank1_retained_region     { rw section bank1_retained_ram };
+
+// place data declared as bank2-hibernation-retained (RAM modes 2 or 3 only)
+//place in          dRAM_bank2_retained_region     { rw section bank2_retained_ram };
+
+// RAM: place volatile RAM data (never retained during hibernation) into select
+// named volatile regions, depending on SRAM Mode# and SRAMRET.BANK#EN bits
+//
+
+// place unterained sections
+place in          dRAM_never_retained_region     { rw section never_retained_ram };
