@@ -404,9 +404,9 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>AD5940_ADCPolling.c</FileName>
+              <FileName>AD5940_Reset.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\AD5940_ADCPolling.c</FilePath>
+              <FilePath>..\AD5940_Reset.c</FilePath>
             </File>
           </Files>
         </Group>

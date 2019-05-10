@@ -404,9 +404,29 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>AD5940_ADCPolling.c</FileName>
+              <FileName>AD5940Main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\AD5940_ADCPolling.c</FilePath>
+              <FilePath>..\AD5940Main.c</FilePath>
+            </File>
+            <File>
+              <FileName>BodyImpedance.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BodyImpedance.c</FilePath>
+            </File>
+            <File>
+              <FileName>Electrocardiograph.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Electrocardiograph.c</FilePath>
+            </File>
+            <File>
+              <FileName>ElectrodermalActivity.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ElectrodermalActivity.c</FilePath>
+            </File>
+            <File>
+              <FileName>UARTCmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UARTCmd.c</FilePath>
             </File>
           </Files>
         </Group>
