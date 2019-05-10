@@ -1,3 +1,12 @@
+/*
+
+Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
+
+This software is proprietary to Analog Devices, Inc. and its licensors.
+By using this software you agree to the terms of the associated
+Analog Devices Software License Agreement.
+
+*/
 #include "stdio.h"
 #include "AD5940.h"
 #include "stm32f4xx_hal.h"
