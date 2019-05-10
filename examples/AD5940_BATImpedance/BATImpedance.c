@@ -243,7 +243,7 @@ static AD5940Err AppBATSeqCfgGen(void)
   lp_loop.LpDacCfg.LpDacRef = LPDACREF_2P5;
   lp_loop.LpDacCfg.DataRst = bFALSE;
   lp_loop.LpDacCfg.PowerEn = bTRUE;
-  lp_loop.LpDacCfg.DacData12Bit = (uint32_t)((AppBATCfg.DCVolt-200)/2200.0*4095);
+  lp_loop.LpDacCfg.DacData12Bit = (uint32_t)((AppBATCfg.DCVolt-200)/2200.0f*4095);
   lp_loop.LpDacCfg.DacData6Bit = 31;  //not used. Set it to middle value.
 
   lp_loop.LpAmpCfg.LpAmpSel = LPAMP0;
