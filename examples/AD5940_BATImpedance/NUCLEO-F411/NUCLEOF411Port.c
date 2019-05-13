@@ -102,17 +102,9 @@ void AD5940_RstClr(void)
 
 void AD5940_Delay10us(uint32_t time)
 {
-  if(time==0)return;
-  if(time*10<SYSTICK_MAXCOUNT/(SYSTICK_CLKFREQ/1000000)){
-    SysTick->LOAD = time*10*(SYSTICK_CLKFREQ/1000000);
-    SysTick->CTRL = (1 << 2) | (1<<0);    /* Enable SysTick Timer, using core clock */
-    while(!((SysTick->CTRL)&(1<<16)));    /* Wait until count to zero */
-    SysTick->CTRL = 0;                    /* Disable SysTick Timer */
-  }
-  else {
-    AD5940_Delay10us(time/2);
-    AD5940_Delay10us(time/2 + (time&1));
-  }
+  time/=100;
+  if(time == 0) time =1;
+  HAL_Delay(time);
 }
 
 uint32_t AD5940_GetMCUIntFlag(void)
@@ -188,7 +180,7 @@ uint32_t AD5940_MCUResourceInit(void *pCfg)
   
   /* Set the SPI parameters */
   SpiHandle.Instance               = AD5940SPI;
-  SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8; //SPI clock should be < AD5940_SystemClock
   SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
   SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
   SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;

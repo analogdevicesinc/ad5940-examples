@@ -25,6 +25,7 @@ int main(void)
 }
 
 #define DEBUG_UART                         USART2
+#define DEBUG_UART_IRQN                    USART2_IRQn
 #define DEBUGUART_CLK_ENABLE()             __HAL_RCC_USART2_CLK_ENABLE()
 #define DEBUGUART_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
 
@@ -39,6 +40,9 @@ int main(void)
 
 UART_HandleTypeDef UartHandle;
 
+void Error_Handler(void){
+  while(1);
+}
 /**
   * @brief SPI MSP Initialization 
   *        This function configures the hardware resources used in this example: 
@@ -76,10 +80,54 @@ void HAL_UART_MspInit(UART_HandleTypeDef *husart)
   }
 }
 
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage 
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  /** Initializes the CPU, AHB and APB busses clocks 
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 100;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB busses clocks 
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
 uint32_t MCUPlatformInit(void *pCfg)
 {
   HAL_Init();
-  
+  SystemClock_Config();
+  HAL_Init();
   /* Init UART */  
   UartHandle.Instance        = DEBUG_UART;
 
@@ -95,6 +143,8 @@ uint32_t MCUPlatformInit(void *pCfg)
     /* Initialization Error */
     return 0;
   }
+  __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_RXNE);
+  HAL_NVIC_EnableIRQ(DEBUG_UART_IRQN);
 	return 1;
 }
 
@@ -109,7 +159,6 @@ void USART2_IRQHandler(void)
   }
 }
 
-
 #include "stdio.h"
 #ifdef __ICCARM__
 int putchar(int c)
@@ -122,3 +171,12 @@ int fputc(int c, FILE *f)
   return c;
 }
 
+/**
+  * @brief  This function handles SysTick Handler.
+  * @param  None
+  * @retval None
+  */
+void SysTick_Handler(void)
+{
+  HAL_IncTick();
+}
