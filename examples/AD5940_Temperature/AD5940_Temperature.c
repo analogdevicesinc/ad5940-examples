@@ -16,6 +16,13 @@ Analog Devices Software License Agreement.
 #include <stdio.h>
 #include "string.h"
 
+/**
+ * This example shows how to configure temperature sensor and using sequencer to take
+ * measurements. There is 'chop' function to remove offset errors from circuit, this
+ * feature is in register REG_AFE_TEMPSENS and is not included in this example. Enable
+ * this function will have better accuracy.
+*/
+
 #define SINC3OSR_SEL  ADCSINC3OSR_4
 #define SINC2OSR_SEL  ADCSINC2OSR_22
 #define MEASURE_FREQ	4.0f	//4Hz(4SPS)
@@ -54,7 +61,7 @@ static int32_t AD5940PlatformCfg(void){
   fifo_cfg.FIFOSrc = FIFOSRC_SINC2NOTCH;
   fifo_cfg.FIFOThresh = FIFO_THRESHOLD;
   AD5940_FIFOCfg(&fifo_cfg);                             /* Disable to reset FIFO. */
-	fifo_cfg.FIFOEn = bTRUE;  
+  fifo_cfg.FIFOEn = bTRUE;  
   AD5940_FIFOCfg(&fifo_cfg);                             /* Enable FIFO here */
   /* Configure sequencer and stop it */
   seq_cfg.SeqMemSize = SEQMEMSIZE_2KB;
@@ -164,9 +171,8 @@ void AD5940_TemperatureInit(void){
   seq_info.SeqRamAddr = 0;  //place this sequence from start of SRAM.
   seq_info.WriteSRAM = bTRUE;// we need to write this sequence to AD5940 SRAM.
   AD5940_SEQInfoCfg(&seq_info);
-  //now configure wakeup timer to trigger above sequence periodically to measure temperature data.
   
-  /* Start it */
+  //now configure wakeup timer to trigger above sequence periodically to measure temperature data.
   wupt_cfg.WuptEn = bFALSE; // do not start it right now.
   wupt_cfg.WuptEndSeq = WUPTENDSEQ_A;
   wupt_cfg.WuptOrder[0] = SEQID_0;
@@ -181,9 +187,9 @@ void AD5940_TemperatureISR(void){
   //process data from AD5940 FIFO.
   uint32_t FifoCnt, IntcFlag;
   if(AD5940_WakeUp(10) > 10){  /* Wakup AFE by read register, read 10 times at most */
-		printf("Failed to wakeup AD5940!\n");
-		return;
-	}
+    printf("Failed to wakeup AD5940!\n");
+    return;
+  }
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* We need time to read data from FIFO, so, do not let AD5940 goes to hibernate automatically */
   IntcFlag = AD5940_INTCGetFlag(AFEINTC_0);
   if(IntcFlag&AFEINTSRC_DATAFIFOTHRESH){
@@ -199,8 +205,8 @@ void AD5940_TemperatureISR(void){
 
 void AD5940_PrintResult(void){
   for(int i=0; i<data_count; i++){
-		int32_t data = buff[i]&0xffff;
-		data -= 0x8000;	//data from SINC2 is added 0x8000, while data from register TEMPSENSDAT has no 0x8000 offset.
+    int32_t data = buff[i]&0xffff;
+    data -= 0x8000;	//data from SINC2 is added 0x8000, while data from register TEMPSENSDAT has no 0x8000 offset.
     printf("Result[%d] = %d, %.2f(C)\n", i, data, data/8.13f/1.5f-273.15f);
   }
 }
