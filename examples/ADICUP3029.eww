@@ -13,6 +13,9 @@
         <path>$WS_DIR$\AD5940_ADC\ADICUP3029\AD5940_ADC.ewp</path>
     </project>
     <project>
+        <path>$WS_DIR$\AD5940_Temperature\ADICUP3029\AD5940_Temperature.ewp</path>
+    </project>
+    <project>
         <path>$WS_DIR$\AD5940_DFT\ADICUP3029\AD5940_DFT.ewp</path>
     </project>
     <project>
@@ -69,6 +72,10 @@
             <name>Debug</name>
             <member>
                 <project>AD5940_ADC</project>
+                <configuration>Debug</configuration>
+            </member>
+            <member>
+                <project>AD5940_Temperature</project>
                 <configuration>Debug</configuration>
             </member>
             <member>

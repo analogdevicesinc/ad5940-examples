@@ -30,6 +30,10 @@
   </project>
 
   <project>
+    <PathAndName>.\AD5940_Temperature\ADICUP3029\AD5940_Temperature.uvprojx</PathAndName>
+  </project>
+
+  <project>
     <PathAndName>.\AD5940_DFT\ADICUP3029\AD5940_DFT.uvprojx</PathAndName>
     <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
