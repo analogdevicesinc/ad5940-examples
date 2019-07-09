@@ -404,9 +404,14 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>AD5940_ADCPolling.c</FileName>
+              <FileName>AD5940Main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\AD5940_ADCPolling.c</FilePath>
+              <FilePath>..\AD5940Main.c</FilePath>
+            </File>
+            <File>
+              <FileName>Amperometric.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Amperometric.c</FilePath>
             </File>
           </Files>
         </Group>

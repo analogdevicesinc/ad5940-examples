@@ -150,12 +150,12 @@ uint32_t MCUPlatformInit(void *pCfg)
 
 void USART2_IRQHandler(void)
 {
-  //void UARTCmd_Process(char);
+  void UARTCmd_Process(char);
   volatile char c;
   if (__HAL_UART_GET_FLAG(&UartHandle, UART_FLAG_RXNE))
   {
     c = USART2->DR;
-    //UARTCmd_Process(c);
+    UARTCmd_Process(c);
   }
 }
 

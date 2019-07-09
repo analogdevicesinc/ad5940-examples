@@ -26,6 +26,9 @@
 #define AD5940_RST_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
 #define AD5940_GP0INT_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
 
+#define ARDUINO_D3_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
+#define ARDUINO_D4_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
+
 #define AD5940SPI_FORCE_RESET()               __HAL_RCC_SPI1_FORCE_RESET()
 #define AD5940SPI_RELEASE_RESET()             __HAL_RCC_SPI1_RELEASE_RESET()
 
@@ -49,6 +52,11 @@
 #define AD5940_GP0INT_PIN                  GPIO_PIN_10   //A3
 #define AD5940_GP0INT_GPIO_PORT            GPIOA
 #define AD5940_GP0INT_IRQn                 EXTI15_10_IRQn
+
+#define ARDUINO_D3_PIN                     GPIO_PIN_3
+#define ARDUINO_D3_PORT                    GPIOB
+#define ARDUINO_D4_PIN                     GPIO_PIN_5
+#define ARDUINO_D4_PORT                    GPIOB
 
 SPI_HandleTypeDef  SpiHandle;
 
@@ -108,6 +116,25 @@ uint32_t AD5940_ClrMCUIntFlag(void)
 {
 	ucInterrupted = 0;
 	return 1;
+}
+
+/* This function is used to set Dn on Arduino shield(and set it to output) */
+void Arduino_WriteDn(uint32_t Dn, BoolFlag bHigh)
+{
+  if(Dn&(1<<3)) //set D3, P0.13
+  {
+    if(bHigh)
+      HAL_GPIO_WritePin(ARDUINO_D3_PORT, ARDUINO_D3_PIN, GPIO_PIN_SET);
+    else 
+      HAL_GPIO_WritePin(ARDUINO_D3_PORT, ARDUINO_D3_PIN, GPIO_PIN_RESET);
+  }
+  if(Dn&(1<<4))//Set D4, P0.9
+  {
+    if(bHigh)
+      HAL_GPIO_WritePin(ARDUINO_D4_PORT, ARDUINO_D4_PIN, GPIO_PIN_SET);
+    else 
+      HAL_GPIO_WritePin(ARDUINO_D4_PORT, ARDUINO_D4_PIN, GPIO_PIN_RESET);
+  }
 }
 
 uint32_t AD5940_MCUResourceInit(void *pCfg)
@@ -178,6 +205,19 @@ uint32_t AD5940_MCUResourceInit(void *pCfg)
   /* Enable and set EXTI Line0 Interrupt to the lowest priority */
   HAL_NVIC_EnableIRQ(AD5940_GP0INT_IRQn);
 //  HAL_NVIC_SetPriority(AD5940_GP0INT_IRQn, 0, 0);
+	
+  //D3 D4 GPIO
+  ARDUINO_D3_GPIO_CLK_ENABLE();
+  ARDUINO_D4_GPIO_CLK_ENABLE();
+  GPIO_InitStruct.Pin       = ARDUINO_D3_PIN;
+  GPIO_InitStruct.Mode      = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull      = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = 0;
+  HAL_GPIO_Init(ARDUINO_D3_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin       = ARDUINO_D4_PIN;
+  HAL_GPIO_Init(ARDUINO_D4_PORT, &GPIO_InitStruct);
+  
   return 0;
 }
 

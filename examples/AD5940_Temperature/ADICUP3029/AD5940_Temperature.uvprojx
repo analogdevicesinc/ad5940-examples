@@ -7,24 +7,23 @@
 
   <Targets>
     <Target>
-      <TargetName>AD5940Prj</TargetName>
+      <TargetName>ADICUP3029</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>5060750::V5.06 update 6 (build 750)::ARMCC</pArmCC>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F411RETx</Device>
-          <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.13.0</PackID>
-          <PackURL>http://www.keil.com/pack</PackURL>
-          <Cpu>IRAM(0x20000000,0x20000) IROM(0x08000000,0x80000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Device>ADuCM3029</Device>
+          <Vendor>Analog Devices</Vendor>
+          <PackID>AnalogDevices.ADuCM302x_DFP.3.2.0</PackID>
+          <PackURL>http://download.analog.com/tools/EZBoards/CM302x/Releases/</PackURL>
+          <Cpu>IRAM(0x20000000,0x04000) IRAM2(0x20040000,0x04000) IROM(0x00000000,0x40000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_512 -FS08000000 -FL080000 -FP0($$Device:STM32F411RETx$CMSIS\Flash\STM32F4xx_512.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0ADuCM302x -FS00 -FL040000 -FP0($$Device:ADuCM3029$Flash\ADuCM302x.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32F411RETx$Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h</RegisterFile>
+          <RegisterFile>$$Device:ADuCM3029$Include\ADuCM3029.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -34,7 +33,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F411RETx$CMSIS\SVD\STM32F411xx.svd</SFDFile>
+          <SFDFile>$$Device:ADuCM3029$SVD\ADuCM302x.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -50,10 +49,10 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\OUT\</OutputDirectory>
-          <OutputName>NUCLEOF411</OutputName>
+          <OutputName>ADICUP3029</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>1</CreateHexFile>
+          <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\OUT\</ListingPath>
@@ -111,13 +110,13 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments> -REMAP -MPU</SimDllArguments>
+          <SimDllArguments> </SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
+          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
-          <TargetDllArguments> -MPU</TargetDllArguments>
+          <TargetDllArguments></TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -175,7 +174,7 @@
             <AdsLsxf>1</AdsLsxf>
             <RvctClst>0</RvctClst>
             <GenPPlst>0</GenPPlst>
-            <AdsCpuType>"Cortex-M4"</AdsCpuType>
+            <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
             <mOS>0</mOS>
             <uocRom>0</uocRom>
@@ -184,9 +183,9 @@
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>2</RvdsVP>
+            <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
-            <hadIRAM2>0</hadIRAM2>
+            <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
             <useUlib>1</useUlib>
@@ -194,14 +193,14 @@
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
-            <RwSelD>3</RwSelD>
+            <RwSelD>4</RwSelD>
             <CodeSel>0</CodeSel>
             <OptFeed>0</OptFeed>
             <NoZi1>0</NoZi1>
             <NoZi2>0</NoZi2>
             <NoZi3>0</NoZi3>
-            <NoZi4>0</NoZi4>
-            <NoZi5>0</NoZi5>
+            <NoZi4>1</NoZi4>
+            <NoZi5>1</NoZi5>
             <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
@@ -211,7 +210,7 @@
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
-            <Im2Chk>0</Im2Chk>
+            <Im2Chk>1</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -246,12 +245,12 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x4000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x40000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -275,8 +274,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x40000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -301,12 +300,12 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x4000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x0</StartAddress>
-                <Size>0x0</Size>
+                <StartAddress>0x20040000</StartAddress>
+                <Size>0x4000</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -328,8 +327,8 @@
             <uC99>0</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>3</v6Lang>
-            <v6LangP>3</v6LangP>
+            <v6Lang>1</v6Lang>
+            <v6LangP>1</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -337,9 +336,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,STM32F411xE,CHIPSEL_594X</Define>
+              <Define>CHIPSEL_594X</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\AD5940Lib;..\..\STM32F4StdLib\CMSIS\Device\ST\STM32F4xx\Include;..\..\STM32F4StdLib\STM32F4xx_StdPeriph_Driver\inc;..\..\STM32F4StdLib\CMSIS\Include;..\;.\</IncludePath>
+              <IncludePath>..\..\;..\..\AD5940Lib</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +354,7 @@
             <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>CHIPSEL_594X</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
@@ -367,7 +366,7 @@
             <noStLib>0</noStLib>
             <RepFail>1</RepFail>
             <useFile>0</useFile>
-            <TextAddressRange>0x08000000</TextAddressRange>
+            <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
             <ScatterFile></ScatterFile>
@@ -384,14 +383,14 @@
           <GroupName>AD5940Lib</GroupName>
           <Files>
             <File>
+              <FileName>ADICUP3029Port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ADICUP3029Port.c</FilePath>
+            </File>
+            <File>
               <FileName>ad5940.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\AD5940Lib\ad5940.c</FilePath>
-            </File>
-            <File>
-              <FileName>NUCLEOF411Port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\NUCLEOF411Port.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -404,9 +403,9 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>AD5940_ADCPolling.c</FileName>
+              <FileName>AD5940_Temperature.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\AD5940_ADCPolling.c</FilePath>
+              <FilePath>..\AD5940_Temperature.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -421,161 +420,76 @@
   </Targets>
 
   <RTE>
-    <apis>
-      <api Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" exclusive="1">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </api>
-    </apis>
+    <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.2.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.5.1"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.0.2" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.2.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </component>
-      <component Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" Csub="Classic" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 Framework Classic">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <component Cclass="CMSIS" Cgroup="DSP" Cvendor="ARM" Cversion="1.5.2" condition="CMSIS DSP">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.2.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="Common" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL Common">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <component Cclass="Device" Cgroup="Global Configuration" Cvendor="AnalogDevices" Cversion="2.0.0" condition="ADuCM302x">
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="2.0.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="Cortex" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <component Cclass="Device" Cgroup="Startup" Cvendor="AnalogDevices" Cversion="2.0.0" condition="ADuCM302x Driver">
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="2.0.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="DMA" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="GPIO" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="PWR" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="RCC" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL GPIO">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="SPI" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL DMA">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="UART" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 HAL DMA">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS">
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
-        <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </component>
     </components>
     <files>
-      <file attr="config" category="header" name="RTE_Driver\Config\RTE_Device.h" version="1.1.2">
-        <instance index="0" removed="1">RTE\Device\STM32F103C8\RTE_Device.h</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" condition="STM32F1xx MD ARMCC" name="Device\Source\ARM\startup_stm32f10x_md.s" version="1.0.0">
-        <instance index="0" removed="1">RTE\Device\STM32F103C8\startup_stm32f10x_md.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" name="Device\StdPeriph_Driver\templates\stm32f10x_conf.h" version="3.5.0">
-        <instance index="0" removed="1">RTE\Device\STM32F103C8\stm32f10x_conf.h</instance>
-        <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="Framework" Cvendor="Keil" Cversion="3.5.1" condition="STM32F1xx STDPERIPH"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" name="Device\Source\system_stm32f10x.c" version="1.0.0">
-        <instance index="0" removed="1">RTE\Device\STM32F103C8\system_stm32f10x.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="header" name="RTE_Driver\Config\RTE_Device.h" version="1.1.2">
-        <instance index="0" removed="1">RTE\Device\STM32F103RE\RTE_Device.h</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" condition="STM32F1xx HD ARMCC" name="Device\Source\ARM\startup_stm32f10x_hd.s" version="1.0.0">
-        <instance index="0" removed="1">RTE\Device\STM32F103RE\startup_stm32f10x_hd.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" name="Device\StdPeriph_Driver\templates\stm32f10x_conf.h" version="3.5.0">
-        <instance index="0" removed="1">RTE\Device\STM32F103RE\stm32f10x_conf.h</instance>
-        <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="Framework" Cvendor="Keil" Cversion="3.5.1" condition="STM32F1xx STDPERIPH"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" name="Device\Source\system_stm32f10x.c" version="1.0.0">
-        <instance index="0" removed="1">RTE\Device\STM32F103RE\system_stm32f10x.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
-        <package name="STM32F1xx_DFP" schemaVersion="1.4.0" url="http://www.keil.com/pack/" vendor="Keil" version="2.2.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="header" name="CMSIS\Driver\Config\RTE_Device.h" version="2.4.4">
-        <instance index="0">RTE\Device\STM32F411RETx\RTE_Device.h</instance>
-        <component Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" Csub="Classic" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 Framework Classic"/>
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <file attr="config" category="header" name="Include\config\adi_cycle_counting_config.h" version="3.2.0">
+        <instance index="0">RTE\Device\ADuCM3029\adi_cycle_counting_config.h</instance>
+        <component Cclass="Device" Cgroup="Global Configuration" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x"/>
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </file>
-      <file attr="config" category="source" condition="STM32F411xE_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f411xe.s" version="2.6.2">
-        <instance index="0">RTE\Device\STM32F411RETx\startup_stm32f411xe.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS"/>
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <file attr="config" category="header" name="Include\config\adi_global_config.h" version="3.2.0">
+        <instance index="0">RTE\Device\ADuCM3029\adi_global_config.h</instance>
+        <component Cclass="Device" Cgroup="Global Configuration" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x"/>
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="MDK\Templates\Inc\stm32f4xx_hal_conf.h" version="1.7.0">
-        <instance index="0">RTE\Device\STM32F411RETx\stm32f4xx_hal_conf.h</instance>
-        <component Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" Csub="Classic" Cvendor="Keil" Cversion="1.7.4" condition="STM32F4 Framework Classic"/>
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <file attr="config" category="header" name="Include\config\adi_i2c_config.h" version="2.0.0">
+        <instance index="0" removed="1">RTE\Device\ADuCM3029\adi_i2c_config.h</instance>
+        <component Cclass="Device" Cgroup="Drivers" Csub="I2C" Cvendor="AnalogDevices" Cversion="2.0.0" condition="ADuCM302x I2C"/>
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="2.0.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="header" name="Include\config\adi_pwr_config.h" version="2.0.0">
+        <instance index="0" removed="1">RTE\Device\ADuCM3029\adi_pwr_config.h</instance>
+        <component Cclass="Device" Cgroup="Drivers" Csub="Power" Cvendor="AnalogDevices" Cversion="2.0.0" condition="ADuCM302x Driver"/>
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="2.0.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="source" condition="ADuCM3029_ARM" name="Source\ARM\startup_ADuCM3029.s" version="3.2.0">
+        <instance index="0">RTE\Device\ADuCM3029\startup_ADuCM3029.s</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x Driver"/>
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </file>
-      <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" version="2.6.2">
-        <instance index="0">RTE\Device\STM32F411RETx\system_stm32f4xx.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS"/>
-        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+      <file attr="config" category="source" condition="ADuCM3029" name="Source\system_ADuCM3029.c" version="3.2.0">
+        <instance index="0">RTE\Device\ADuCM3029\system_ADuCM3029.c</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x Driver"/>
+        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
         <targetInfos>
-          <targetInfo name="AD5940Prj"/>
+          <targetInfo name="ADICUP3029"/>
         </targetInfos>
       </file>
     </files>

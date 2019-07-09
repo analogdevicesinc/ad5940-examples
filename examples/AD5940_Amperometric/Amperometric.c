@@ -467,7 +467,7 @@ float AppAMPCalcVoltage(uint32_t ADCcode)
       fVolt = ((float)(tmp)/32768)*(AppAMPCfg.ADCRefVolt/1)*kFactor;
       break;
     case ADCPGA_1P5:
-      fVolt = ((float)(tmp)/32768)*(AppAMPCfg.ADCRefVolt/1.5)*kFactor;
+      fVolt = ((float)(tmp)/32768)*(AppAMPCfg.ADCRefVolt/1.5f)*kFactor;
       break;
     case ADCPGA_2:
       fVolt = ((float)(tmp)/32768)*(AppAMPCfg.ADCRefVolt/2)*kFactor;
