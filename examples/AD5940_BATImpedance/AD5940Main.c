@@ -6,9 +6,7 @@
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
-
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
-
 This software is proprietary to Analog Devices, Inc. and its licensors.
 By using this software you agree to the terms of the associated
 Analog Devices Software License Agreement.
@@ -33,11 +31,12 @@ uint32_t AppBuff[APPBUFF_SIZE];
 int32_t BATShowResult(uint32_t *pData, uint32_t DataCount)
 {
   fImpCar_Type *pImp = (fImpCar_Type*)pData;
-
+	float freq;
+	AppBATCtrl(BATCTRL_GETFREQ, &freq);
   /*Process data*/
   for(int i=0;i<DataCount;i++)
   {
-    printf("(real, image) = (%f,%f)mOhm \n",pImp[i].Real,pImp[i].Image);
+    printf("Freq: %f (real, image) = ,%f , %f ,mOhm \n",freq, pImp[i].Real,pImp[i].Image);
   }
   return 0;
 }
@@ -54,12 +53,12 @@ static int32_t AD5940PlatformCfg(void)
   AD5940_Initialize();
   /* Step1. Configure clock */
   clk_cfg.ADCClkDiv = ADCCLKDIV_1;
-  clk_cfg.ADCCLkSrc = ADCCLKSRC_XTAL;
-  clk_cfg.SysClkDiv = SYSCLKDIV_2;
-  clk_cfg.SysClkSrc = SYSCLKSRC_XTAL; //on battery board, there is a 32MHz crystal.
+  clk_cfg.ADCCLkSrc = ADCCLKSRC_HFOSC;
+  clk_cfg.SysClkDiv = SYSCLKDIV_1;
+  clk_cfg.SysClkSrc = SYSCLKSRC_HFOSC; //on battery board, there is a 32MHz crystal.
   clk_cfg.HfOSC32MHzMode = bFALSE;
-  clk_cfg.HFOSCEn = bFALSE;
-  clk_cfg.HFXTALEn = bTRUE;
+  clk_cfg.HFOSCEn = bTRUE;
+  clk_cfg.HFXTALEn = bFALSE;
   clk_cfg.LFOSCEn = bTRUE;
   AD5940_CLKCfg(&clk_cfg);
   /* Step2. Configure FIFO and Sequencer*/
@@ -77,9 +76,9 @@ static int32_t AD5940PlatformCfg(void)
   AD5940_INTCCfg(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH, bTRUE);   /* Interrupt Controller 0 will control GP0 to generate interrupt to MCU */
   AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
   /* Step4: Reconfigure GPIO */
-  gpio_cfg.FuncSet = GP0_INT;
+  gpio_cfg.FuncSet = GP0_INT|GP2_SYNC;
   gpio_cfg.InputEnSet = AGPIO_Pin2;
-  gpio_cfg.OutputEnSet = AGPIO_Pin0;
+  gpio_cfg.OutputEnSet = AGPIO_Pin0|AGPIO_Pin2;
   gpio_cfg.OutVal = 0;
   gpio_cfg.PullEnSet = 0;
   AD5940_AGPIOCfg(&gpio_cfg);
@@ -93,46 +92,45 @@ void AD5940BATStructInit(void)
   AppBATGetCfg(&pBATCfg);
   pBATCfg->SeqStartAddr = 0;
   pBATCfg->MaxSeqLen = 512;
-  pBATCfg->RcalVal = 50.0;  //50mOhm
-  pBATCfg->ACVoltPP = 300.0f;
-  pBATCfg->DCVolt = 1200.0f;
-  pBATCfg->SinFreq = 1e3;
-  pBATCfg->DftNum = DFTNUM_16384;
-  pBATCfg->NumOfData = -1;      /* Never stop until you stop it mannually by AppBATCtrl() function */
-  pBATCfg->BatODR = 1.0;         /* ODR(Sample Rate) 20Hz */
-  pBATCfg->FifoThresh = 8;      /* 8 */
-  pBATCfg->ADCSinc3Osr = ADCSINC3OSR_4;
+  pBATCfg->RcalVal = 50.0;  							/* Value of RCAL on EVAL-AD5941BATZ board is 50mOhm */
+  pBATCfg->ACVoltPP = 300.0f;							/* Pk-pk amplidued is 300mV */
+  pBATCfg->DCVolt = 1200.0f;							/* Offset voltage of 1.2V*/
+  pBATCfg->DftNum = DFTNUM_8192;
+  
+  pBATCfg->FifoThresh = 2;      					/* 2 results in FIFO, real and imaginary part. */
+	
+	pBATCfg->SinFreq = 200;									/* Sin wave frequency. THis value has no effect if sweep is enabled */
+	
+	pBATCfg->SweepCfg.SweepEn = bTRUE;			/* Set to bTRUE to enable sweep function */
+	pBATCfg->SweepCfg.SweepStart = 1.0f;		/* Start sweep at 1Hz  */
+	pBATCfg->SweepCfg.SweepStop = 1000.0f;	/* Finish sweep at 1000Hz */
+	pBATCfg->SweepCfg.SweepPoints = 20;			/* 100 frequencies in the sweep */
+	pBATCfg->SweepCfg.SweepLog = bTRUE;			/* Set to bTRUE to use LOG scale. Set bFALSE to use linear scale */
+	
 }
 
 void AD5940_Main(void)
 {
   uint32_t temp;
-  BoolFlag bCalibrating = bTRUE;  
   AD5940PlatformCfg();
   
   AD5940BATStructInit(); /* Configure your parameters in this function */
   
   AppBATInit(AppBuff, APPBUFF_SIZE);    /* Initialize BAT application. Provide a buffer, which is used to store sequencer commands */
-  temp = 10;
-  AppBATCtrl(BATCTRL_MRCAL, &temp);     /* Measur RCAL for 10 times */
- 
+  AppBATCtrl(BATCTRL_MRCAL, 0);     /* Measur RCAL each point in sweep */
+	AppBATCtrl(BATCTRL_START, 0); 
   while(1)
   {
     /* Check if interrupt flag which will be set when interrupt occured. */
     if(AD5940_GetMCUIntFlag())
     {
-      AD5940_ClrMCUIntFlag(); /* Clear this flag */
-      temp = APPBUFF_SIZE;
-      AppBATISR(AppBuff, &temp); /* Deal with it and provide a buffer to store data we got */
-      
-      if(bCalibrating)
-      {
-        bCalibrating = bFALSE;
-        AppBATCtrl(BATCTRL_START, 0); /* Measure battery */
-      }
-      else
-        BATShowResult(AppBuff, temp);
-    }
+				AD5940_ClrMCUIntFlag(); 				/* Clear this flag */
+				temp = APPBUFF_SIZE;
+				AppBATISR(AppBuff, &temp); 			/* Deal with it and provide a buffer to store data we got */
+				AD5940_Delay10us(100000);
+				BATShowResult(AppBuff, temp);		/* Print measurement results over UART */		
+				AD5940_SEQMmrTrig(SEQID_0);  		/* Trigger next measurement ussing MMR write*/      
+   }
   }
 }
 
@@ -140,4 +138,3 @@ void AD5940_Main(void)
  * @}
  * @}
  * */
- 
