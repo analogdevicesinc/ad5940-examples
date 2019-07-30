@@ -110,7 +110,7 @@ int32_t AppIMPCtrl(uint32_t Command, void *pPara)
     {
       WUPTCfg_Type wupt_cfg;
 
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppIMPCfg.IMPInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -127,11 +127,11 @@ int32_t AppIMPCtrl(uint32_t Command, void *pPara)
     }
     case IMPCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case IMPCTRL_STOPSYNC:
@@ -273,7 +273,7 @@ static AD5940Err AppIMPSeqCfgGen(void)
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   
   dsp_cfg.ADCFilterCfg.ADCAvgNum = AppIMPCfg.ADCAvgNum;
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* @todo what does this parameter decide */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppIMPCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppIMPCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
@@ -448,7 +448,7 @@ int32_t AppIMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   SEQCfg_Type seq_cfg;
   FIFOCfg_Type fifo_cfg;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -553,7 +553,7 @@ int32_t AppIMPDataProcess(int32_t * const pData, uint32_t *pDataCount)
   /* Convert DFT result to int32_t type */
   for(uint32_t i=0; i<DataCount; i++)
   {
-    pData[i] &= 0x3ffff; /* @todo option to check ECC */
+    pData[i] &= 0x3ffff;
     if(pData[i]&(1L<<17)) /* Bit17 is sign bit */
     {
       pData[i] |= 0xfffc0000; /* Data is 18bit in two's complement, bit17 is the sign bit */
@@ -653,7 +653,7 @@ int32_t AppIMPISR(void *pBuff, uint32_t *pCount)
   
   *pCount = 0;
   
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Prohibit AFE to enter sleep mode. */
 

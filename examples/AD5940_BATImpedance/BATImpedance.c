@@ -1,14 +1,12 @@
 /*!
  *****************************************************************************
- @file:    BodyComposition.c
+ @file:    BATImpedance.c
  @author:  $Author: nxu2 $
- @brief:   BAT measurment sequences.
+ @brief:   BAT measurement sequences.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
-
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
-
 This software is proprietary to Analog Devices, Inc. and its licensors.
 By using this software you agree to the terms of the associated
 Analog Devices Software License Agreement.
@@ -35,18 +33,17 @@ AppBATCfg_Type AppBATCfg =
 
   .SysClkFreq = 16000000.0,
   .WuptClkFreq = 32000.0,
-  .AdcClkFreq = 32000000.0,
+  .AdcClkFreq = 16000000.0,
   .BatODR = 20.0, /* 20.0 Hz*/
   .NumOfData = -1,
 
-  .PwrMod = AFEPWR_HP,
+  .PwrMod = AFEPWR_LP,
   .ACVoltPP = 800.0,
   .DCVolt = 1100.0f,
   .SinFreq = 50000.0, /* 50kHz */
   .RcalVal = 50.0, /* 50mOhm */
-  .RSenseVal = 62.0f,
 
-  .ADCSinc3Osr = ADCSINC3OSR_2,
+  .ADCSinc3Osr = ADCSINC3OSR_4,
   .ADCSinc2Osr = ADCSINC2OSR_22,
 
   .DftNum = DFTNUM_16384,
@@ -57,6 +54,13 @@ AppBATCfg_Type AppBATCfg =
   .BATInited = bFALSE,
   .StopRequired = bFALSE,
   .MeasSeqCycleCount = 0,
+	
+	.SweepCfg.SweepEn = bTRUE,
+  .SweepCfg.SweepStart = 1000,
+  .SweepCfg.SweepStop = 100000.0,
+  .SweepCfg.SweepPoints = 101,
+  .SweepCfg.SweepLog = bFALSE,
+  .SweepCfg.SweepIndex = 0,
 };
 
 /**
@@ -98,41 +102,37 @@ static void PreCharge(unsigned char channel)
   Arduino_WriteDn(1<<4, bTRUE);  //d4
 }
 
-AD5940Err AppBATCtrl(int32_t BcmCtrl, void *pPara)
+AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
 {
-  WUPTCfg_Type wupt_cfg;
-  switch (BcmCtrl)
+  switch (BatCtrl)
   {
     case BATCTRL_START:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppBATCfg.BATInited == bFALSE)
         return AD5940ERR_APPERROR;
-      AD5940_WriteReg(REG_AFE_SWMUX, 1<<0); //control ADG636 to measure battery
+      AD5940_WriteReg(REG_AFE_SWMUX, 1<<0); 				/* control ADG636 to measure battery */
+			AD5940_WriteReg(REG_AFE_SYNCEXTDEVICE, 0x0);
       PreCharge(PRECHARGE_BAT);
       PreCharge(PRECHARGE_AMP);
       AD5940_FIFOCtrlS(FIFOSRC_DFT, bFALSE);
-      AD5940_FIFOThrshSet(AppBATCfg.FifoThresh);  //DFT result contains both real and image.
+      AD5940_FIFOThrshSet(AppBATCfg.FifoThresh);  /* DFT result contains both real and image. */
       AD5940_FIFOCtrlS(FIFOSRC_DFT, bTRUE);
-      /* Start it */
-      wupt_cfg.WuptEn = bTRUE;
-      wupt_cfg.WuptEndSeq = WUPTENDSEQ_A;
-      wupt_cfg.WuptOrder[0] = SEQID_0;
-      wupt_cfg.SeqxSleepTime[SEQID_0] = (uint32_t)(AppBATCfg.WuptClkFreq/AppBATCfg.BatODR)-2-1;
-      wupt_cfg.SeqxWakeupTime[SEQID_0] = 1; /* The minimum value is 1. Do not set it to zero. Set it to 1 will spend 2 32kHz clock. */
-      AD5940_WUPTCfg(&wupt_cfg);
+			AppBATCfg.state = STATE_BATTERY;
+      /* Trigger sequence using MMR write */
+			AD5940_SEQMmrTrig(SEQID_0);
       AppBATCfg.FifoDataCount = 0;  /* restart */
-      AppBATCfg.state = STATE_BATTERY;
+      
       break;
     }
     case BATCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case BATCTRL_STOPSYNC:
@@ -140,9 +140,18 @@ AD5940Err AppBATCtrl(int32_t BcmCtrl, void *pPara)
       AppBATCfg.StopRequired = bTRUE;
       break;
     }
+		case BATCTRL_GETFREQ:
+    if(pPara)
+    {
+      if(AppBATCfg.SweepCfg.SweepEn == bTRUE)
+        *(float*)pPara = AppBATCfg.FreqofData;
+      else
+        *(float*)pPara = AppBATCfg.SinFreq;
+    }
+		break;
     case BATCTRL_SHUTDOWN:
     {
-      AppBATCtrl(BATCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppBATCtrl(BATCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by sleep operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -158,21 +167,13 @@ AD5940Err AppBATCtrl(int32_t BcmCtrl, void *pPara)
         return AD5940ERR_WAKEUP;
     //Settle input RC filter.
     AD5940_WriteReg(REG_AFE_SWMUX, 0); //control ADG636 to measure rcal
+		AD5940_WriteReg(REG_AFE_SYNCEXTDEVICE, 0x4);
     PreCharge(PRECHARGE_RCAL);
     PreCharge(PRECHARGE_AMP);
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bFALSE);
-    AD5940_FIFOThrshSet(*(uint32_t *)pPara*2);  //DFT result contains both real and image.
+		AD5940_FIFOThrshSet(2);
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bTRUE); //enable FIFO
-    //AppBATCtrl(BATCTRL_START, 0);
-
-    AppBATCfg.state = STATE_RCAL;
-    /* Start Wupt */
-    wupt_cfg.WuptEn = bTRUE;
-    wupt_cfg.WuptEndSeq = WUPTENDSEQ_A;
-    wupt_cfg.WuptOrder[0] = SEQID_0;
-    wupt_cfg.SeqxSleepTime[SEQID_0] = 4;
-    wupt_cfg.SeqxWakeupTime[SEQID_0] = 4; //trigger it at high frequency.
-    AD5940_WUPTCfg(&wupt_cfg);
+		AppBATMeasureRCAL();
     break;
     default:
     break;
@@ -190,6 +191,7 @@ static AD5940Err AppBATSeqCfgGen(void)
   HSLoopCfg_Type hs_loop;
   LPLoopCfg_Type lp_loop;
   DSPCfg_Type dsp_cfg;
+	float sin_freq;
 
   /* Start sequence generator here */
   AD5940_SEQGenCtrl(bTRUE);
@@ -212,7 +214,7 @@ static AD5940Err AppBATSeqCfgGen(void)
   /* Determine buffer gain according to ACVoltPP */
   hs_loop.HsDacCfg.ExcitBufGain = EXCITBUFGAIN_2;
   hs_loop.HsDacCfg.HsDacGain = HSDACGAIN_1;
-  hs_loop.HsDacCfg.HsDacUpdateRate = 7; //the maximum update rate is 16MHz/7
+  hs_loop.HsDacCfg.HsDacUpdateRate = 0x1B; //the maximum update rate is 16MHz/7
 
   hs_loop.HsTiaCfg.DiodeClose = bFALSE;
   hs_loop.HsTiaCfg.HstiaBias = HSTIABIAS_1P1;
@@ -229,7 +231,19 @@ static AD5940Err AppBATSeqCfgGen(void)
   hs_loop.WgCfg.WgType = WGTYPE_SIN;
   hs_loop.WgCfg.GainCalEn = bFALSE;
   hs_loop.WgCfg.OffsetCalEn = bFALSE;
-  hs_loop.WgCfg.SinCfg.SinFreqWord = AD5940_WGFreqWordCal(AppBATCfg.SinFreq, AppBATCfg.SysClkFreq);
+	if(AppBATCfg.SweepCfg.SweepEn == bTRUE)
+  {
+    AppBATCfg.FreqofData = AppBATCfg.SweepCfg.SweepStart;
+    AppBATCfg.SweepCurrFreq = AppBATCfg.SweepCfg.SweepStart;
+		AD5940_SweepNext(&AppBATCfg.SweepCfg, &AppBATCfg.SweepNextFreq);
+		sin_freq = AppBATCfg.SweepCurrFreq;    
+  }
+  else
+  {
+    sin_freq = AppBATCfg.SinFreq;
+    AppBATCfg.FreqofData = sin_freq;
+  }
+  hs_loop.WgCfg.SinCfg.SinFreqWord = AD5940_WGFreqWordCal(sin_freq, AppBATCfg.SysClkFreq);
   hs_loop.WgCfg.SinCfg.SinAmplitudeWord = (uint32_t)(AppBATCfg.ACVoltPP/800.0f*2047 + 0.5f);
   hs_loop.WgCfg.SinCfg.SinOffsetWord = 0;
   hs_loop.WgCfg.SinCfg.SinPhaseWord = 0;
@@ -243,7 +257,7 @@ static AD5940Err AppBATSeqCfgGen(void)
   lp_loop.LpDacCfg.LpDacRef = LPDACREF_2P5;
   lp_loop.LpDacCfg.DataRst = bFALSE;
   lp_loop.LpDacCfg.PowerEn = bTRUE;
-  lp_loop.LpDacCfg.DacData12Bit = (uint32_t)((AppBATCfg.DCVolt-200)/2200.0*4095);
+  lp_loop.LpDacCfg.DacData12Bit = (uint32_t)((AppBATCfg.DCVolt-200)/2200.0f*4095);
   lp_loop.LpDacCfg.DacData6Bit = 31;  //not used. Set it to middle value.
 
   lp_loop.LpAmpCfg.LpAmpSel = LPAMP0;
@@ -260,8 +274,8 @@ static AD5940Err AppBATSeqCfgGen(void)
   dsp_cfg.ADCBaseCfg.ADCMuxP = ADCMUXP_AIN3;
   dsp_cfg.ADCBaseCfg.ADCPga = ADCPGA_1P5;
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_1P6MHZ;  /* Battery Impedance Board use external 32MHz crystal as clock source. */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
@@ -281,11 +295,11 @@ static AD5940Err AppBATSeqCfgGen(void)
                 AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
                 AFECTRL_SINC2NOTCH, bTRUE);
   /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one external command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppBATCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -320,11 +334,11 @@ static AD5940Err AppBATSeqMeasureGen(void)
   /* Start sequence generator here */
   AD5940_SEQGenCtrl(bTRUE);
   AD5940_SEQGenInsert(SEQ_WAIT(16*250));  /* wait 250us for reference power up from hibernate mode. */
-  AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR, bTRUE);  /* Enable Waveform generator, ADC power */
+  AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bTRUE);  /* Enable Waveform generator, ADC power */
   AD5940_SEQGenInsert(SEQ_WAIT(16*50));   /* Wait for ADC ready. */
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */  
-  AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT/*|AFECTRL_WG*/|AFECTRL_ADCPWR, bFALSE);  /* Stop ADC convert and DFT */
+  AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT/*|AFECTRL_WG*/|AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bFALSE);  /* Stop ADC convert and DFT */
   //AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
@@ -361,7 +375,7 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   SEQCfg_Type seq_cfg;
   FIFOCfg_Type fifo_cfg;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -408,7 +422,8 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppBATCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-  /* Measurment sequence  */
+	AppBATCheckFreq(AppBATCfg.SweepCfg.SweepStart);
+  /* Measurement sequence  */
   AppBATCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppBATCfg.MeasureSeqInfo);
   seq_cfg.SeqEnable = bTRUE;
@@ -420,15 +435,81 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   return AD5940ERR_OK;
 }
 
+/* Depending on frequency of Sin wave set optimum filter settings */
+AD5940Err AppBATCheckFreq(float freq)
+{
+	DSPCfg_Type dsp_cfg;
+	uint32_t WaitClks;
+  ClksCalInfo_Type clks_cal;
+	uint32_t SeqCmdBuff[2];
+	uint32_t SRAMAddr = 0;;
+	/* Step 1: Check Frequency */
+	if(freq < 0.51)
+	{
+		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_1067;
+		AppBATCfg.ADCSinc3Osr = ADCSINC3OSR_4;
+		AppBATCfg.DftSrc = DFTSRC_SINC2NOTCH;
+	}else if(freq < 5 )
+	{
+		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_640;
+		AppBATCfg.ADCSinc3Osr= ADCSINC3OSR_4;
+		AppBATCfg.DftSrc = DFTSRC_SINC2NOTCH;
+	}else if(freq <450)
+	{
+		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_178;
+		AppBATCfg.ADCSinc3Osr = ADCSINC3OSR_4;
+		AppBATCfg.DftSrc = DFTSRC_SINC2NOTCH;
+	}else if(freq < 80000)
+	{
+		AppBATCfg.ADCSinc3Osr = ADCSINC3OSR_4;
+		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_178;
+		AppBATCfg.DftSrc = DFTSRC_SINC3;
+	}
+	/* Step 2: Adjust ADCFILTERCON  */
+	dsp_cfg.ADCBaseCfg.ADCMuxN = ADCMUXN_AIN2;
+  dsp_cfg.ADCBaseCfg.ADCMuxP = ADCMUXP_AIN3;
+  dsp_cfg.ADCBaseCfg.ADCPga = ADCPGA_1P5;
+  memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;
+  dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
+  dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
+  dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
+  dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
+  dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
+  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;
+  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
+  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;
+  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
+  dsp_cfg.DftCfg.DftNum = AppBATCfg.DftNum;
+  dsp_cfg.DftCfg.DftSrc = AppBATCfg.DftSrc;
+  dsp_cfg.DftCfg.HanWinEn = AppBATCfg.HanWinEn;
+  memset(&dsp_cfg.StatCfg, 0, sizeof(dsp_cfg.StatCfg)); /* Don't care about Statistic */
+  AD5940_DSPCfgS(&dsp_cfg);
+	
+	/* Step 3: Calculate clocks needed toget result to FIFO and update sequencer wait command */
+	clks_cal.DataType = DATATYPE_DFT;
+  clks_cal.DftSrc = AppBATCfg.DftSrc;
+  clks_cal.DataCount = 1L<<(AppBATCfg.DftNum+2); /* 2^(DFTNUMBER+2) */
+  clks_cal.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
+  clks_cal.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
+  clks_cal.ADCAvgNum = 0;
+  clks_cal.RatioSys2AdcClk = AppBATCfg.SysClkFreq/AppBATCfg.AdcClkFreq;
+  AD5940_ClksCalculate(&clks_cal, &WaitClks);	
+		
+	/* Find start address of sequence in SRAM 
+		Update WaitClks */
+	SRAMAddr = AppBATCfg.MeasureSeqInfo.SeqRamAddr;
+	SeqCmdBuff[0] = SEQ_WAIT(WaitClks);
+	AD5940_SEQCmdWrite(SRAMAddr+4, SeqCmdBuff, 1);
+	
+	
+	return AD5940ERR_OK;
+}
+
 /* Modify registers when AFE wakeup */
 static AD5940Err AppBATRegModify(int32_t * const pData, uint32_t *pDataCount)
 {
-  if(AppBATCfg.state == STATE_RCAL)
-  {
-    //we only need one interrupt for RCAL measurement. Let the upper application decides next step.
-    AD5940_WUPTCtrl(bFALSE);
-    return AD5940ERR_OK;
-  }
   if(AppBATCfg.NumOfData > 0)
   {
     AppBATCfg.FifoDataCount += *pDataCount/4;
@@ -442,6 +523,11 @@ static AD5940Err AppBATRegModify(int32_t * const pData, uint32_t *pDataCount)
   {
     AD5940_WUPTCtrl(bFALSE);
     return AD5940ERR_OK;
+  }
+	if(AppBATCfg.SweepCfg.SweepEn) /* Need to set new frequency and set power mode */
+  {
+    AD5940_WGFreqCtrlS(AppBATCfg.SweepNextFreq, AppBATCfg.SysClkFreq);
+		AppBATCheckFreq(AppBATCfg.SweepNextFreq);
   }
   return AD5940ERR_OK;
 }
@@ -461,7 +547,7 @@ static AD5940Err AppBATDataProcess(int32_t * const pData, uint32_t *pDataCount)
   /* Convert DFT result to int32_t type */
   for(uint32_t i=0; i<DataCount; i++)
   {
-    pData[i] &= 0x3ffff; /* @todo option to check ECC */
+    pData[i] &= 0x3ffff;
     if(pData[i]&(1<<17)) /* Bit17 is sign bit */
     {
       pData[i] |= 0xfffc0000; /* Data is 18bit in two's complement, bit17 is the sign bit */
@@ -480,10 +566,6 @@ static AD5940Err AppBATDataProcess(int32_t * const pData, uint32_t *pDataCount)
     AppBATCfg.RcalVolt.Real /= DftResCount;
     AppBATCfg.RcalVolt.Image /= DftResCount;
     *pDataCount = 0;  /* Report no result to upper application */
-    AppBATCfg.state = STATE_IDLE; //RCAL measurment is done.
-#ifdef ADI_DEBUG
-    ADI_Print("RcalVolt:(%f,%f)\n", AppBATCfg.RcalVolt.Real, AppBATCfg.RcalVolt.Image);
-#endif
   }
   else if(AppBATCfg.state == STATE_BATTERY)
   {
@@ -497,35 +579,41 @@ static AD5940Err AppBATDataProcess(int32_t * const pData, uint32_t *pDataCount)
       BatImp.Image *= AppBATCfg.RcalVal;
       BatImp.Real *= AppBATCfg.RcalVal;
       pOut[i] = BatImp;
+		//	printf("i: %d , %.2f , %.2f , %.2f , %.2f , %.2f , %.2f , %.2f\n",AppBATCfg.SweepCfg.SweepIndex, AppBATCfg.SweepCurrFreq, BatImp.Real, BatImp.Image, AppBATCfg.RcalVolt.Real, AppBATCfg.RcalVolt.Image, AppBATCfg.RcalVoltTable[AppBATCfg.SweepCfg.SweepIndex][0], AppBATCfg.RcalVoltTable[AppBATCfg.SweepCfg.SweepIndex][1]);
     }
     *pDataCount = DftResCount;
   }
+	/* Calculate next frequency point */
+		if(AppBATCfg.SweepCfg.SweepEn == bTRUE)
+		{
+			AppBATCfg.FreqofData = AppBATCfg.SweepCurrFreq;
+			AppBATCfg.SweepCurrFreq = AppBATCfg.SweepNextFreq;
+			if(AppBATCfg.state == STATE_BATTERY)
+			{
+				AppBATCfg.RcalVolt.Real = AppBATCfg.RcalVoltTable[AppBATCfg.SweepCfg.SweepIndex][0];
+				AppBATCfg.RcalVolt.Image = AppBATCfg.RcalVoltTable[AppBATCfg.SweepCfg.SweepIndex][1];
+			}
+			AD5940_SweepNext(&AppBATCfg.SweepCfg, &AppBATCfg.SweepNextFreq);		
+		}
   return AD5940ERR_OK;
 }
 
 /**
-
 */
 AD5940Err AppBATISR(void *pBuff, uint32_t *pCount)
 {
-  uint32_t BuffCount;
   uint32_t FifoCnt;
-  BuffCount = *pCount;
   if(AppBATCfg.BATInited == bFALSE)
     return AD5940ERR_APPERROR;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Don't enter hibernate */
   *pCount = 0;
 
-  if(AD5940_INTCTestFlag(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH) == bTRUE)
+  if(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_DATAFIFOTHRESH) == bTRUE)
   {
-    /* Now there should be 4 data in FIFO */
+    /* Now there should be 2 data in FIFO */
     FifoCnt = (AD5940_FIFOGetCnt()/2)*2;
-    if(FifoCnt > BuffCount)
-    {
-      ///@todo buffer is limited.
-    }
     AD5940_FIFORd((uint32_t *)pBuff, FifoCnt);
     AD5940_INTCClrFlag(AFEINTSRC_DATAFIFOTHRESH);
     AppBATRegModify(pBuff, &FifoCnt);   /* If there is need to do AFE re-configure, do it here when AFE is in active state */
@@ -540,7 +628,38 @@ AD5940Err AppBATISR(void *pBuff, uint32_t *pCount)
   return 0;
 }
 
+AD5940Err AppBATMeasureRCAL(void)
+{
+	uint32_t buff[100];
+	uint32_t temp;
+	AD5940_INTCCfg(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH, bFALSE); /* Disable INT0 interrupt for RCAL measurement. */
+	AppBATCfg.state = STATE_RCAL;
+	if(AppBATCfg.SweepCfg.SweepEn)
+	{
+		uint32_t i;
+    for(i=0;i<AppBATCfg.SweepCfg.SweepPoints;i++)
+    {
+      AD5940_SEQMmrTrig(SEQID_0);
+			while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_DATAFIFOTHRESH) == bFALSE);
+			printf("i: %d   Freq: %.2f ",AppBATCfg.SweepCfg.SweepIndex, AppBATCfg.SweepCurrFreq);
+			AppBATISR(buff, &temp);
+			AppBATCfg.RcalVoltTable[i][0] = AppBATCfg.RcalVolt.Real;
+			AppBATCfg.RcalVoltTable[i][1] = AppBATCfg.RcalVolt.Image;
+			printf(" RcalVolt:(%f,%f)\n",  AppBATCfg.RcalVoltTable[i][0], AppBATCfg.RcalVoltTable[i][1]);
+			AD5940_Delay10us(10000);
+    }
+		AppBATCfg.RcalVolt.Real = AppBATCfg.RcalVoltTable[0][0];
+		AppBATCfg.RcalVolt.Image = AppBATCfg.RcalVoltTable[0][1];
+	}else
+	{
+		AD5940_SEQMmrTrig(SEQID_0);
+		while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_DATAFIFOTHRESH) == bFALSE);
+		AppBATISR(buff, &temp);
+	}
+	AD5940_INTCCfg(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH, bTRUE);
+	return 0;
+}
+
 /**
   * @}
   */
-

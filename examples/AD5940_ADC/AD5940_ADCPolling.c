@@ -31,7 +31,7 @@ void AD5940_Main(void)
   /* Use hardware reset */
   AD5940_HWReset();
 
-  /* Fistly call this function after reset to initialize AFE registers. */
+  /* Firstly call this function after reset to initialize AFE registers. */
   AD5940_Initialize();
   
   /* Configure AFE power mode and bandwidth */

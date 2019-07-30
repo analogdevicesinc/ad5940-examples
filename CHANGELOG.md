@@ -1,9 +1,25 @@
 AD5940 Examples Change log
 ==========================
+## 0.2.1(..)
+
+### Added
+* Add Keil example projects for board [NUCLEO-F411RE](https://www.st.com/en/evaluation-tools/nucleo-f411re.html).
+* Add Keil example projects for board [EVAL-ADICUP3029](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/EVAL-ADICUP3029.html)
+* Add on-chip temperature sensor example.
+
+### Changed
+* Clean up comments, fix spell error.
+* BAT-Impedance example updates to use HFOSC clock. Add RCAL measurements for all sweep points.
+### Deprecated
+
+### Fixed
+* ad5940.h: fix FIFO_STREAM bug.
+* fix warnings.
+
 ## 0.2.0(2019-4-23)
 
 ### Added
-** Add support to ADuCM355. The library(ad5940lib) support both Lower power channel 0 and channel1(only available for ADuCM355). Channel0 must be specified for AD594x.
+* **Add support to ADuCM355. The library(ad5940lib) support both Lower power channel 0 and channel1(only available for ADuCM355). Channel0 must be specified for AD594x.**
 * Add HSDAC calibration routine
 * Add Battery Impedance example which need hardware from CircuitNote.
 
@@ -33,13 +49,13 @@ AD5940 Examples Change log
 ### Changed
 * Change name SWP_RE1 to SWP_AFE2
 * Change Impedance example default parameters to measure EVAL-AD5940ELECZ on-board dummy sensor impedance. 
-** Update data sheet to PrN.
+* **Update data sheet to PrN.**
 * Update SensorPal to v1011.
 
 ### Deprecated
 
 ### Removed
-** SILICON_VER macro in AD5940.H is removed. The firmware will automatically detect the silicon version based on register REG_AFECON_CHIPID in function AD5940_Initialize().
+* **SILICON_VER macro in AD5940.H is removed. The firmware will automatically detect the silicon version based on register REG_AFECON_CHIPID in function AD5940_Initialize().**
 
 ### Fixed
 * Fix bug in function AD5940_ADCCode2Volt() that should use signed variable.
@@ -65,7 +81,7 @@ AD5940 Examples Change log
 * Add function AD5940_GetChipID().
 * Add schematics. EVAL-AD5940-RevC, EVAL-AD5940LowCurrent-RevA, AD5940 Z Test.
 * Set pin RESET and CS in file xxxPORT.C.
-** Update Application Note.
+* **Update Application Note.**
 
 ### Fixed
 * Fix bug in BIA example that DE0 is connected to HSTIA output. It should be left OPEN.

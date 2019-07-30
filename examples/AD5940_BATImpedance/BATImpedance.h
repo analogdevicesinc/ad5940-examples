@@ -1,7 +1,7 @@
 /*!
- @file:    ImpSeqs.h
+ @file:    BATImpedance.h
  @author:  $Author: nxu2 $
- @brief:   4-wire BAT measurement header file.
+ @brief:   Battery impedance measurement header file.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -59,16 +59,19 @@ typedef struct
   float ACVoltPP;               /* Final AC excitation voltage on pin AIN1 in mV peak to peak unit. */
   float DCVolt;                 /* The DC bias voltage on AIN1 pin. Unit is mV. */
   float RcalVal;                /* Rcal value in mOhm */
-  float RSenseVal;              /* Rsense resistor(R21+R22) value in Ohm */
   float SinFreq;                /* Frequency of excitation signal */
   uint8_t ADCSinc3Osr;          /* SINC3 OSR selection. ADCSINC3OSR_2, ADCSINC3OSR_4 */
   uint8_t ADCSinc2Osr;          /* SINC2 OSR selection. ADCSINC2OSR_22...ADCSINC2OSR_1333 */
   uint32_t DftNum;              /* DFT number */
   uint32_t DftSrc;              /* DFT Source */
   BoolFlag HanWinEn;            /* Enable Hanning window */
-
+/* Sweep Function Control */
+  SoftSweepCfg_Type SweepCfg;
 /* Private variables for internal usage */
-  BoolFlag BATInited;                       /* If the program run firstly, generated sequence commands */
+  float SweepCurrFreq;
+  float SweepNextFreq;
+  float FreqofData;  
+  BoolFlag BATInited;           /* If the program run firstly, generated sequence commands */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
   BoolFlag StopRequired;        /* After FIFO is ready, stop the measurment sequence */
@@ -76,6 +79,7 @@ typedef struct
   uint32_t MeasSeqCycleCount;   /* How long the measurement sequence will take */
   float MaxODR;                 /* Max ODR for sampling in this config */
   fImpCar_Type RcalVolt;        /* The measured Rcal resistor(R1) response voltage. */
+  float RcalVoltTable[100][2];    
 /* End */
 }AppBATCfg_Type;
 
@@ -84,10 +88,13 @@ typedef struct
 #define BATCTRL_STOPSYNC       2
 #define BATCTRL_SHUTDOWN       4   /* Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
 #define BATCTRL_MRCAL          5   /* Measure RCAL response voltage */
+#define BATCTRL_GETFREQ				 6
 
 AD5940Err AppBATGetCfg(void *pCfg);
 AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize);
 AD5940Err AppBATISR(void *pBuff, uint32_t *pCount);
-AD5940Err AppBATCtrl(int32_t BcmCtrl, void *pPara);
+AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara);
+AD5940Err AppBATCheckFreq(float freq);
+AD5940Err AppBATMeasureRCAL(void);
 
 #endif

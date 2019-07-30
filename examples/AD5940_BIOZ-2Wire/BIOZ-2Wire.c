@@ -94,7 +94,7 @@ AD5940Err AppBIOZCtrl(int32_t BcmCtrl, void *pPara)
     case BIOZCTRL_START:
     {
       WUPTCfg_Type wupt_cfg;
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppBIOZCfg.BIOZInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -114,11 +114,11 @@ AD5940Err AppBIOZCtrl(int32_t BcmCtrl, void *pPara)
     }
     case BIOZCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
 #ifdef ADI_DEBUG
       ADI_Print("BIOZ Stop Now...\n");
 #endif
@@ -237,7 +237,7 @@ static AD5940Err AppBIOZSeqCfgGen(void)
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   
   dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* @todo Add explanation in UG that SINC3 filter clock is same as ADC, when ADC runs at 32MHz, clear this bit to enable clock divider for SINC3 filter. Make sure SINC3 clock is below 16MHz. */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBIOZCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBIOZCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
@@ -309,7 +309,7 @@ static AD5940Err AppBIOZSeqMeasureGen(void)
   sw_cfg.Nswitch = SWN_AIN1;
   sw_cfg.Tswitch = SWT_AIN1|SWT_TRTIA;
   AD5940_SWMatrixCfgS(&sw_cfg);
-  AD5940_SEQGenInsert(SEQ_WAIT(16*250));  /* @todo wait 250us?? */
+  AD5940_SEQGenInsert(SEQ_WAIT(16*250));
   
   //AD5940_ADCMuxCfgS(ADCMUXP_HSTIA_P, ADCMUXN_HSTIA_N);
   AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR, bTRUE);  /* Enable Waveform generator, ADC power */
@@ -397,7 +397,7 @@ AD5940Err AppBIOZInit(uint32_t *pBuffer, uint32_t BufferSize)
   SEQCfg_Type seq_cfg;
   FIFOCfg_Type fifo_cfg;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -538,7 +538,7 @@ static AD5940Err AppBIOZDataProcess(int32_t * const pData, uint32_t *pDataCount)
   /* Convert DFT result to int32_t type */
   for(uint32_t i=0; i<DataCount; i++)
   {
-    pData[i] &= 0x3ffff; /* @todo option to check ECC */
+    pData[i] &= 0x3ffff;
     if(pData[i]&(1<<17)) /* Bit17 is sign bit */
     {
       pData[i] |= 0xfffc0000; /* Data is 18bit in two's complement, bit17 is the sign bit */
@@ -581,7 +581,7 @@ AD5940Err AppBIOZISR(void *pBuff, uint32_t *pCount)
   BuffCount = *pCount;
   if(AppBIOZCfg.BIOZInited == bFALSE)
     return AD5940ERR_APPERROR;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Don't enter hibernate */
   *pCount = 0;
