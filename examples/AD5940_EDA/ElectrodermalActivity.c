@@ -117,7 +117,7 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
     {
       WUPTCfg_Type wupt_cfg;
 
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppEDACfg.EDAInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -129,22 +129,19 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
       wupt_cfg.SeqxWakeupTime[SEQID_0] = 4; /* The minimum value is 1. Do not set it to zero. Set it to 1 will spend 2 32kHz clock. */
       AD5940_WUPTCfg(&wupt_cfg);
       AppEDACfg.FifoDataCount = 0;  /* restart */
-      //printf("EDA Start...\n");
       break;
     }
     case APPCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
-      //printf("EDA Stop Now...\n");
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case APPCTRL_STOPSYNC:
     {
-      //printf("EDA Stop SYNC...\n");
       AppEDACfg.StopRequired = bTRUE;
       break;
     }
@@ -159,7 +156,6 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
       memset(&lp_loop, 0, sizeof(lp_loop));
       AD5940_LPLoopCfgS(&lp_loop);
       AD5940_EnterSleepS();  /* Enter Hibernate */
-      //printf("EDA Shut down...\n");
     }
     break;
     case EDACTRL_MEASVOLT:
@@ -207,7 +203,7 @@ static AD5940Err AppEDASeqCfgGen(void)
   uint32_t SeqLen;
 
   AFERefCfg_Type aferef_cfg;
-  HSDACCfg_Type hsdac_cfg;  /** @todo Need good documentation to explain here */
+  HSDACCfg_Type hsdac_cfg; /* Waveform Generator uses some parameter(DAC update rate) from HSDAC config registers */
   LPLoopCfg_Type lp_loop;
   WGCfg_Type wg_cfg;
   DSPCfg_Type dsp_cfg;
@@ -458,7 +454,7 @@ static AD5940Err AppEDARtiaCal(void)
   lprtia_cal.ADCSinc3Osr = ADCSINC3OSR_4;
   lprtia_cal.ADCSinc2Osr = ADCSINC2OSR_22;        /* We don't use SINC2 for now. */
   lprtia_cal.DftCfg.DftNum = DFTNUM_2048;        /* Maximum DFT number */
-  lprtia_cal.DftCfg.DftSrc = DFTSRC_SINC2NOTCH;        /* @todo For frequency under 12Hz, need to optimize DFT source. Use SINC3 data as DFT source */
+  lprtia_cal.DftCfg.DftSrc = DFTSRC_SINC2NOTCH;
   lprtia_cal.DftCfg.HanWinEn = bTRUE;
   lprtia_cal.fFreq = AppEDACfg.SinFreq;
   lprtia_cal.fRcal = AppEDACfg.RcalVal;
@@ -503,7 +499,7 @@ AD5940Err AppEDAInit(uint32_t *pBuffer, uint32_t BufferSize)
   FIFOCfg_Type fifo_cfg;
 
   AppEDACfg.EDAStateCurr = EDASTATE_INIT;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -835,7 +831,7 @@ AD5940Err AppEDAISR(void *pBuff, uint32_t *pCount)
   BuffCount = *pCount;
   if(AppEDACfg.EDAInited == bFALSE)
     return AD5940ERR_APPERROR;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Don't enter hibernate */
   *pCount = 0;
