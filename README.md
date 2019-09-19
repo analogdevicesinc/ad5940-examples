@@ -17,7 +17,22 @@ Firstly, checkout the repository using below command. Make sure you have cloned 
 
 > git clone --recursive https://github.com/analogdevicesinc/ad5940-examples.git
 
-To run the example code, you need the AD5940 evaluation board. And the software development IDE like IAR or Keil. 
+If you are downloading code from web browser, it won't automatically download folder examples/ad5940lib, please download it manually from [ad5940lib](https://github.com/analogdevicesinc/ad5940lib) and extract it to examples/ad5940lib.
+
+The final file structure should be:
+
+```
+ad5940-examples\doc...
+ad5940-examples\examples\ad5940lib\ad5940.c
+ad5940-examples\examples\ad5940lib\ad5940.h
+ad5940-examples\LICENSE...
+ad5940-examples\README.md...
+```
+
+To run the example code, you need the AD5940 evaluation board, and the software development IDE like IAR or [Keil](http://www.keil.com).
+
+**Keil is verified on all examples and it's recommended.**
+
 ## Hardware
 Currently, there are two kinks of EVB. 
 * [EVAL-AD5940BIOZ](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/EVAL-AD5940BIOZ.html) is used for healthcare application like EDA/BIA/ECG. You can find the related introduction in [Wiki](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/hardware/eval-ad5940bioz). 
