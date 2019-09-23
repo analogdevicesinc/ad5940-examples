@@ -33,6 +33,8 @@ To run the example code, you need the AD5940 evaluation board, and the software 
 
 **Keil is verified on all examples and it's recommended.**
 
+If you want to use IAR, do not forget to manually install ADuCM3029 Device Support Pack(ADuCM302x_DFP) from IAR CMSIS-Pack-Manager, under tab 'Packs/AnalogDevices.ADuCM302x_DFP'.
+
 ## Hardware
 Currently, there are two kinks of EVB. 
 * [EVAL-AD5940BIOZ](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/EVAL-AD5940BIOZ.html) is used for healthcare application like EDA/BIA/ECG. You can find the related introduction in [Wiki](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/hardware/eval-ad5940bioz). 
