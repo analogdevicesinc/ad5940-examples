@@ -7,7 +7,7 @@ This repository targets to provide rich examples for you to get start with and p
 * [AD5940 Wiki](https://wiki.analog.com/resources/eval/user-guides/ad5940)
 * [AD5940 Datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/AD5940.pdf)
 * [AD5940 FAQ](https://ez.analog.com/data_converters/precision_adcs/w/documents/14012/ad5940-faqs)
-* GUI tool used with Evaluation Board: SensorPal v1011 ftp://ftp.analog.com/pub/MicroConverter/ADxxxxV2.0/SensorPal%20Installer_v1011.exe
+* [SensorPal](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/tools/sensorpal_setup_guide) The GUI tool used with Evaluation Board
 * Evaluation Boards:
   - [EVAL-AD5940BIOZ](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/EVAL-AD5940BIOZ.html) Board information: [Wiki](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/hardware/eval-ad5940bioz)
   - [EVAL-AD5940ELEC](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/EVAL-AD5940ELCZ.html) Board information: [Wiki](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/hardware/eval-ad5940elcz)

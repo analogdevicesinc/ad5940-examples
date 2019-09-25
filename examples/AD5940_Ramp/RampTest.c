@@ -107,7 +107,7 @@ Analog Devices Software License Agreement.
  * SEQ2 commands are fixed. Function is simply turn on ADC for a while and turn off it
  *      after required number of data ready.                                                                \n
  * SEQ0/1 is always changing its start address to update DAC with different voltage.                        \n
- * Check above figure we can see SEQ0/SEQ1 is repeatly trigged by wakuptimer, if we don't change the start
+ * Check above figure we can see SEQ0/SEQ1 is repeatly trigged by Wakeuptimer, if we don't change the start
  * Address of SEQ0/SEQ1, they will always update DAC with same data, thus no waveform generated.
  *
  * Considering below SEQ0 command which is similar for SEQ1 on modifying SEQxINFO register.:
@@ -241,7 +241,7 @@ AD5940Err AppRAMPCtrl(uint32_t Command, void *pPara)
             {
             WUPTCfg_Type wupt_cfg;
 
-            if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+            if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
                 return AD5940ERR_WAKEUP;  /* Wakeup Failed */
             if(AppRAMPCfg.RAMPInited == bFALSE)
                 return AD5940ERR_APPERROR;
@@ -270,11 +270,11 @@ AD5940Err AppRAMPCtrl(uint32_t Command, void *pPara)
             }
         case APPCTRL_STOPNOW:
             {
-            if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+            if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
                 return AD5940ERR_WAKEUP;  /* Wakeup Failed */
             /* Start Wupt right now */
             AD5940_WUPTCtrl(bFALSE);
-            AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+            AD5940_WUPTCtrl(bFALSE);
             break;
             }
         case APPCTRL_STOPSYNC:
@@ -412,7 +412,6 @@ static AD5940Err AppRAMPSeqADCCtrlGen(void)
     clks_cal.ADCAvgNum = ADCAVGNUM_2; /* Don't care */
     clks_cal.RatioSys2AdcClk = AppRAMPCfg.SysClkFreq / AppRAMPCfg.AdcClkFreq;
     AD5940_ClksCalculate(&clks_cal, &WaitClks);
-    //WaitClks += 200;    /* @todo FIX this error! why do we need extra clocks for OSR=4? */
 
     AD5940_SEQGenCtrl(bTRUE);
     AD5940_SEQGpioCtrlS(AGPIO_Pin2);
@@ -721,7 +720,7 @@ static AD5940Err AppRAMPRtiaCal(void)
     lprtia_cal.ADCSinc3Osr = ADCSINC3OSR_4;
     lprtia_cal.ADCSinc2Osr = ADCSINC2OSR_22;        /* Use SINC2 data as DFT data source */
     lprtia_cal.DftCfg.DftNum = DFTNUM_2048;         /* Maximum DFT number */
-    lprtia_cal.DftCfg.DftSrc = DFTSRC_SINC2NOTCH;        /* @todo For frequency under 12Hz, need to optimize DFT source. Use SINC3 data as DFT source */
+    lprtia_cal.DftCfg.DftSrc = DFTSRC_SINC2NOTCH;
     lprtia_cal.DftCfg.HanWinEn = bTRUE;
     lprtia_cal.fFreq = AppRAMPCfg.AdcClkFreq / 4 / 22 / 2048 * 3; /* Sample 3 period of signal, 13.317Hz here. Do not use DC method, because it needs ADC/PGA calibrated firstly(but it's faster) */
     lprtia_cal.fRcal = AppRAMPCfg.RcalVal;
@@ -746,7 +745,7 @@ AD5940Err AppRAMPInit(uint32_t *pBuffer, uint32_t BufferSize)
     FIFOCfg_Type fifo_cfg;
     SEQCfg_Type seq_cfg;
 
-    if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+    if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
     /* Configure sequencer and stop it */
@@ -877,7 +876,7 @@ AD5940Err AppRAMPISR(void *pBuff, uint32_t *pCount)
     BuffCount = *pCount;
     uint32_t IntFlag;
 
-    if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+    if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
     AD5940_SleepKeyCtrlS(SLPKEY_LOCK);
     *pCount = 0;

@@ -104,7 +104,7 @@ AD5940Err AppAMPCtrl(int32_t AmpCtrl, void *pPara)
       AD5940_ReadReg(REG_AFE_ADCDAT); /* Any SPI Operation can wakeup AFE */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case AMPCTRL_STOPSYNC:
@@ -114,7 +114,7 @@ AD5940Err AppAMPCtrl(int32_t AmpCtrl, void *pPara)
     }
     case AMPCTRL_SHUTDOWN:
     {
-      AppAMPCtrl(AMPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppAMPCtrl(AMPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by sleep operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -199,7 +199,7 @@ static AD5940Err AppAMPSeqCfgGen(void)
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   memset(&dsp_cfg.DftCfg, 0, sizeof(dsp_cfg.DftCfg));
   dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* @todo Add explanation in UG that SINC3 filter clock is same as ADC, when ADC runs at 32MHz, clear this bit to enable clock divider for SINC3 filter. Make sure SINC3 clock is below 16MHz. */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppAMPCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppAMPCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
@@ -264,8 +264,8 @@ static AD5940Err AppAMPSeqMeasureGen(void)
   AD5940_SEQGenCtrl(bTRUE);
   AD5940_SEQGpioCtrlS(AGPIO_Pin2);
   AD5940_AFECtrlS(AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bTRUE);
-  AD5940_SEQGenInsert(SEQ_WAIT(16*250));  /* @todo wait 250us? */
-  AD5940_AFECtrlS(AFECTRL_ADCCNV, bTRUE);  /* Start ADC convert*/
+  AD5940_SEQGenInsert(SEQ_WAIT(16*250));    /* wait 250us */
+  AD5940_AFECtrlS(AFECTRL_ADCCNV, bTRUE);   /* Start ADC convert*/
   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */
   AD5940_AFECtrlS(AFECTRL_ADCPWR|AFECTRL_ADCCNV|AFECTRL_SINC2NOTCH, bFALSE);  /* Stop ADC */
   AD5940_SEQGpioCtrlS(0);
@@ -299,7 +299,7 @@ fImpPol_Type RtiaCalValue;  /* Calibration result */
   lprtia_cal.ADCSinc3Osr = ADCSINC3OSR_4;
   lprtia_cal.ADCSinc2Osr = ADCSINC2OSR_22;        /* Use SINC2 data as DFT data source */
   lprtia_cal.DftCfg.DftNum = DFTNUM_2048;         /* Maximum DFT number */
-  lprtia_cal.DftCfg.DftSrc = DFTSRC_SINC2NOTCH;        /* @todo For frequency under 12Hz, need to optimize DFT source. Use SINC3 data as DFT source */
+  lprtia_cal.DftCfg.DftSrc = DFTSRC_SINC2NOTCH;   /* For frequency under 12Hz, need to optimize DFT source. Use SINC3 data as DFT source */
   lprtia_cal.DftCfg.HanWinEn = bTRUE;
   lprtia_cal.fFreq = AppAMPCfg.AdcClkFreq/4/22/2048*3;  /* Sample 3 period of signal, 13.317Hz here. Do not use DC method, because it needs ADC/PGA calibrated firstly(but it's faster) */
   lprtia_cal.fRcal = AppAMPCfg.RcalVal;
@@ -318,7 +318,7 @@ AD5940Err AppAMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   SEQCfg_Type seq_cfg;
   FIFOCfg_Type fifo_cfg;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -432,7 +432,7 @@ static AD5940Err AppAMPDataProcess(int32_t * const pData, uint32_t *pDataCount)
 AD5940Err AppAMPISR(void *pBuff, uint32_t *pCount)
 {
   uint32_t FifoCnt;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);
 	

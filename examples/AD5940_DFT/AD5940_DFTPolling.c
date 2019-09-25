@@ -71,7 +71,7 @@ void AD5940_Main(void)
   while(1)
   {
     int32_t real, image;
-    if(AD5940_INTCTestFlag(AFEINTC_1,AFEINTSRC_DFTRDY))  /* @todo Fix the name. Choose one from Supply filter or notch filter or low pass filter. */
+    if(AD5940_INTCTestFlag(AFEINTC_1,AFEINTSRC_DFTRDY))
     {
       AD5940_INTCClrFlag(AFEINTSRC_DFTRDY);
       real = AD5940_ReadAfeResult(AFERESULT_DFTREAL);

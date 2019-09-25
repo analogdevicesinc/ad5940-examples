@@ -75,7 +75,7 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
     {
       WUPTCfg_Type wupt_cfg;
 
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppECGCfg.ECGInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -92,11 +92,11 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
     }
     case APPCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case APPCTRL_STOPSYNC:
@@ -223,14 +223,14 @@ static AD5940Err AppECGSeqMeasureGen(void)
   //printf("Wait clocks:%d\n", WaitClks);
   AD5940_SEQGenCtrl(bTRUE);
   AD5940_SEQGpioCtrlS(AGPIO_Pin6|AGPIO_Pin5|AGPIO_Pin1);//GP6->endSeq, GP5 -> AD8233=OFF, GP1->RLD=OFF .
-  AD5940_SEQGenInsert(SEQ_WAIT(16*200));  /* Time for reference settling. @todo wait 200 us? */
+  AD5940_SEQGenInsert(SEQ_WAIT(16*200));  /* Time for reference settling.*/
   AD5940_AFECtrlS(AFECTRL_ADCPWR, bTRUE);
-  AD5940_SEQGenInsert(SEQ_WAIT(16*50));  /* @todo wait 50 us? */
+  AD5940_SEQGenInsert(SEQ_WAIT(16*50));
   AD5940_AFECtrlS(AFECTRL_ADCCNV, bTRUE);  /* Start ADC convert */
   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));
   //wait for first data ready
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_ADCPWR, bFALSE);  /* Stop ADC convert and DFT */
-  AD5940_SEQGpioCtrlS(/*AGPIO_Pin6|*/AGPIO_Pin5|AGPIO_Pin1); /* GP6 to indicate Sequenser is running. GP5 to enable AD8233. GP1 to enable AD8233 RLD function. */
+  AD5940_SEQGpioCtrlS(/*AGPIO_Pin6|*/AGPIO_Pin5|AGPIO_Pin1); /* GP6 to indicate Sequencer is running. GP5 to enable AD8233. GP1 to enable AD8233 RLD function. */
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
@@ -256,7 +256,7 @@ int32_t AppECGInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940Err error = AD5940ERR_OK;  
 
   SEQCfg_Type seq_cfg;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
     /* Configure sequencer and stop it */
   seq_cfg.SeqMemSize = SEQMEMSIZE_2KB;
@@ -360,7 +360,7 @@ AD5940Err AppECGISR(void *pBuff, uint32_t *pCount)
   uint32_t FifoCnt;
   BuffCount = *pCount;
   
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);     /* We are operating registers, so we don't allow AFE enter sleep mode which is done in our sequencer */
   *pCount = 0;

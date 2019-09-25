@@ -2,7 +2,7 @@
  *****************************************************************************
  @file:    BATImpedance.c
  @author:  $Author: nxu2 $
- @brief:   BAT measurment sequences.
+ @brief:   BAT measurement sequences.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
   {
     case BATCTRL_START:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppBATCfg.BATInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -128,11 +128,11 @@ AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
     }
     case BATCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case BATCTRL_STOPSYNC:
@@ -151,7 +151,7 @@ AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
 		break;
     case BATCTRL_SHUTDOWN:
     {
-      AppBATCtrl(BATCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppBATCtrl(BATCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by sleep operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -274,8 +274,8 @@ static AD5940Err AppBATSeqCfgGen(void)
   dsp_cfg.ADCBaseCfg.ADCMuxP = ADCMUXP_AIN3;
   dsp_cfg.ADCBaseCfg.ADCPga = ADCPGA_1P5;
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;  /* Battery Impedance Board use external 32MHz crystal as clock source. */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
@@ -295,11 +295,11 @@ static AD5940Err AppBATSeqCfgGen(void)
                 AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
                 AFECTRL_SINC2NOTCH, bTRUE);
   /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one external command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppBATCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -375,7 +375,7 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   SEQCfg_Type seq_cfg;
   FIFOCfg_Type fifo_cfg;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -423,7 +423,7 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
 	AppBATCheckFreq(AppBATCfg.SweepCfg.SweepStart);
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppBATCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppBATCfg.MeasureSeqInfo);
   seq_cfg.SeqEnable = bTRUE;
@@ -471,7 +471,7 @@ AD5940Err AppBATCheckFreq(float freq)
   dsp_cfg.ADCBaseCfg.ADCPga = ADCPGA_1P5;
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;  /* Battery Impedance Board use external 32MHz crystal as clock source. */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
@@ -547,7 +547,7 @@ static AD5940Err AppBATDataProcess(int32_t * const pData, uint32_t *pDataCount)
   /* Convert DFT result to int32_t type */
   for(uint32_t i=0; i<DataCount; i++)
   {
-    pData[i] &= 0x3ffff; /* @todo option to check ECC */
+    pData[i] &= 0x3ffff;
     if(pData[i]&(1<<17)) /* Bit17 is sign bit */
     {
       pData[i] |= 0xfffc0000; /* Data is 18bit in two's complement, bit17 is the sign bit */
@@ -605,7 +605,7 @@ AD5940Err AppBATISR(void *pBuff, uint32_t *pCount)
   uint32_t FifoCnt;
   if(AppBATCfg.BATInited == bFALSE)
     return AD5940ERR_APPERROR;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Don't enter hibernate */
   *pCount = 0;

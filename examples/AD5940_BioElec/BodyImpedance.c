@@ -90,7 +90,7 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
     {
       WUPTCfg_Type wupt_cfg;
 
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppBIACfg.BIAInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -108,11 +108,11 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
     }
     case APPCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       printf("BIA Stop Now...\n");
       break;
     }
@@ -238,7 +238,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   lp_loop.LpAmpCfg.LpTiaRf = LPTIARF_20K;
   lp_loop.LpAmpCfg.LpTiaRload = LPTIARLOAD_SHORT;
   lp_loop.LpAmpCfg.LpTiaRtia = LPTIARTIA_OPEN;
-  lp_loop.LpAmpCfg.LpTiaSW = LPTIASW(5)|LPTIASW(6)|LPTIASW(7)|LPTIASW(8)|LPTIASW(9)|LPTIASW(12); /* @todo Optimizanation needed for new silicon */
+  lp_loop.LpAmpCfg.LpTiaSW = LPTIASW(5)|LPTIASW(6)|LPTIASW(7)|LPTIASW(8)|LPTIASW(9)|LPTIASW(12);
   AD5940_LPLoopCfgS(&lp_loop);
 
   dsp_cfg.ADCBaseCfg.ADCMuxN = ADCMUXN_HSTIA_N;
@@ -247,8 +247,8 @@ static AD5940Err AppBIASeqCfgGen(void)
   
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* @todo Add explanation in UG that SINC3 filter clock is same as ADC, when ADC runs at 32MHz, clear this bit to enable clock divider for SINC3 filter. Make sure SINC3 clock is below 16MHz. */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBIACfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBIACfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
@@ -315,7 +315,7 @@ static AD5940Err AppBIASeqMeasureGen(void)
   
   AD5940_SEQGpioCtrlS(AGPIO_Pin6/*|AGPIO_Pin5|AGPIO_Pin1*/);//GP6->endSeq, GP5 -> AD8233=OFF, GP1->RLD=OFF .
   
-  AD5940_SEQGenInsert(SEQ_WAIT(16*250));  /* @todo wait 250us?? */
+  AD5940_SEQGenInsert(SEQ_WAIT(16*250));
   sw_cfg.Dswitch = SWD_CE0;
   sw_cfg.Pswitch = SWP_CE0;
   sw_cfg.Nswitch = SWN_AIN1;
@@ -412,7 +412,7 @@ AD5940Err AppBIAInit(uint32_t *pBuffer, uint32_t BufferSize)
   SEQCfg_Type seq_cfg;
   FIFOCfg_Type fifo_cfg;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -525,7 +525,7 @@ static AD5940Err AppBIADataProcess(int32_t * const pData, uint32_t *pDataCount)
   /* Convert DFT result to int32_t type */
   for(uint32_t i=0; i<DataCount; i++)
   {
-    pData[i] &= 0x3ffff; /* @todo option to check ECC */
+    pData[i] &= 0x3ffff;
     if(pData[i]&(1<<17)) /* Bit17 is sign bit */
     {
       pData[i] |= 0xfffc0000; /* Data is 18bit in two's complement, bit17 is the sign bit */
@@ -575,7 +575,7 @@ AD5940Err AppBIAISR(void *pBuff, uint32_t *pCount)
   BuffCount = *pCount;
   if(AppBIACfg.BIAInited == bFALSE)
     return AD5940ERR_APPERROR;
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   if(AD5940_INTCTestFlag(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH) == bTRUE)

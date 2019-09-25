@@ -186,7 +186,7 @@ void AD5940_TemperatureInit(void){
 void AD5940_TemperatureISR(void){
   //process data from AD5940 FIFO.
   uint32_t FifoCnt, IntcFlag;
-  if(AD5940_WakeUp(10) > 10){  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10){  /* Wakeup AFE by read register, read 10 times at most */
     printf("Failed to wakeup AD5940!\n");
     return;
   }

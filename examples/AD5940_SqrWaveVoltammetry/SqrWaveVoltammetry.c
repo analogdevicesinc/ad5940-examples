@@ -105,7 +105,7 @@ Analog Devices Software License Agreement.
  * SEQ2 commands are fixed. Function is simply turn on ADC for a while and turn off it 
  *      after required number of data ready.                                                                \n
  * SEQ0/1 is always changing its start address to update DAC with different voltage.                        \n
- * Check above figure we can see SEQ0/SEQ1 is repeatly trigged by wakuptimer, if we don't change the start
+ * Check above figure we can see SEQ0/SEQ1 is repeatly trigged by Wakeuptimer, if we don't change the start
  * Address of SEQ0/SEQ1, they will always update DAC with same data, thus no waveform generated.
  * 
  * Considering below SEQ0 command which is similar for SEQ1 on modifying SEQxINFO register.:
@@ -242,7 +242,7 @@ AD5940Err AppSWVCtrl(uint32_t Command, void *pPara)
     {
       WUPTCfg_Type wupt_cfg;
 
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       if(AppSWVCfg.SWVInited == bFALSE)
         return AD5940ERR_APPERROR;
@@ -271,11 +271,11 @@ AD5940Err AppSWVCtrl(uint32_t Command, void *pPara)
     }
     case APPCTRL_STOPNOW:
     {
-      if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+      if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case APPCTRL_STOPSYNC:
@@ -698,7 +698,7 @@ AD5940Err AppSWVInit(uint32_t *pBuffer, uint32_t BufferSize)
   FIFOCfg_Type fifo_cfg;
   SEQCfg_Type seq_cfg;
   
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
 
   /* Configure sequencer and stop it */
@@ -830,7 +830,7 @@ AD5940Err AppSWVISR(void *pBuff, uint32_t *pCount)
   BuffCount = *pCount;
   uint32_t IntFlag;
 
-  if(AD5940_WakeUp(10) > 10)  /* Wakup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);
   *pCount = 0;
