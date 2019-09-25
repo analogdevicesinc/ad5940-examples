@@ -2,17 +2,14 @@
  *****************************************************************************
  @file:    AD5940Main.c
  @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
+ @brief:   Used to control specific application and further process data.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
-
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
-
 This software is proprietary to Analog Devices, Inc. and its licensors.
 By using this software you agree to the terms of the associated
 Analog Devices Software License Agreement.
-
 *****************************************************************************/
 #include "ad5940.h"
 #include "AD5940.h"
@@ -60,7 +57,7 @@ static int32_t AD5940PlatformCfg(void)
   /* Step2. Configure FIFO and Sequencer*/
   fifo_cfg.FIFOEn = bFALSE;
   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
-  fifo_cfg.FIFOSize = FIFOSIZE_4KB;                       /* 4kB for FIFO, The reset 2kB for sequencer */
+  fifo_cfg.FIFOSize = FIFOSIZE_4KB;                      /* 4kB for FIFO, The reset 2kB for sequencer */
   fifo_cfg.FIFOSrc = FIFOSRC_DFT;
   fifo_cfg.FIFOThresh = 4;      
   AD5940_FIFOCfg(&fifo_cfg);                             /* Disable to reset FIFO. */
@@ -87,7 +84,7 @@ static int32_t AD5940PlatformCfg(void)
   gpio_cfg.PullEnSet = 0;
   AD5940_AGPIOCfg(&gpio_cfg);
 	
-  AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);  /* Enable AFE to enter sleep mode. */
+  AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);  /* Allow AFE to enter sleep mode. */
   /* Measure LFOSC frequency */
   LfoscMeasure.CalDuration = 1000.0;  /* 1000ms used for calibration. */
   LfoscMeasure.CalSeqAddr = 0;
@@ -106,19 +103,21 @@ void AD5940AMPStructInit(void)
 	pAMPCfg->WuptClkFreq = LFOSCFreq;
   /* Configure general parameters */
   pAMPCfg->SeqStartAddr = 0;
-  pAMPCfg->MaxSeqLen = 512; /* @todo add checker in function */  
+  pAMPCfg->MaxSeqLen = 512;     /* @todo add checker in function */  
   pAMPCfg->RcalVal = 10000.0;
-  pAMPCfg->NumOfData = -1;      /* Never stop until you stop it mannually by AppAMPCtrl() function */	
+  pAMPCfg->NumOfData = -1;      /* Never stop until you stop it manually by AppAMPCtrl() function */	
 	
-	pAMPCfg->ExtRtia = bTRUE;			/* Set to true if using external Rtia */
-	pAMPCfg->ExtRtiaVal = 10000000; /* Enter external Rtia value here is using one */
 	
 	/* Configure measurement parameters */
-  pAMPCfg->AmpODR = 1;          /* Time between samples in seconds */
-  pAMPCfg->FifoThresh = 4;      /* Number of measurements before alerting host microcontroller */
-  pAMPCfg->Vzero = 1100;        	/* Vzero voltage. Voltage on Sense electrode. Unit is mV*/
-  pAMPCfg->SensorBias = 150;   /* Sensor bias voltage between reference and sense electrodes*/
-	pAMPCfg->ADCRefVolt = 1.8162;		/* Measure voltage on Vref_1V8 pin */
+  pAMPCfg->AmpODR = 1;          	/* Time between samples in seconds */
+  pAMPCfg->FifoThresh = 4;      		/* Number of measurements before alerting host microcontroller */
+	
+  pAMPCfg->SensorBias = 0;   			/* Sensor bias voltage between reference and sense electrodes*/
+	pAMPCfg->LptiaRtiaSel = LPTIARTIA_1K;
+	pAMPCfg->LpTiaRl = LPTIARLOAD_10R;
+	pAMPCfg->Vzero = 1100;        		/* Vzero voltage. Voltage on Sense electrode. Unit is mV*/
+	
+	pAMPCfg->ADCRefVolt = 1.82;		/* Measure voltage on Vref_1V8 pin */
 }
 
 void AD5940_Main(void)
@@ -142,4 +141,3 @@ void AD5940_Main(void)
     }
   }
 }
-
