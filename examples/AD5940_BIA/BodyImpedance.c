@@ -199,6 +199,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   hs_loop.WgCfg.OffsetCalEn = bFALSE;
   if(AppBIACfg.SweepCfg.SweepEn == bTRUE)
   {
+		AppBIACfg.SweepCfg.SweepIndex = 0;
     AppBIACfg.FreqofData = AppBIACfg.SweepCfg.SweepStart;
     AppBIACfg.SweepCurrFreq = AppBIACfg.SweepCfg.SweepStart;
     AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
@@ -394,8 +395,10 @@ static AD5940Err AppBIARtiaCal(void)
     AppBIACfg.SweepCfg.SweepIndex = 0;  /* Reset index */
     for(i=0;i<AppBIACfg.SweepCfg.SweepPoints;i++)
     {
-			printf("RTIA cal, freq:%f\n", hsrtia_cal.fFreq);
 			AD5940_HSRtiaCal(&hsrtia_cal, AppBIACfg.RtiaCalTable[i]);
+#ifdef ADI_DEBUG
+      ADI_Print("Freq:%.2f, RTIA: Mag:%f Ohm, Phase:%.3f\n", hsrtia_cal.fFreq, AppBIACfg.RtiaCalTable[i][0], AppBIACfg.RtiaCalTable[i][1]);
+#endif
       AD5940_SweepNext(&AppBIACfg.SweepCfg, &hsrtia_cal.fFreq);     
     }
     AppBIACfg.SweepCfg.SweepIndex = 0;  /* Reset index */
