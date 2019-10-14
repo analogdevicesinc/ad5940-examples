@@ -423,9 +423,9 @@
               <FilePath>..\ElectrodermalActivity.c</FilePath>
             </File>
             <File>
-              <FileName>UARTCmd.C</FileName>
+              <FileName>UARTCmd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\UARTCmd.C</FilePath>
+              <FilePath>..\UARTCmd.c</FilePath>
             </File>
           </Files>
         </Group>
