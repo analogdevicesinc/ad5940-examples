@@ -48,7 +48,7 @@ AppBIACfg_Type AppBIACfg =
   .HsDacUpdateRate = 7,
   .DacVoltPP = 800.0,
 
-  .SinFreq = 50000.0, /* 1000Hz */
+  .SinFreq = 50000.0, /* 50kHz */
 
   .ADCPgaGain = ADCPGA_1,
   .ADCSinc3Osr = ADCSINC3OSR_2,
@@ -68,6 +68,7 @@ AppBIACfg_Type AppBIACfg =
   .FifoThresh = 4,
   .BIAInited = bFALSE,
   .StopRequired = bFALSE,
+  .MeasSeqCycleCount = 0,
 };
 
 /**
@@ -103,7 +104,9 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
       AD5940_WUPTCfg(&wupt_cfg);
       
       AppBIACfg.FifoDataCount = 0;  /* restart */
-      printf("BIA Start...\n");
+#ifdef ADI_DEBUG
+      ADI_Print("BIA Start...\n");
+#endif
       break;
     }
     case APPCTRL_STOPNOW:
@@ -113,12 +116,16 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
       AD5940_WUPTCtrl(bFALSE);
-      printf("BIA Stop Now...\n");
+#ifdef ADI_DEBUG
+      ADI_Print("BIA Stop Now...\n");
+#endif
       break;
     }
     case APPCTRL_STOPSYNC:
     {
-      printf("BIA Stop SYNC...\n");
+#ifdef ADI_DEBUG
+      ADI_Print("BIA Stop SYNC...\n");
+#endif
       AppBIACfg.StopRequired = bTRUE;
       break;
     }
@@ -142,7 +149,9 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
       memset(&lp_loop, 0, sizeof(lp_loop));
       AD5940_LPLoopCfgS(&lp_loop);
       AD5940_EnterSleepS();  /* Enter Hibernate */
-      printf("BIA Shut down...\n");
+#ifdef ADI_DEBUG
+      ADI_Print("BIA Shut down...\n");
+#endif
     }
     break;
     default:
@@ -204,6 +213,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   hs_loop.WgCfg.OffsetCalEn = bFALSE;
   if(AppBIACfg.SweepCfg.SweepEn == bTRUE)
   {
+		AppBIACfg.SweepCfg.SweepIndex = 0;
     AppBIACfg.FreqofData = AppBIACfg.SweepCfg.SweepStart;
     AppBIACfg.SweepCurrFreq = AppBIACfg.SweepCfg.SweepStart;
     AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
@@ -229,7 +239,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   lp_loop.LpDacCfg.DataRst = bFALSE;
   lp_loop.LpDacCfg.PowerEn = bTRUE;
   lp_loop.LpDacCfg.DacData12Bit = (uint32_t)((1100-200)/2200.0*4095);
-  lp_loop.LpDacCfg.DacData6Bit = 0;
+  lp_loop.LpDacCfg.DacData6Bit = 31;
 
   lp_loop.LpAmpCfg.LpAmpSel = LPAMP0;
   lp_loop.LpAmpCfg.LpAmpPwrMod = LPAMPPWR_NORM;
@@ -238,7 +248,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   lp_loop.LpAmpCfg.LpTiaRf = LPTIARF_20K;
   lp_loop.LpAmpCfg.LpTiaRload = LPTIARLOAD_SHORT;
   lp_loop.LpAmpCfg.LpTiaRtia = LPTIARTIA_OPEN;
-  lp_loop.LpAmpCfg.LpTiaSW = LPTIASW(5)|LPTIASW(6)|LPTIASW(7)|LPTIASW(8)|LPTIASW(9)|LPTIASW(12);
+  lp_loop.LpAmpCfg.LpTiaSW = LPTIASW(5)|LPTIASW(6)|LPTIASW(7)|LPTIASW(8)|LPTIASW(9)|LPTIASW(12)|LPTIASW(13);
   AD5940_LPLoopCfgS(&lp_loop);
 
   dsp_cfg.ADCBaseCfg.ADCMuxN = ADCMUXN_HSTIA_N;
@@ -348,6 +358,16 @@ static AD5940Err AppBIASeqMeasureGen(void)
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
   AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
 
+  AppBIACfg.MeasSeqCycleCount = AD5940_SEQCycleTime();
+  AppBIACfg.MaxODR = 1/(((AppBIACfg.MeasSeqCycleCount + 10) / 16.0)* 1E-6)  ;
+  if(AppBIACfg.BiaODR > AppBIACfg.MaxODR)
+  {
+    /* We have requested a sampling rate that cannot be achieved with the time it
+       takes to acquire a sample.
+    */
+    AppBIACfg.BiaODR = AppBIACfg.MaxODR;
+  }
+
   if(error == AD5940ERR_OK)
   {
     AppBIACfg.MeasureSeqInfo.SeqId = SEQID_0;
@@ -364,23 +384,24 @@ static AD5940Err AppBIASeqMeasureGen(void)
 
 static AD5940Err AppBIARtiaCal(void)
 {
-  HSRTIACal_Type hprtia_cal;
+  HSRTIACal_Type hsrtia_cal;
 
-  hprtia_cal.AdcClkFreq = AppBIACfg.AdcClkFreq;
-  hprtia_cal.ADCSinc2Osr = AppBIACfg.ADCSinc2Osr;
-  hprtia_cal.ADCSinc3Osr = AppBIACfg.ADCSinc3Osr;
-  hprtia_cal.bPolarResult = bTRUE; /* We need magnitude and phase here */
-  hprtia_cal.DftCfg.DftNum = AppBIACfg.DftNum;
-  hprtia_cal.DftCfg.DftSrc = AppBIACfg.DftSrc;
-  hprtia_cal.DftCfg.HanWinEn = AppBIACfg.HanWinEn;
-  hprtia_cal.fRcal= AppBIACfg.RcalVal;
-  hprtia_cal.HsTiaCfg.DiodeClose = bFALSE;
-  hprtia_cal.HsTiaCfg.HstiaBias = HSTIABIAS_1P1;
-  hprtia_cal.HsTiaCfg.HstiaCtia = AppBIACfg.CtiaSel;
-  hprtia_cal.HsTiaCfg.HstiaDeRload = HSTIADERLOAD_OPEN;
-  hprtia_cal.HsTiaCfg.HstiaDeRtia = HSTIADERTIA_TODE;
-  hprtia_cal.HsTiaCfg.HstiaRtiaSel = AppBIACfg.HstiaRtiaSel;
-  hprtia_cal.SysClkFreq = AppBIACfg.SysClkFreq;
+  hsrtia_cal.AdcClkFreq = AppBIACfg.AdcClkFreq;
+  hsrtia_cal.ADCSinc2Osr = AppBIACfg.ADCSinc2Osr;
+  hsrtia_cal.ADCSinc3Osr = AppBIACfg.ADCSinc3Osr;
+  hsrtia_cal.bPolarResult = bTRUE; /* We need magnitude and phase here */
+  hsrtia_cal.DftCfg.DftNum = AppBIACfg.DftNum;
+  hsrtia_cal.DftCfg.DftSrc = AppBIACfg.DftSrc;
+  hsrtia_cal.DftCfg.HanWinEn = AppBIACfg.HanWinEn;
+  hsrtia_cal.fRcal= AppBIACfg.RcalVal;
+  hsrtia_cal.HsTiaCfg.DiodeClose = bFALSE;
+  hsrtia_cal.HsTiaCfg.HstiaBias = HSTIABIAS_1P1;
+  hsrtia_cal.HsTiaCfg.HstiaCtia = AppBIACfg.CtiaSel;
+  hsrtia_cal.HsTiaCfg.HstiaDeRload = HSTIADERLOAD_OPEN;
+  hsrtia_cal.HsTiaCfg.HstiaDeRtia = HSTIADERTIA_TODE;
+  hsrtia_cal.HsTiaCfg.HstiaRtiaSel = AppBIACfg.HstiaRtiaSel;
+  hsrtia_cal.SysClkFreq = AppBIACfg.SysClkFreq;
+  hsrtia_cal.fFreq = AppBIACfg.SweepCfg.SweepStart;
 
   if(AppBIACfg.SweepCfg.SweepEn == bTRUE)
   {
@@ -388,19 +409,24 @@ static AD5940Err AppBIARtiaCal(void)
     AppBIACfg.SweepCfg.SweepIndex = 0;  /* Reset index */
     for(i=0;i<AppBIACfg.SweepCfg.SweepPoints;i++)
     {
-      AD5940_SweepNext(&AppBIACfg.SweepCfg, &hprtia_cal.fFreq);
-      AD5940_HSRtiaCal(&hprtia_cal, AppBIACfg.RtiaCalTable[i]);
-      printf("Freq:%.2f,Mag:%.2f,Phase:%fDegree\n", hprtia_cal.fFreq, AppBIACfg.RtiaCalTable[i][0], AppBIACfg.RtiaCalTable[i][1]*180/MATH_PI);
+      AD5940_HSRtiaCal(&hsrtia_cal, AppBIACfg.RtiaCalTable[i]);
+#ifdef ADI_DEBUG
+      ADI_Print("Freq:%.2f, RTIA: Mag:%f Ohm, Phase:%.3f\n", hsrtia_cal.fFreq, AppBIACfg.RtiaCalTable[i][0], AppBIACfg.RtiaCalTable[i][1]);
+#endif
+      AD5940_SweepNext(&AppBIACfg.SweepCfg, &hsrtia_cal.fFreq);    
     }
-    AppBIACfg.RtiaCurrValue[AppBIACfg.SweepCfg.SweepIndex] = AppBIACfg.RtiaCalTable[i][0];
-    AppBIACfg.RtiaCurrValue[AppBIACfg.SweepCfg.SweepIndex] = AppBIACfg.RtiaCalTable[i][0];
     AppBIACfg.SweepCfg.SweepIndex = 0;  /* Reset index */
+    AppBIACfg.RtiaCurrValue[0] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][0];
+    AppBIACfg.RtiaCurrValue[0] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][0];
+
   }
   else
   {
-    hprtia_cal.fFreq = AppBIACfg.SinFreq;
-    AD5940_HSRtiaCal(&hprtia_cal, AppBIACfg.RtiaCurrValue);
-    printf("RtiaMag:%.2f,Phase:%fDegree\n", AppBIACfg.RtiaCurrValue[0], AppBIACfg.RtiaCurrValue[1]*180/MATH_PI);
+    hsrtia_cal.fFreq = AppBIACfg.SinFreq;
+    AD5940_HSRtiaCal(&hsrtia_cal, AppBIACfg.RtiaCurrValue);
+#ifdef ADI_DEBUG
+      ADI_Print("RtiaMag:%.2f,Phase:%fDegree\n", AppBIACfg.RtiaCurrValue[0], AppBIACfg.RtiaCurrValue[1]*180/MATH_PI);
+#endif
   }
   return AD5940ERR_OK;
 }
@@ -558,9 +584,9 @@ static AD5940Err AppBIADataProcess(int32_t * const pData, uint32_t *pDataCount)
   {
     AppBIACfg.FreqofData = AppBIACfg.SweepCurrFreq;
     AppBIACfg.SweepCurrFreq = AppBIACfg.SweepNextFreq;
-    AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
     AppBIACfg.RtiaCurrValue[0] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][0];
     AppBIACfg.RtiaCurrValue[1] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][1];
+    AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
   }
   return AD5940ERR_OK;
 }
@@ -577,6 +603,8 @@ AD5940Err AppBIAISR(void *pBuff, uint32_t *pCount)
     return AD5940ERR_APPERROR;
   if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
+  AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Don't enter hibernate */
+  *pCount = 0;
 
   if(AD5940_INTCTestFlag(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH) == bTRUE)
   {
@@ -590,8 +618,8 @@ AD5940Err AppBIAISR(void *pBuff, uint32_t *pCount)
     AD5940_FIFORd((uint32_t *)pBuff, FifoCnt);
     AD5940_INTCClrFlag(AFEINTSRC_DATAFIFOTHRESH);
     AppBIARegModify(pBuff, &FifoCnt);   /* If there is need to do AFE re-configure, do it here when AFE is in active state */
-    AD5940_EnterSleepS();  /* Manually put AFE back to hibernate mode. This operation only takes effect when register value is ACTIVE previously */
-
+    //AD5940_EnterSleepS();  /* Manually put AFE back to hibernate mode. */
+    AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);  /* Allow AFE to enter hibernate mode */
     /* Process data */ 
     AppBIADataProcess((int32_t*)pBuff,&FifoCnt); 
     *pCount = FifoCnt;
