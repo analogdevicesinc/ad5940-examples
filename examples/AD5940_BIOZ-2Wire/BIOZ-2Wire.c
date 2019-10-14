@@ -352,7 +352,7 @@ static AD5940Err AppBIOZRtiaCal(void)
   hsrtia_cal.AdcClkFreq = AppBIOZCfg.AdcClkFreq;
   hsrtia_cal.ADCSinc2Osr = AppBIOZCfg.ADCSinc2Osr;
   hsrtia_cal.ADCSinc3Osr = AppBIOZCfg.ADCSinc3Osr;
-  hsrtia_cal.bPolarResult = bTRUE; /* We need magnitude and phase here */
+  hsrtia_cal.bPolarResult = bFALSE; /* Use complex number. Real+Image */
   hsrtia_cal.DftCfg.DftNum = AppBIOZCfg.DftNum;
   hsrtia_cal.DftCfg.DftSrc = AppBIOZCfg.DftSrc;
   hsrtia_cal.DftCfg.HanWinEn = AppBIOZCfg.HanWinEn;
