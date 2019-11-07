@@ -6,9 +6,7 @@
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
-
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
-
 This software is proprietary to Analog Devices, Inc. and its licensors.
 By using this software you agree to the terms of the associated
 Analog Devices Software License Agreement.
@@ -112,7 +110,9 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      /* There is chance this operation will fail because sequencer could put AFE back 
+        to hibernate mode just after waking up. Use STOPSYNC is better. */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case BIACTRL_STOPSYNC:
@@ -201,6 +201,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   hs_loop.WgCfg.OffsetCalEn = bFALSE;
   if(AppBIACfg.SweepCfg.SweepEn == bTRUE)
   {
+		AppBIACfg.SweepCfg.SweepIndex = 0;
     AppBIACfg.FreqofData = AppBIACfg.SweepCfg.SweepStart;
     AppBIACfg.SweepCurrFreq = AppBIACfg.SweepCfg.SweepStart;
     AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
@@ -388,6 +389,7 @@ static AD5940Err AppBIARtiaCal(void)
   hsrtia_cal.HsTiaCfg.HstiaDeRtia = HSTIADERTIA_TODE;
   hsrtia_cal.HsTiaCfg.HstiaRtiaSel = AppBIACfg.HstiaRtiaSel;
   hsrtia_cal.SysClkFreq = AppBIACfg.SysClkFreq;
+  hsrtia_cal.fFreq = AppBIACfg.SweepCfg.SweepStart;
 
   if(AppBIACfg.SweepCfg.SweepEn == bTRUE)
   {
@@ -395,8 +397,11 @@ static AD5940Err AppBIARtiaCal(void)
     AppBIACfg.SweepCfg.SweepIndex = 0;  /* Reset index */
     for(i=0;i<AppBIACfg.SweepCfg.SweepPoints;i++)
     {
-      AD5940_SweepNext(&AppBIACfg.SweepCfg, &hsrtia_cal.fFreq);
-      AD5940_HSRtiaCal(&hsrtia_cal, AppBIACfg.RtiaCalTable[i]);
+			AD5940_HSRtiaCal(&hsrtia_cal, AppBIACfg.RtiaCalTable[i]);
+#ifdef ADI_DEBUG
+      ADI_Print("Freq:%.2f, RTIA: Mag:%f Ohm, Phase:%.3f\n", hsrtia_cal.fFreq, AppBIACfg.RtiaCalTable[i][0], AppBIACfg.RtiaCalTable[i][1]);
+#endif
+      AD5940_SweepNext(&AppBIACfg.SweepCfg, &hsrtia_cal.fFreq);     
     }
     AppBIACfg.SweepCfg.SweepIndex = 0;  /* Reset index */
     AppBIACfg.RtiaCurrValue[0] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][0];
@@ -563,15 +568,14 @@ static AD5940Err AppBIADataProcess(int32_t * const pData, uint32_t *pDataCount)
   {
     AppBIACfg.FreqofData = AppBIACfg.SweepCurrFreq;
     AppBIACfg.SweepCurrFreq = AppBIACfg.SweepNextFreq;
-    AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
-    AppBIACfg.RtiaCurrValue[0] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][0];
+		AppBIACfg.RtiaCurrValue[0] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][0];
     AppBIACfg.RtiaCurrValue[1] = AppBIACfg.RtiaCalTable[AppBIACfg.SweepCfg.SweepIndex][1];
+    AD5940_SweepNext(&AppBIACfg.SweepCfg, &AppBIACfg.SweepNextFreq);
   }
   return AD5940ERR_OK;
 }
 
 /**
-
 */
 AD5940Err AppBIAISR(void *pBuff, uint32_t *pCount)
 {
@@ -611,4 +615,3 @@ AD5940Err AppBIAISR(void *pBuff, uint32_t *pCount)
 /**
   * @}
   */
-

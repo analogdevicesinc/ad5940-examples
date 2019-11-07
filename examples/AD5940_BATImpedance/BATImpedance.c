@@ -132,6 +132,8 @@ AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
+      /* There is chance this operation will fail because sequencer could put AFE back 
+        to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
       break;
     }

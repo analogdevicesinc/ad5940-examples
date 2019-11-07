@@ -162,7 +162,7 @@ static AD5940Err AppAMPSeqCfgGen(void)
   aferef_cfg.LpRefBoostEn = bFALSE;
   AD5940_REFCfgS(&aferef_cfg);	
 
-
+	lp_loop.LpDacCfg.LpdacSel = LPDAC0;
   lp_loop.LpDacCfg.LpDacSrc = LPDACSRC_MMR;
   lp_loop.LpDacCfg.LpDacSW = LPDACSW_VBIAS2LPPA|LPDACSW_VBIAS2PIN|LPDACSW_VZERO2LPTIA|LPDACSW_VZERO2PIN;
   lp_loop.LpDacCfg.LpDacVzeroMux = LPDACVZERO_6BIT;
@@ -174,6 +174,7 @@ static AD5940Err AppAMPSeqCfgGen(void)
 	lp_loop.LpDacCfg.DacData12Bit =(int32_t)((AppAMPCfg.SensorBias)/DAC12BITVOLT_1LSB) + lp_loop.LpDacCfg.DacData6Bit*64;
 	if(lp_loop.LpDacCfg.DacData12Bit>lp_loop.LpDacCfg.DacData6Bit*64)
 		lp_loop.LpDacCfg.DacData12Bit--;
+	lp_loop.LpAmpCfg.LpAmpSel = LPAMP0;
   lp_loop.LpAmpCfg.LpAmpPwrMod = LPAMPPWR_NORM;
   lp_loop.LpAmpCfg.LpPaPwrEn = bTRUE;
   lp_loop.LpAmpCfg.LpTiaPwrEn = bTRUE;

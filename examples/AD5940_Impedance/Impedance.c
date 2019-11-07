@@ -127,7 +127,9 @@ int32_t AppIMPCtrl(uint32_t Command, void *pPara)
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
-      AD5940_WUPTCtrl(bFALSE);  /* @todo is it sure this will stop Wupt? */
+      /* There is chance this operation will fail because sequencer could put AFE back 
+        to hibernate mode just after waking up. Use STOPSYNC is better. */
+      AD5940_WUPTCtrl(bFALSE);
       break;
     }
     case IMPCTRL_STOPSYNC:
@@ -216,7 +218,10 @@ static AD5940Err AppIMPSeqCfgGen(void)
   HsLoopCfg.HsDacCfg.HsDacUpdateRate = AppIMPCfg.HsDacUpdateRate;
 
   HsLoopCfg.HsTiaCfg.DiodeClose = bFALSE;
-  HsLoopCfg.HsTiaCfg.HstiaBias = HSTIABIAS_1P1;
+	if(AppIMPCfg.BiasVolt != 0.0f)    /* With bias voltage */
+		HsLoopCfg.HsTiaCfg.HstiaBias = HSTIABIAS_VZERO0;
+	else
+		HsLoopCfg.HsTiaCfg.HstiaBias = HSTIABIAS_1P1;
   HsLoopCfg.HsTiaCfg.HstiaCtia = 31; /* 31pF + 2pF */
   HsLoopCfg.HsTiaCfg.HstiaDeRload = HSTIADERLOAD_OPEN;
   HsLoopCfg.HsTiaCfg.HstiaDeRtia = HSTIADERTIA_OPEN;
@@ -259,7 +264,7 @@ static AD5940Err AppIMPSeqCfgGen(void)
     if(AppIMPCfg.BiasVolt> 1100.0f) AppIMPCfg.BiasVolt = 1100.0f - DAC12BITVOLT_1LSB;
     lpdac_cfg.DacData12Bit = (uint32_t)((AppIMPCfg.BiasVolt + 1100.0f)/DAC12BITVOLT_1LSB);
     lpdac_cfg.DataRst = bFALSE;      /* Do not reset data register */
-    lpdac_cfg.LpDacSW = LPDACSW_VBIAS2LPPA|LPDACSW_VBIAS2PIN|LPDACSW_VZERO2LPTIA|LPDACSW_VZERO2PIN;
+    lpdac_cfg.LpDacSW = LPDACSW_VBIAS2LPPA|LPDACSW_VBIAS2PIN|LPDACSW_VZERO2LPTIA|LPDACSW_VZERO2PIN|LPDACSW_VZERO2HSTIA;
     lpdac_cfg.LpDacRef = LPDACREF_2P5;
     lpdac_cfg.LpDacSrc = LPDACSRC_MMR;      /* Use MMR data, we use LPDAC to generate bias voltage for LPTIA - the Vzero */
     lpdac_cfg.PowerEn = bTRUE;              /* Power up LPDAC */

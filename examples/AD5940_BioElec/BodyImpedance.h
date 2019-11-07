@@ -75,6 +75,8 @@ typedef struct
   SEQInfo_Type MeasureSeqInfo;
   BoolFlag StopRequired;          /* After FIFO is ready, stop the measurment sequence */
   uint32_t FifoDataCount;         /* Count how many times impedance have been measured */
+  uint32_t MeasSeqCycleCount;     /* How long the measurement sequence will take */
+  float MaxODR;                   /* Max ODR for sampling in this config */       
 /* End */
 }AppBIACfg_Type;
 

@@ -52,7 +52,7 @@ AppBIOZCfg_Type AppBIOZCfg =
   .HsDacUpdateRate = 7,
   .DacVoltPP = 600.0,
 
-  .SinFreq = 50000.0, /* 1000Hz */
+  .SinFreq = 50000.0, /* 50kHz */
 
   .ADCPgaGain = ADCPGA_1,
   .ADCSinc3Osr = ADCSINC3OSR_2,
@@ -118,6 +118,8 @@ AD5940Err AppBIOZCtrl(int32_t BcmCtrl, void *pPara)
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
+      /* There is chance this operation will fail because sequencer could put AFE back 
+        to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
 #ifdef ADI_DEBUG
       ADI_Print("BIOZ Stop Now...\n");
@@ -214,6 +216,7 @@ static AD5940Err AppBIOZSeqCfgGen(void)
   hs_loop.WgCfg.OffsetCalEn = bFALSE;
   if(AppBIOZCfg.SweepCfg.SweepEn == bTRUE)
   {
+		AppBIOZCfg.SweepCfg.SweepIndex = 0;
     AppBIOZCfg.FreqofData = AppBIOZCfg.SweepCfg.SweepStart;
     AppBIOZCfg.SweepCurrFreq = AppBIOZCfg.SweepCfg.SweepStart;
     AD5940_SweepNext(&AppBIOZCfg.SweepCfg, &AppBIOZCfg.SweepNextFreq);
@@ -351,7 +354,7 @@ static AD5940Err AppBIOZRtiaCal(void)
   hsrtia_cal.AdcClkFreq = AppBIOZCfg.AdcClkFreq;
   hsrtia_cal.ADCSinc2Osr = AppBIOZCfg.ADCSinc2Osr;
   hsrtia_cal.ADCSinc3Osr = AppBIOZCfg.ADCSinc3Osr;
-  hsrtia_cal.bPolarResult = bTRUE; /* We need magnitude and phase here */
+  hsrtia_cal.bPolarResult = bFALSE; /* Use complex number. Real+Image */
   hsrtia_cal.DftCfg.DftNum = AppBIOZCfg.DftNum;
   hsrtia_cal.DftCfg.DftSrc = AppBIOZCfg.DftSrc;
   hsrtia_cal.DftCfg.HanWinEn = AppBIOZCfg.HanWinEn;
@@ -363,6 +366,7 @@ static AD5940Err AppBIOZRtiaCal(void)
   hsrtia_cal.HsTiaCfg.HstiaDeRtia = HSTIADERTIA_OPEN;
   hsrtia_cal.HsTiaCfg.HstiaRtiaSel = AppBIOZCfg.HstiaRtiaSel;
   hsrtia_cal.SysClkFreq = AppBIOZCfg.SysClkFreq;
+  hsrtia_cal.fFreq = AppBIOZCfg.SweepCfg.SweepStart;
 
   if(AppBIOZCfg.SweepCfg.SweepEn == bTRUE)
   {
@@ -370,11 +374,11 @@ static AD5940Err AppBIOZRtiaCal(void)
     AppBIOZCfg.SweepCfg.SweepIndex = 0;  /* Reset index */
     for(i=0;i<AppBIOZCfg.SweepCfg.SweepPoints;i++)
     {
-      AD5940_SweepNext(&AppBIOZCfg.SweepCfg, &hsrtia_cal.fFreq);
       AD5940_HSRtiaCal(&hsrtia_cal, &AppBIOZCfg.RtiaCalTable[i]);
 #ifdef ADI_DEBUG
       ADI_Print("Freq:%.2f, (%f, %f)Ohm\n", hsrtia_cal.fFreq, AppBIOZCfg.RtiaCalTable[i].Real, AppBIOZCfg.RtiaCalTable[i].Image);
 #endif
+      AD5940_SweepNext(&AppBIOZCfg.SweepCfg, &hsrtia_cal.fFreq);
     }
     AppBIOZCfg.SweepCfg.SweepIndex = 0;  /* Reset index */
     AppBIOZCfg.RtiaCurrValue = AppBIOZCfg.RtiaCalTable[0];
@@ -565,8 +569,8 @@ static AD5940Err AppBIOZDataProcess(int32_t * const pData, uint32_t *pDataCount)
   {
     AppBIOZCfg.FreqofData = AppBIOZCfg.SweepCurrFreq;
     AppBIOZCfg.SweepCurrFreq = AppBIOZCfg.SweepNextFreq;
-    AD5940_SweepNext(&AppBIOZCfg.SweepCfg, &AppBIOZCfg.SweepNextFreq);
     AppBIOZCfg.RtiaCurrValue = AppBIOZCfg.RtiaCalTable[AppBIOZCfg.SweepCfg.SweepIndex];
+    AD5940_SweepNext(&AppBIOZCfg.SweepCfg, &AppBIOZCfg.SweepNextFreq);
   }
   return AD5940ERR_OK;
 }
