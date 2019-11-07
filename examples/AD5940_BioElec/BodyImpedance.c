@@ -115,6 +115,8 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
         return AD5940ERR_WAKEUP;  /* Wakeup Failed */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
+      /* There is chance this operation will fail because sequencer could put AFE back 
+        to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
 #ifdef ADI_DEBUG
       ADI_Print("BIA Stop Now...\n");
