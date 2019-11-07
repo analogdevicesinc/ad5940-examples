@@ -26,9 +26,14 @@ Currently, there are two kinks of EVB.
 ![pic](https://www.analog.com/-/media/analog/en/evaluation-board-images/images/eval-ad5940elczangle-web.gif?h=270&thn=1&hash=C7A2DE91D5A315F0F4A167EBB83F8ECBE02EC79B)
 
 ## Software
-By the time of writing, only IAR projects are checked into this repository. Keil project is still WIP.
+Both IAR and Keil example projects are provided.
 
 On how to use the IAR project, follow [this link](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/tools/iar_setup_guide) from ADI Wiki.
+
+For Keil project, follow [this link](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/tools/keil_setup_guide).
+
+**Note: CMSIS pack is used in all examples, make sure you installed the pack no matter in Keil or IAR.**
+
 
 # License
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
