@@ -1,6 +1,6 @@
-AD5940 Examples Change log
+AD5940 Examples Change Log
 ==========================
-## 0.2.1(..)
+## 0.2.1(2019-11-7)
 
 ### Added
 * Add Keil example projects for board [NUCLEO-F411RE](https://www.st.com/en/evaluation-tools/nucleo-f411re.html).
@@ -10,9 +10,15 @@ AD5940 Examples Change log
 ### Changed
 * Clean up comments, fix spell error.
 * BAT-Impedance example updates to use HFOSC clock. Add RCAL measurements for all sweep points.
+* Update ad5940lib submodule.
+  - Fix bug that SeqGenDB should be initialized.
+  - Added DE1 node configuration, prepared for ADuCM355
+  - Version number to 0.2.1
+
 ### Deprecated
 
 ### Fixed
+* Fix frequency sweep in example BioElec, BIA, BIOZ-2wire.
 * ad5940.h: fix FIFO_STREAM bug.
 * fix warnings.
 
