@@ -831,12 +831,12 @@ AD5940Err AppEDAISR(void *pBuff, uint32_t *pCount)
   uint32_t BuffCount;
   uint32_t FifoCnt;
   BuffCount = *pCount;
+  *pCount = 0;
   if(AppEDACfg.EDAInited == bFALSE)
     return AD5940ERR_APPERROR;
-  if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
+  if(AD5940_WakeUp(20) > 20)  /* Wakeup AFE by read register, read 20 times at most */
     return AD5940ERR_WAKEUP;  /* Wakeup Failed */
   AD5940_SleepKeyCtrlS(SLPKEY_LOCK);  /* Don't enter hibernate */
-  *pCount = 0;
 
   if(AD5940_INTCTestFlag(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH) == bTRUE)
   {
