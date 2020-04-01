@@ -48,7 +48,7 @@ typedef struct
 }SeqPatchInfo_Type;
 
 /* 
-  Note: this example will use SEQID_0 as measurment sequence, and use SEQID_1 as init sequence. 
+  Note: this example will use SEQID_0 as measurement sequence, and use SEQID_1 as init sequence. 
   SEQID_3 is used for calibration if there is need.
 */
 typedef struct
@@ -57,7 +57,7 @@ typedef struct
   BoolFlag bParaChanged;        /**< Indicate to generate sequence again. It's auto cleared by AppEDAInit */
   uint32_t SeqStartAddr;        /**< Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /**< Limit the maximum sequence.   */
-  uint32_t SeqStartAddrCal;     /**< Measurment sequence start address in SRAM of AD5940 */
+  uint32_t SeqStartAddrCal;     /**< Measurement sequence start address in SRAM of AD5940 */
   uint32_t MaxSeqLenCal;
 /* Application related parameters */ 
   BoolFlag bBioElecBoard;       /**< Select between AD5941Sens1 board and BioElec board */
@@ -73,7 +73,7 @@ typedef struct
   float SinFreq;                /**< Frequency of excitation signal */
   float SampleFreq;             /**< Sample Frequency in Hz. Clock source is 32kHz.*/  
   float SinAmplitude;           /**< Signal in amplitude in mV unit. Range: 0Vp to 1100mVp (0Vpp to 2.2Vpp) */
-  uint32_t DacUpdateRate;       /**< DAC update rate is SystemCLoock/Divider. The available value is 7 to 255. */
+  uint32_t DacUpdateRate;       /**< DAC update rate is SystemCLock/Divider. The available value is 7 to 255. */
   uint32_t LptiaRtiaSel;        /**< Use internal RTIA, Select from LPTIARTIA_OPEN, LPTIARTIA_200R, ... , LPTIARTIA_512K */
   
   uint32_t DftNum;              /**< DFT number */
@@ -101,7 +101,8 @@ typedef struct
   BoolFlag EDAInited;           /**< If the program run firstly, generated sequence commands */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
-  BoolFlag StopRequired;        /**< After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;        /**< After FIFO is ready, stop the measurement sequence */
+  BoolFlag bRunning;            /**< status of if EDA is running. Useful when send STOP_SYNC to detect if it's actually stopped. */
   uint32_t FifoDataCount;       /**< Count how many times impedance have been measured */
 
   enum __EDAState{
@@ -116,19 +117,20 @@ typedef struct
 /* Common application control message */
 #define APPCTRL_START          0      /**< Start the measurement by starting Wakeup Timer */
 #define APPCTRL_STOPNOW        1      /**< Stop immediately by stop Wakeup Timer*/
-#define APPCTRL_STOPSYNC       2      /**< Stop the measurement when interrupt occured */
+#define APPCTRL_STOPSYNC       2      /**< Stop the measurement when interrupt occurred */
 #define APPCTRL_SHUTDOWN       3      /**< Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
 
-#define EDACTRL_MEASVOLT       100    /**< Measure Exciation voltage now */
+#define EDACTRL_MEASVOLT       100    /**< Measure Excitation voltage now */
 #define EDACTRL_GETRTIAMAG     101    /**< Get the rtia magnitude for current measured data */
 
 #define EDACTRL_RSTBASE        102    /**< Reset base line of EDA result. */
 #define EDACTRL_SETBASE        103    /**< Set base line of EDA result */
 #define EDACTRL_GETAVR         104    /**< Get average value of all measured impedance */
+#define EDACTRL_STATUS         105    /**< Get if EDA is running. */
 
 /* Error message */
 #define EDAERR_ERROR            AD5940ERR_APPERROR    /**< General error */
-#define EDAERR_VOLTMEASURE      AD5940ERR_APPERROR-1  /**< Excitation voltage measurment error. Points not match */
+#define EDAERR_VOLTMEASURE      AD5940ERR_APPERROR-1  /**< Excitation voltage measurement error. Points not match */
 
 AD5940Err AppEDAGetCfg(void *pCfg);
 AD5940Err AppEDAInit(uint32_t *pBuffer, uint32_t BufferSize);

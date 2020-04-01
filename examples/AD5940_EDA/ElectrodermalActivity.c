@@ -78,6 +78,7 @@ AppEDACfg_Type AppEDACfg =
   .ImpSum = {0,0},
   .EDAInited = bFALSE,
   .StopRequired = bFALSE,
+  .bRunning = bFALSE,
   .bMeasVoltReq = bFALSE,
   .EDAStateCurr = EDASTATE_INIT,
   .EDAStateNext = EDASTATE_INIT,
@@ -129,6 +130,7 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
       wupt_cfg.SeqxWakeupTime[SEQID_0] = 4; /* The minimum value is 1. Do not set it to zero. Set it to 1 will spend 2 32kHz clock. */
       AD5940_WUPTCfg(&wupt_cfg);
       AppEDACfg.FifoDataCount = 0;  /* restart */
+      AppEDACfg.bRunning = bTRUE;
       break;
     }
     case APPCTRL_STOPNOW:
@@ -140,6 +142,7 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
       /* There is chance this operation will fail because sequencer could put AFE back 
         to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
+      AppEDACfg.bRunning = bFALSE;
       break;
     }
     case APPCTRL_STOPSYNC:
@@ -187,7 +190,12 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
       fImpCar_Type *pImpAVR = (fImpCar_Type *)pPara;
       pImpAVR->Real = AppEDACfg.ImpSum.Real/AppEDACfg.ImpSumCount;
       pImpAVR->Image = AppEDACfg.ImpSum.Image/AppEDACfg.ImpSumCount;
+      break;
     }
+    case EDACTRL_STATUS:
+      if(pPara == NULL)
+        return AD5940ERR_NULLP; /* Null pointer */
+      *(BoolFlag*)pPara = AppEDACfg.bRunning;
     default:
     break;
   }
@@ -684,6 +692,7 @@ static AD5940Err AppEDARegModify(int32_t * const pData, uint32_t *pDataCount)
   if(AppEDACfg.StopRequired == bTRUE)
   {
     AD5940_WUPTCtrl(bFALSE);
+    AppEDACfg.bRunning = bFALSE;
     return AD5940ERR_OK;
   }
   return AD5940ERR_OK;
