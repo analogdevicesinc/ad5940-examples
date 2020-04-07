@@ -24,8 +24,8 @@ Analog Devices Software License Agreement.
 
 uint32_t help(uint32_t para1, uint32_t para2);
 uint32_t say_hello(uint32_t para1, uint32_t para2);
-uint32_t command_start_measurment(uint32_t para1, uint32_t para2);
-uint32_t command_stop_measurment(uint32_t para1, uint32_t para2);
+uint32_t command_start_measurement(uint32_t para1, uint32_t para2);
+uint32_t command_stop_measurement(uint32_t para1, uint32_t para2);
 uint32_t command_switch_app(uint32_t AppID, uint32_t para2);
 
 struct __uartcmd_table
@@ -38,8 +38,8 @@ struct __uartcmd_table
   {(void*)help, "help", "print supported commands"},
   {(void*)help, "?", "print supported commands"},
   {(void*)say_hello, "hello", "print parameteres and say hello"},
-  {(void*)command_start_measurment, "start", "start selected application"},
-  {(void*)command_stop_measurment, "stop", "stop selected application"},
+  {(void*)command_start_measurement, "start", "start selected application"},
+  {(void*)command_stop_measurement, "stop", "stop selected application"},
   {(void*)command_switch_app, "switch", "stop current APP and switch to new APP set by parameter1"},
 };
 
