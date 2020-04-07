@@ -16,8 +16,6 @@ Analog Devices Software License Agreement.
 *****************************************************************************/
 #include "Amperometric.h"
 
-/* This file contains auto generated source code that user defined */
-
 /* 
   Application configuration structure. Specified by user from template.
   The variables are usable in this whole application.
@@ -36,7 +34,7 @@ AppAMPCfg_Type AppAMPCfg =
   .SysClkFreq = 16000000.0,
   .WuptClkFreq = 32000.0,
   .AdcClkFreq = 16000000.0,
-  .AmpODR = 1.0,                /* Sample time in seconds. I.e. every 5 sesonds make a measurement */
+  .AmpODR = 1.0,                /* Sample time in seconds. I.e. every 5 seconds make a measurement */
   .NumOfData = -1,
   .RcalVal = 10000.0,           /* RCAL = 10kOhm */
   .PwrMod = AFEPWR_LP,
@@ -104,6 +102,8 @@ AD5940Err AppAMPCtrl(int32_t AmpCtrl, void *pPara)
       AD5940_ReadReg(REG_AFE_ADCDAT); /* Any SPI Operation can wakeup AFE */
       /* Start Wupt right now */
       AD5940_WUPTCtrl(bFALSE);
+      /* There is chance this operation will fail because sequencer could put AFE back 
+        to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
       break;
     }
@@ -156,7 +156,7 @@ static AD5940Err AppAMPSeqCfgGen(void)
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bTRUE;
   aferef_cfg.Lp1V8BuffEn = bTRUE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bTRUE;
   aferef_cfg.LpRefBufEn = bTRUE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -198,7 +198,7 @@ static AD5940Err AppAMPSeqCfgGen(void)
   
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   memset(&dsp_cfg.DftCfg, 0, sizeof(dsp_cfg.DftCfg));
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
   dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppAMPCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppAMPCfg.ADCSinc3Osr;
@@ -229,7 +229,7 @@ static AD5940Err AppAMPSeqCfgGen(void)
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppAMPCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -272,7 +272,7 @@ static AD5940Err AppAMPSeqMeasureGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   if(error == AD5940ERR_OK)
   {
@@ -377,7 +377,7 @@ AD5940Err AppAMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppAMPCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppAMPCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppAMPCfg.MeasureSeqInfo);
 

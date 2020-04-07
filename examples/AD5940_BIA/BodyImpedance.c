@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    BodyComposition.c
- @author:  $Author: nxu2 $
- @brief:   BIA measurment sequences.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   BIA measurement sequences.
  -----------------------------------------------------------------------------
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
 This software is proprietary to Analog Devices, Inc. and its licensors.
@@ -13,8 +11,6 @@ Analog Devices Software License Agreement.
  
 *****************************************************************************/
 #include "BodyImpedance.h"
-
-/* This file contains auto generated source code that user defined */
 
 /* 
   Application configuration structure. Specified by user from template.
@@ -131,7 +127,7 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
     break;
     case BIACTRL_SHUTDOWN:
     {
-      AppBIACtrl(BIACTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppBIACtrl(BIACTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by sleep operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -175,7 +171,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bFALSE;
   aferef_cfg.Lp1V8BuffEn = bFALSE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bTRUE;
   aferef_cfg.LpRefBufEn = bTRUE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -236,7 +232,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   lp_loop.LpAmpCfg.LpTiaRf = LPTIARF_20K;
   lp_loop.LpAmpCfg.LpTiaRload = LPTIARLOAD_SHORT;
   lp_loop.LpAmpCfg.LpTiaRtia = LPTIARTIA_OPEN;
-  lp_loop.LpAmpCfg.LpTiaSW = LPTIASW(5)|LPTIASW(6)|LPTIASW(7)|LPTIASW(8)|LPTIASW(9)|LPTIASW(12)|LPTIASW(13); /* @todo Optimizanation needed for new silicon */
+  lp_loop.LpAmpCfg.LpTiaSW = LPTIASW(5)|LPTIASW(6)|LPTIASW(7)|LPTIASW(8)|LPTIASW(9)|LPTIASW(12)|LPTIASW(13); /** @todo Optimization needed for new silicon */
   AD5940_LPLoopCfgS(&lp_loop);
 
   dsp_cfg.ADCBaseCfg.ADCMuxN = ADCMUXN_HSTIA_N;
@@ -245,7 +241,7 @@ static AD5940Err AppBIASeqCfgGen(void)
   
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
   dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBIACfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBIACfg.ADCSinc3Osr;
@@ -270,11 +266,11 @@ static AD5940Err AppBIASeqCfgGen(void)
   AD5940_SEQGpioCtrlS(0/*AGPIO_Pin6|AGPIO_Pin5|AGPIO_Pin1*/);        //GP6->endSeq, GP5 -> AD8233=OFF, GP1->RLD=OFF .
   
   /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extra command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppBIACfg.InitSeqInfo.SeqId = SEQID_1;
@@ -344,7 +340,7 @@ static AD5940Err AppBIASeqMeasureGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   AppBIACfg.MeasSeqCycleCount = AD5940_SEQCycleTime();
   AppBIACfg.MaxODR = 1/(((AppBIACfg.MeasSeqCycleCount + 10) / 16.0)* 1E-6)  ;
@@ -482,7 +478,7 @@ AD5940Err AppBIAInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppBIACfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppBIACfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppBIACfg.MeasureSeqInfo);
 

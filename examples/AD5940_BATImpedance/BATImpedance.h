@@ -31,7 +31,7 @@ Analog Devices Software License Agreement.
 #define PRECHARGE_BAT       PRECHARGE_CH2
 #define PRECHARGE_AMP       PRECHARGE_CH3
 /* 
-  Note: this example will use SEQID_0 as measurment sequence, and use SEQID_1 as init sequence. 
+  Note: this example will use SEQID_0 as measurement sequence, and use SEQID_1 as init sequence. 
   SEQID_3 is used for calibration.
 */
 
@@ -46,7 +46,7 @@ typedef struct
   BoolFlag bDoCal;              /* Need to do calibration. */
   uint32_t SeqStartAddr;        /* Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /* Limit the maximum sequence.   */
-  uint32_t SeqStartAddrCal;     /* Measurment sequence start address in SRAM of AD5940 */
+  uint32_t SeqStartAddrCal;     /* Measurement sequence start address in SRAM of AD5940 */
   uint32_t MaxSeqLenCal;
 /* Application related parameters */ 
   float SysClkFreq;             /* The real frequency of system clock */
@@ -74,7 +74,7 @@ typedef struct
   BoolFlag BATInited;           /* If the program run firstly, generated sequence commands */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
-  BoolFlag StopRequired;        /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;        /* After FIFO is ready, stop the measurement sequence */
   uint32_t FifoDataCount;       /* Count how many times impedance have been measured */
   uint32_t MeasSeqCycleCount;   /* How long the measurement sequence will take */
   float MaxODR;                 /* Max ODR for sampling in this config */

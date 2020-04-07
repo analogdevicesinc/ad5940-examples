@@ -2,7 +2,7 @@
 *****************************************************************************
 @file:    ChronoAmperometric.c
 @author:  $Author: nxu2 $
-@brief:   Chrono-amperometric measurment sequences.
+@brief:   Chrono-amperometric measurement sequences.
 @version: $Revision: 766 $
 @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
 -----------------------------------------------------------------------------
@@ -15,8 +15,6 @@ Analog Devices Software License Agreement.
  
 *****************************************************************************/
 #include "ChronoAmperometric.h"
-
-/* This file contains auto generated source code that user defined */
 
 /* 
 Application configuration structure. Specified by user from template.
@@ -131,7 +129,7 @@ AD5940Err AppCHRONOAMPCtrl(int32_t AmpCtrl, void *pPara)
     }
   case CHRONOAMPCTRL_SHUTDOWN:
     {
-      AppCHRONOAMPCtrl(CHRONOAMPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppCHRONOAMPCtrl(CHRONOAMPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by sleep operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -191,7 +189,7 @@ static AD5940Err AppCHRONOAMPSeqCfgGen(void)
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bTRUE;
   aferef_cfg.Lp1V8BuffEn = bTRUE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bTRUE;
   aferef_cfg.LpRefBufEn = bTRUE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -233,7 +231,7 @@ static AD5940Err AppCHRONOAMPSeqCfgGen(void)
   
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
   dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppCHRONOAMPCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppCHRONOAMPCfg.ADCSinc3Osr;
@@ -258,11 +256,11 @@ static AD5940Err AppCHRONOAMPSeqCfgGen(void)
   AD5940_SEQGpioCtrlS(0);     
   
   /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extra command to disable sequencer for initialization sequence because we only want it to run one time. */
   
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppCHRONOAMPCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -320,7 +318,7 @@ static AD5940Err AppCHRONOAMPTransientMeasureGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   
   if(error == AD5940ERR_OK)
   {
@@ -363,7 +361,7 @@ static AD5940Err AppCHRONOAMPSeqMeasureGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   
   if(error == AD5940ERR_OK)
   {
@@ -480,7 +478,7 @@ AD5940Err AppCHRONOAMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   AppCHRONOAMPCfg.TransientSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppCHRONOAMPCfg.TransientSeqInfo);
   
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppCHRONOAMPCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppCHRONOAMPCfg.MeasureSeqInfo);
   

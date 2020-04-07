@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
- @file:    ImpSeqs.h
- @author:  $Author: nxu2 $
- @brief:   4-wire BIA measurement header file.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @file:    BodyImpedance.h
+ @author:  Neo Xu
+ @brief:   4-wire body impedance measurement header file.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -34,7 +32,7 @@ typedef struct
   BoolFlag bParaChanged;        /* Indicate to generate sequence again. It's auto cleared by AppBIAInit */
   uint32_t SeqStartAddr;        /* Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /* Limit the maximum sequence.   */
-  uint32_t SeqStartAddrCal;     /* Measurment sequence start address in SRAM of AD5940 */
+  uint32_t SeqStartAddrCal;     /* Measurement sequence start address in SRAM of AD5940 */
   uint32_t MaxSeqLenCal;
 /* Application related parameters */ 
   //BoolFlag bBioElecBoard;     /* The code is same for BioElec board and AD5941Sens1 board. No changes are needed */
@@ -51,7 +49,7 @@ typedef struct
   float DacVoltPP;              /* Final excitation voltage is DAC_VOLTpp*DAC_PGA*EXCIT_GAIN, DAC_PGA= 1 or 0.2, EXCIT_GAIN=2 or 0.25. DAC output voltage in mV peak to peak. Maximum value is 800mVpp. Peak to peak voltage  */
   uint32_t ExcitBufGain;        /* Select from  EXCITBUFGAIN_2, EXCITBUFGAIN_0P25 */     
   uint32_t HsDacGain;           /* Select from  HSDACGAIN_1, HSDACGAIN_0P2 */  
-  uint32_t HsDacUpdateRate;     /* DAC update rate is SystemCLoock/Divider. The available value is 7 to 255. Set to 7 for better perfomance */
+  uint32_t HsDacUpdateRate;     /* DAC update rate is SystemCLoock/Divider. The available value is 7 to 255. Set to 7 for better performance */
   uint32_t ADCPgaGain;          /* PGA Gain select from GNPGA_1, GNPGA_1_5, GNPGA_2, GNPGA_4, GNPGA_9 !!! We must ensure signal is in range of +-1.5V which is limited by ADC input stage */   
   uint8_t ADCSinc3Osr;          /* SINC3 OSR selection. ADCSINC3OSR_2, ADCSINC3OSR_4 */
   uint8_t ADCSinc2Osr;          /* SINC2 OSR selection. ADCSINC2OSR_22...ADCSINC2OSR_1333 */

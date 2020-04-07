@@ -2,7 +2,7 @@
  *****************************************************************************
  @file:    AD5940Main.c
  @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
+ @brief:   Used to control specific application and process data.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void AD5940AMPStructInit(void)
   pAMPCfg->SeqStartAddr = 0;
   pAMPCfg->MaxSeqLen = 512; 								/* @todo add checker in function */
   pAMPCfg->RcalVal = 10000.0;
-  pAMPCfg->NumOfData = -1;      						/* Never stop until you stop it mannually by AppAMPCtrl() function */
+  pAMPCfg->NumOfData = -1;      						/* Never stop until you stop it manually by AppAMPCtrl() function */
 	
 	pAMPCfg->AmpODR = 1;
 	pAMPCfg->FifoThresh = 5;
@@ -139,11 +139,11 @@ void AD5940_Main(void)
   AD5940AMPStructInit(); /* Configure your parameters in this function */
   
   AppCHRONOAMPInit(AppBuff[0], APPBUFF_SIZE);    /* Initialize AMP application. Provide a buffer, which is used to store sequencer commands */
-  AppCHRONOAMPCtrl(CHRONOAMPCTRL_PULSETEST, 0);         /* Control AMP measurment. AMPCTRL_PULSETEST carries out pulse test*/
+  AppCHRONOAMPCtrl(CHRONOAMPCTRL_PULSETEST, 0);         /* Control AMP measurement. AMPCTRL_PULSETEST carries out pulse test*/
  
   while(1)
   {
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag())
     {
       AD5940_ClrMCUIntFlag(); /* Clear this flag */

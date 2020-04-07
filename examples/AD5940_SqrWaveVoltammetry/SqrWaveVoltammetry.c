@@ -2,7 +2,7 @@
  *****************************************************************************
  @file:    SWVTest.c
  @author:  $Author: nxu2 $
- @brief:   Square Wave Voltammetry measurment sequences.
+ @brief:   Square Wave Voltammetry measurement sequences.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ Analog Devices Software License Agreement.
  * @note Need to update code when runs at S2 silicon.
  * @todo update LPDAC switch settings for S2 and LPDAC 1LSB bug.
  * @todo Calibrate ADC/PGA firstly to get accurate current. (Voltage/Rtia = Current)
- * @note The method to caculate LPDAC ouput voltage
+ * @note The method to calculate LPDAC ouput voltage
  *        - #define LSB_DAC12BIT (2.2V/4095)
  *        - #define LSB_DAC6BIT  (2.2V/4095*64)
  *        - Volt_12bit = Code12Bit*LSB_DAC12BIT + 0.2V
@@ -60,7 +60,7 @@ Analog Devices Software License Agreement.
  * RampState define:    S0 | S1  | S2 |          
  * @endcode
  * 
- *  # The seuqencer method to do Ramp test.
+ *  # The sequencer method to do Ramp test.
  * The Ramp test need to update DAC data in real time to generate required waveform, and control ADC to start sample data. \n
  * We used two kinds of sequence to realize it. One is to control DAC where SEQ0 and SEQ1 are used, another sequence SEQ2 controls ADC. 
  *  ## Sequence Allocation
@@ -105,7 +105,7 @@ Analog Devices Software License Agreement.
  * SEQ2 commands are fixed. Function is simply turn on ADC for a while and turn off it 
  *      after required number of data ready.                                                                \n
  * SEQ0/1 is always changing its start address to update DAC with different voltage.                        \n
- * Check above figure we can see SEQ0/SEQ1 is repeatly trigged by Wakeuptimer, if we don't change the start
+ * Check above figure we can see SEQ0/SEQ1 is repeatedly trigged by Wakeuptimer, if we don't change the start
  * Address of SEQ0/SEQ1, they will always update DAC with same data, thus no waveform generated.
  * 
  * Considering below SEQ0 command which is similar for SEQ1 on modifying SEQxINFO register.:
@@ -136,10 +136,10 @@ Analog Devices Software License Agreement.
  * @endcode
  * 
  * Total SRAM is 6kB in AD594x. In normal other application, we use 2kB for sequencer and 4kB for FIFO.
- * Assume the ramp test require 128 steps, then the sequence lenght is 4*128 = 512, each command need 4Byte. So it costs 2kB SRAM.
+ * Assume the ramp test require 128 steps, then the sequence length is 4*128 = 512, each command need 4Byte. So it costs 2kB SRAM.
  * When ramp test requires hundres of voltage steps(ADC samples), 2kB SRAM is far from enough. We recommend to use 4kB for sequencer
  * and 2kB for data FIFO. 
- * If ramp test reuire more steps, then we need to update SRAM with commands dynamically, use it as a ping-pong buffer.
+ * If ramp test require more steps, then we need to update SRAM with commands dynamically, use it as a ping-pong buffer.
  * 
  * **Sequencer Command Block 3**
  * @code
@@ -227,11 +227,11 @@ AD5940Err AppSWVGetCfg(void *pCfg)
 
 /**
  * @brief Control application like start, stop.
- * @param Command: The command for this applicaiton, select from below paramters
- *        - APPCTRL_START: start the measurment. Note: the ramp test need firslty call function AppSWVInit() every time before start it.
- *        - APPCTRL_STOPNOW: Stop the measurment immediately.
+ * @param Command: The command for this application, select from below paramters
+ *        - APPCTRL_START: start the measurement. Note: the ramp test need firstly call function AppSWVInit() every time before start it.
+ *        - APPCTRL_STOPNOW: Stop the measurement immediately.
  *        - APPCTRL_STOPSYNC: Stop the measuremnt when current measured data is read back.
- *        - APPCTRL_SHUTDOWN: Stop the measurment immediately and put AFE to shut down mode(turn off LP loop and enter hibernate).
+ *        - APPCTRL_SHUTDOWN: Stop the measurement immediately and put AFE to shut down mode(turn off LP loop and enter hibernate).
  * @return none.
 */
 AD5940Err AppSWVCtrl(uint32_t Command, void *pPara)
@@ -248,7 +248,7 @@ AD5940Err AppSWVCtrl(uint32_t Command, void *pPara)
         return AD5940ERR_APPERROR;
       /**
        *  SWV example is special, because the sequence is dynamically generated. 
-       *  Before 'START' ramp test, call AppSWVInit firslty. 
+       *  Before 'START' ramp test, call AppSWVInit firstly. 
        */
       if(AppSWVCfg.RampState == SWV_STOP)
         return AD5940ERR_APPERROR;
@@ -287,7 +287,7 @@ AD5940Err AppSWVCtrl(uint32_t Command, void *pPara)
     }
     case APPCTRL_SHUTDOWN:
     {
-      AppSWVCtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppSWVCtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       AD5940_ShutDownS();
     }
     break;
@@ -323,7 +323,7 @@ static AD5940Err AppSWVSeqInitGen(void)
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bFALSE;
   aferef_cfg.Lp1V8BuffEn = bFALSE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bTRUE;
   aferef_cfg.LpRefBufEn = bTRUE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -367,14 +367,14 @@ static AD5940Err AppSWVSeqInitGen(void)
   dsp_cfg.ADCFilterCfg.WGClkEnable = bFALSE;    /* WG is not used */  
   dsp_cfg.ADCFilterCfg.DFTClkEnable = bFALSE;   /* DFT is not used */
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = ADCSINC2OSR_1067;  /* Don't care */
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_2;   /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_2;   /* Don't care because it's disabled */
   AD5940_DSPCfgS(&dsp_cfg);
 
   /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extra command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop sequence generator here */
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
   if(error == AD5940ERR_OK)
   {
@@ -427,7 +427,7 @@ static AD5940Err AppSWVSeqADCCtrlGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   if(error == AD5940ERR_OK)
   {

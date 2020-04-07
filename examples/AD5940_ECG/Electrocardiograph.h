@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    Electrocardiograph.h
- @author:  $Author: nxu2 $
- @brief:   ECG measurment.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   ECG measurement.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -45,7 +43,7 @@ typedef struct
   uint32_t ADCSinc2Osr;  
 /* Private variables for internal usage */
   BoolFlag ECGInited;           /* If the program run firstly, generated sequence commands */
-  BoolFlag StopRequired;        /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;        /* After FIFO is ready, stop the measurement sequence */
   uint32_t FifoDataCount;       /* How many data we have got from start. */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;

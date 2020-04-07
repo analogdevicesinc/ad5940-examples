@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    Electrocardiograph.c
- @author:  $Author: nxu2 $
- @brief:   ECG Measurment.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   ECG Measurement.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -108,7 +106,7 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
     }
     case APPCTRL_SHUTDOWN:
     {
-      AppECGCtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppECGCtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by hibernate operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -149,7 +147,7 @@ static AD5940Err AppECGSeqCfgGen(void)
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bFALSE;
   aferef_cfg.Lp1V8BuffEn = bFALSE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bFALSE;
   aferef_cfg.LpRefBufEn = bFALSE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -184,14 +182,14 @@ static AD5940Err AppECGSeqCfgGen(void)
   AD5940_AFECtrlS(AFECTRL_HPREFPWR, bTRUE); /* Enable reference. It's automatically turned off during hibernate */
 
   /* Enable all of them. They are automatically turned off during hibernate mode to save power */
-  AD5940_SEQGpioCtrlS(/*AGPIO_Pin6|*/AGPIO_Pin5|AGPIO_Pin1); /* GP6 to indicate Sequenser is running. GP5 to disable AD8233. GP1 to enable AD8233 RLD function. */
+  AD5940_SEQGpioCtrlS(/*AGPIO_Pin6|*/AGPIO_Pin5|AGPIO_Pin1); /* GP6 to indicate sequencer is running. GP5 to disable AD8233. GP1 to enable AD8233 RLD function. */
 
     /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extra command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppECGCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -236,7 +234,7 @@ static AD5940Err AppECGSeqMeasureGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   if(error == AD5940ERR_OK)
   {
@@ -303,7 +301,7 @@ int32_t AppECGInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppECGCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppECGCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppECGCfg.MeasureSeqInfo);
 
@@ -378,8 +376,8 @@ AD5940Err AppECGISR(void *pBuff, uint32_t *pCount)
     AD5940_FIFORd((uint32_t *)pBuff, FifoCnt);
     AD5940_INTCClrFlag(AFEINTSRC_DATAFIFOTHRESH);
     AppECGRegModify(pBuff, &FifoCnt);   /* If there is need to do AFE re-configure, do it here when AFE is in active state */
-    AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);    /* Allow AFE to enter sleep mode. AFE will stay at active mode untill sequencer trigger sleep */
-    /* AD5940_EnterSleepS(); // We cannot mannually put AFE to hibernate because it's possible sequencer is running to take measurments */
+    AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);    /* Allow AFE to enter sleep mode. AFE will stay at active mode until sequencer trigger sleep */
+    /* AD5940_EnterSleepS(); // We cannot manually put AFE to hibernate because it's possible sequencer is running to take measurements */
     /* Process data */ 
     AppECGDataProcess(pBuff,&FifoCnt); 
     *pCount = FifoCnt;

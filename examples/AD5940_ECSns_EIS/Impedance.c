@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    Impedance.c
- @author:  $Author: nxu2 $
- @brief:   Impedance measurment sequences.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Electrochemical impedance spectroscopy based on example AD5940_Impedance
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -151,7 +149,7 @@ int32_t AppIMPCtrl(uint32_t Command, void *pPara)
     break;
     case IMPCTRL_SHUTDOWN:
     {
-      AppIMPCtrl(IMPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppIMPCtrl(IMPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by hibernate operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lploop_cfg;
@@ -300,11 +298,11 @@ static AD5940Err AppIMPSeqCfgGen(void)
                 AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
                 AFECTRL_SINC2NOTCH|AFECTRL_DCBUFPWR, bTRUE);
     /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extra command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppIMPCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -424,7 +422,7 @@ static AD5940Err AppIMPSeqMeasureGen(void)
   
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   if(error == AD5940ERR_OK)
   {
@@ -498,7 +496,7 @@ int32_t AppIMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppIMPCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppIMPCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppIMPCfg.MeasureSeqInfo);
 

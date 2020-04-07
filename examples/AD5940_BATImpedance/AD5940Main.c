@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940Main.c
- @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Used to control specific application and process data.
  -----------------------------------------------------------------------------
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
 This software is proprietary to Analog Devices, Inc. and its licensors.
@@ -93,7 +91,7 @@ void AD5940BATStructInit(void)
   pBATCfg->SeqStartAddr = 0;
   pBATCfg->MaxSeqLen = 512;
   pBATCfg->RcalVal = 50.0;  							/* Value of RCAL on EVAL-AD5941BATZ board is 50mOhm */
-  pBATCfg->ACVoltPP = 300.0f;							/* Pk-pk amplidued is 300mV */
+  pBATCfg->ACVoltPP = 300.0f;							/* Pk-pk amplitude is 300mV */
   pBATCfg->DCVolt = 1200.0f;							/* Offset voltage of 1.2V*/
   pBATCfg->DftNum = DFTNUM_8192;
   
@@ -121,7 +119,7 @@ void AD5940_Main(void)
 	AppBATCtrl(BATCTRL_START, 0); 
   while(1)
   {
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag())
     {
 				AD5940_ClrMCUIntFlag(); 				/* Clear this flag */

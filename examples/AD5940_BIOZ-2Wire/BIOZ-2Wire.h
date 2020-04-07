@@ -1,9 +1,7 @@
 /*!
- @file:    ImpSeqs.h
- @author:  $Author: nxu2 $
+ @file:    BIOZ-2Wire.h
+ @author:  Neo Xu
  @brief:   4-wire BIOZ measurement header file.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -24,7 +22,7 @@ Analog Devices Software License Agreement.
 #define MAXSWEEP_POINTS   100           /* Need to know how much buffer is needed to save RTIA calibration result */
 
 /* 
-  Note: this example will use SEQID_0 as measurment sequence, and use SEQID_1 as init sequence. 
+  Note: this example will use SEQID_0 as measurement sequence, and use SEQID_1 as init sequence. 
   SEQID_3 is used for calibration.
 */
 
@@ -34,7 +32,7 @@ typedef struct
   BoolFlag bParaChanged;        /* Indicate to generate sequence again. It's auto cleared by AppBIOZInit */
   uint32_t SeqStartAddr;        /* Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /* Limit the maximum sequence.   */
-  uint32_t SeqStartAddrCal;     /* Measurment sequence start address in SRAM of AD5940 */
+  uint32_t SeqStartAddrCal;     /* Measurement sequence start address in SRAM of AD5940 */
   uint32_t MaxSeqLenCal;
 /* Application related parameters */ 
   //BoolFlag bBioElecBoard;     /* The code is same for BioElec board and AD5941Sens1 board. No changes are needed */
@@ -51,7 +49,7 @@ typedef struct
   float DacVoltPP;              /* Final excitation voltage is DAC_VOLTpp*DAC_PGA*EXCIT_GAIN, DAC_PGA= 1 or 0.2, EXCIT_GAIN=2 or 0.25. DAC output voltage in mV peak to peak. Maximum value is 800mVpp. Peak to peak voltage  */
   uint32_t ExcitBufGain;        /* Select from  EXCITBUFGAIN_2, EXCITBUFGAIN_0P25 */     
   uint32_t HsDacGain;           /* Select from  HSDACGAIN_1, HSDACGAIN_0P2 */  
-  uint32_t HsDacUpdateRate;     /* DAC update rate is SystemCLoock/Divider. The available value is 7 to 255. Set to 7 for better perfomance */
+  uint32_t HsDacUpdateRate;     /* DAC update rate is SystemCLoock/Divider. The available value is 7 to 255. Set to 7 for better performance */
   uint32_t ADCPgaGain;          /* PGA Gain select from GNPGA_1, GNPGA_1_5, GNPGA_2, GNPGA_4, GNPGA_9 !!! We must ensure signal is in range of +-1.5V which is limited by ADC input stage */   
   uint8_t ADCSinc3Osr;          /* SINC3 OSR selection. ADCSINC3OSR_2, ADCSINC3OSR_4 */
   uint8_t ADCSinc2Osr;          /* SINC2 OSR selection. ADCSINC2OSR_22...ADCSINC2OSR_1333 */
@@ -68,13 +66,13 @@ typedef struct
   fImpCar_Type  ExcitVolt;      /* Measured excitation voltage */
   float SweepCurrFreq;
   float SweepNextFreq;
-  fImpCar_Type RtiaCurrValue;                    /* Calibrated Rtia value of current frequency */
+  fImpCar_Type RtiaCurrValue;                   /* Calibrated Rtia value at current frequency */
   fImpCar_Type RtiaCalTable[MAXSWEEP_POINTS];   /* Calibrated Rtia Value table */
-  float FreqofData;                         /* The frequency of latest data sampled */
-  BoolFlag BIOZInited;                       /* If the program run firstly, generated sequence commands */
+  float FreqofData;                             /* The frequency of latest data sampled */
+  BoolFlag BIOZInited;                          /* If the program run firstly, generated sequence commands */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
-  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurement sequence */
   uint32_t FifoDataCount;         /* Count how many times impedance have been measured */
 /* End */
 }AppBIOZCfg_Type;

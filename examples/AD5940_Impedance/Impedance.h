@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    Impedance.h
- @author:  $Author: nxu2 $
+ @author:  Neo XU
  @brief:   4-wire/2-wire impedance measurement header file.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -27,7 +25,7 @@ typedef struct
   BoolFlag bParaChanged;        /* Indicate to generate sequence again. It's auto cleared by AppBIAInit */
   uint32_t SeqStartAddr;        /* Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /* Limit the maximum sequence.   */
-  uint32_t SeqStartAddrCal;     /* Measurment sequence start address in SRAM of AD5940 */
+  uint32_t SeqStartAddrCal;     /* Measurement sequence start address in SRAM of AD5940 */
   uint32_t MaxSeqLenCal;
 /* Application related parameters */ 
   float ImpODR;                 /*  */
@@ -67,7 +65,7 @@ typedef struct
   BoolFlag IMPInited;                       /* If the program run firstly, generated sequence commands */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
-  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurement sequence */
   uint32_t FifoDataCount;         /* Count how many times impedance have been measured */
 }AppIMPCfg_Type;
 

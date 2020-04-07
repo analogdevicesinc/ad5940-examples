@@ -2,7 +2,7 @@
  *****************************************************************************
  @file:    AD5940Main.c
  @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
+ @brief:   Used to control specific application and process data.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ static int32_t AD5940PlatformCfg(void)
   gpio_cfg.PullEnSet = 0;
   AD5940_AGPIOCfg(&gpio_cfg);
   /* Measure LFOSC frequency */
-  /**@note Calibrate LFOSC using system clock. The system clock accuracy decides measurment accuracy. Use XTAL to get better result. */
+  /**@note Calibrate LFOSC using system clock. The system clock accuracy decides measurement accuracy. Use XTAL to get better result. */
   LfoscMeasure.CalDuration = 1000.0;  /* 1000ms used for calibration. */
   LfoscMeasure.CalSeqAddr = 0;        /* Put sequence commands from start address of SRAM */
   LfoscMeasure.SystemClkFreq = 16000000.0f; /* 16MHz in this firmware. */
@@ -145,7 +145,7 @@ void AD5940_Main(void)
   AD5940RampStructInit();
 
   AppSWVInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
-  AppSWVCtrl(APPCTRL_START, 0);          /* Control IMP measurment to start. Second parameter has no meaning with this command. */
+  AppSWVCtrl(APPCTRL_START, 0);          /* Control IMP measurement to start. Second parameter has no meaning with this command. */
 
   while(1)
   {

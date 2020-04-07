@@ -75,7 +75,7 @@ typedef struct
   BoolFlag  bDACCodeInc;          /**< Increase DAC code.  */
   BoolFlag  bSqrWaveHiLevel;			/**< Flag to indicate square wave high level */
   float     floor;
-  BoolFlag  StopRequired;         /**< After FIFO is ready, stop the measurment sequence */
+  BoolFlag  StopRequired;         /**< After FIFO is ready, stop the measurement sequence */
   enum _RampState{SWV_STATE0 = 0, SWV_STATE1, SWV_STATE2, SWV_STOP} RampState;
 }AppSWVCfg_Type;
 

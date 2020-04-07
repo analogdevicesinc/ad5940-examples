@@ -24,7 +24,7 @@ Analog Devices Software License Agreement.
 #define DAC12BITVOLT_1LSB   (2200.0f/4095)  //mV
 #define DAC6BITVOLT_1LSB    (DAC12BITVOLT_1LSB*64)  //mV
 /* 
-  Note: this example will use SEQID_0 as measurment sequence, and use SEQID_1 as init sequence. 
+  Note: this example will use SEQID_0 as measurement sequence, and use SEQID_1 as init sequence. 
   SEQID_3 is used for calibration.
 */
 
@@ -34,7 +34,7 @@ typedef struct
   BoolFlag bParaChanged;        /* Indicate to generate sequence again. It's auto cleared by AppCHRONOAMPInit */
   uint32_t SeqStartAddr;        /* Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /* Limit the maximum sequence.   */
-  uint32_t SeqStartAddrCal;     /* Measurment sequence start address in SRAM of AD5940 */
+  uint32_t SeqStartAddrCal;     /* Measurement sequence start address in SRAM of AD5940 */
   uint32_t MaxSeqLenCal;
   
 /* Application related parameters */ 
@@ -79,7 +79,7 @@ typedef struct
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
   SEQInfo_Type TransientSeqInfo;
-  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurement sequence */
   uint32_t FifoDataCount;         /* Count how many times impedance have been measured */
 /* End */
 }AppCHRONOAMPCfg_Type;

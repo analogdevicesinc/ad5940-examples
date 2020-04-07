@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940_WGSin.c
- @author:  $Author: nxu2 $
+ @author:  Neo Xu
  @brief:   Waveform generator(sin wave) example include switch matrix.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -22,7 +20,7 @@ Analog Devices Software License Agreement.
 #include "string.h"
 
 
-#define SIN_FREQ      200000.0   /* 25kHz */
+#define SIN_FREQ      25000     /* 25kHz */
 
 #define SYS_CLOCK_HZ 16000000.0 /* System clock frequency */
 

@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940_Sequencer.c
- @author:  $Author: nxu2 $
+ @author:  Neo Xu
  @brief:   Basic usage of sequencer.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -26,10 +24,10 @@ Analog Devices Software License Agreement.
  * 
  * Once sequencer is enabled, it starts to wait valid trigger signal. Sequencer can
  * manage 4sequences at same time. You can choose which sequence you want to trigger.
- * To make the AFE can manage measurment automatically, there are three method to
+ * To make the AFE can manage measurement automatically, there are three method to
  * trigger sequence.
  *  - MMR. You can trigger any sequence by register write. Or call function @ref AD5940_SEQMmrTrig
- *  - GPIO. You can trigger any sequence by GPIO. To use this, you must fisrtly set
+ *  - GPIO. You can trigger any sequence by GPIO. To use this, you must firstly set
  *          GPIO function to GPx_TRIG. Where x is the GPIO number. GPIO0 is used to trigger
  *          Sequence0 and GPIO3 is used to trigger Sequence3. Check the macro definition to 
  *          Check the details (or below table). 
@@ -47,9 +45,9 @@ Analog Devices Software License Agreement.
  *                 Wakeuptimer will trigger. There are 8 slots in this register. You can fill in any
  *                 of the four sequences. Also, you can choose not to use all these 8 slots, just simply
  *                 specify the end slot. We call the 8 slots are A/B/C/D/E/F/G/H. For example you can 
- *                 choose the end slot as C. So wakeup timer will trigger the seuqence in below order:
- *                 A->B->C->A->B->C->A->B->C->... untill you stop Wakeuptimer.
- *                 If you fill in slot A with sequnce0, B with Sequence3, C with sequence1, the sequence
+ *                 choose the end slot as C. So wakeup timer will trigger the sequence in below order:
+ *                 A->B->C->A->B->C->A->B->C->... until you stop Wakeuptimer.
+ *                 If you fill in slot A with sequence0, B with Sequence3, C with sequence1, the sequence
  *                 will be executed in the order defined above(A-B-C-A-B-C...)
  *                 SEQ0->SEQ3->SEQ1->SEQ0->SEQ3->SEQ1->...
  *                 For each sequence, there is a sleep timer and a wakeup timer. The timer will automatically
@@ -239,7 +237,7 @@ void AD5940_Main(void)
         break;
     }
   }
-  AD5940_WUPTCtrl(bFALSE);  /* Wakeup timer is still running and triggering. Trigger is not accpeted because sequencer 
+  AD5940_WUPTCtrl(bFALSE);  /* Wakeup timer is still running and triggering. Trigger is not accepted because sequencer 
                               is disabled in last sequence(SEQ1) command. */
   AD5940_SEQCtrlS(bTRUE);   /* Enable sequencer again, because we disabled it in seq3 last command. */
 

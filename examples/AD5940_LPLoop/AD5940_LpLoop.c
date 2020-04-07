@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
- @file:    AD5940_WG.c
- @author:  $Author: nxu2 $
- @brief:   Waveform generator example include switch matrix.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @file:    AD5940_LpLoop.c
+ @author:  Neo Xu
+ @brief:   Example of using low power loop amplifiers and LPDAC.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -58,7 +56,7 @@ void AD5940_Main(void)
   lp_cfg.LpAmpCfg.LpAmpPwrMod = LPAMPPWR_NORM;           /* Set low power amplifiers to normal power mode */
   lp_cfg.LpAmpCfg.LpPaPwrEn = bTRUE;                  /* Enable LP PA(potentialstat amplifier) power */
   lp_cfg.LpAmpCfg.LpTiaPwrEn = bFALSE;                /* Leave LPTIA power off */
-  lp_cfg.LpAmpCfg.LpTiaSW = LPTIASW(12)|LPTIASW(15)|LPTIASW(4); /* Close these switches to make sure LP PA amplifire is closed loop */
+  lp_cfg.LpAmpCfg.LpTiaSW = LPTIASW(12)|LPTIASW(15)|LPTIASW(4); /* Close these switches to make sure LP PA amplifier is closed loop */
   AD5940_LPLoopCfgS(&lp_cfg);
   AD5940_LPDAC0WriteS(0x800,31);
   while(1);

@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940Main.c
- @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Used to control specific application and furfur process data.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -130,13 +128,14 @@ void AD5940EDAStructInit(void)
   pCfg->MaxSeqLen = 512;
   
   pCfg->LfoscClkFreq = 32000;             /* Don't do LFOSC calibration now. We assume the default LFOSC is trimmed. */
-  pCfg->RtiaAutoScaleEnable = bTRUE;     /* We manually select resistor value. */
+  pCfg->RtiaAutoScaleEnable = bTRUE;      /* We manually select resistor value. */
   pCfg->LptiaRtiaSel = LPTIARTIA_120K;    
   pCfg->SinAmplitude = 1100*3/4;          /* Set excitation voltage to 0.75 times of full range. */
-  pCfg->SinFreq = 100.0f;                 
+  pCfg->SinFreq = 100.0f;
   pCfg->SampleFreq = 400.0f;              /* Do not change sample frequency unless you know how it works. */
-  pCfg->EDAODR = 4.0f;                    /* ODR decides how freuquently to start the engine to measure impedance. */
+  pCfg->EDAODR = 4.0f;                    /* ODR decides how frequently to start the engine to measure impedance. */
   pCfg->FifoThresh = 4;                   /* The minimum threshold value is 4, and should always be 4*N, where N is 1,2,3... */
+  pCfg->bParaChanged = bTRUE;
 }
 
 
@@ -154,12 +153,12 @@ void AD5940_Main(void)
   AD5940EDAStructInit(); /* Configure your parameters in this function */
   
   AppEDAInit(AppBuff, APPBUFF_SIZE);    /* Initialize BIA application. Provide a buffer, which is used to store sequencer commands */
-  AppEDACtrl(APPCTRL_START, 0);         /* Control BIA measurment to start. Second parameter has no meaning with this command. */
+  AppEDACtrl(APPCTRL_START, 0);         /* Control BIA measurement to start. Second parameter has no meaning with this command. */
   AppEDACtrl(EDACTRL_SETBASE, &EDABase);
   ResistorForBaseline = 20000;          /* Above result is obtained using 20kOhm resistor on BioElec Rev C board. */
   while(1)
   {
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag())
     {
       AD5940_ClrMCUIntFlag(); /* Clear this flag */

@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    BIOZ-2Wire.c
- @author:  $Author: nxu2 $
- @brief:   BioImpedance measurement using 2-wire.
- @version: $Revision: 766 $
- @date:    $Date: 2018-06-27 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Bio impedance(isolated impedance) measurement using 2-wire.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -18,8 +16,8 @@ Analog Devices Software License Agreement.
 
 /**
  * @note This example is modified from BIOZ example. This one is for 2-wire impedance measuremnt.
- *       The default pins used are CE0 and AIN2. The differnce with BIOZ is that the body voltage
- *       Measurment is replaced with excitation voltage measurment and it's only measured once.
+ *       The default pins used are CE0 and AIN2. The difference with BIOZ is that the body voltage
+ *       Measurement is replaced with excitation voltage measurement and it's only measured once.
 */
 
 /* 
@@ -145,7 +143,7 @@ AD5940Err AppBIOZCtrl(int32_t BcmCtrl, void *pPara)
     break;
     case BIOZCTRL_SHUTDOWN:
     {
-      AppBIOZCtrl(BIOZCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppBIOZCtrl(BIOZCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by sleep operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -190,7 +188,7 @@ static AD5940Err AppBIOZSeqCfgGen(void)
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bFALSE;
   aferef_cfg.Lp1V8BuffEn = bFALSE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bTRUE;
   aferef_cfg.LpRefBufEn = bTRUE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -239,7 +237,7 @@ static AD5940Err AppBIOZSeqCfgGen(void)
   
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
   
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
   dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;	/* Tell filter block clock rate of ADC*/
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBIOZCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBIOZCfg.ADCSinc3Osr;
@@ -264,11 +262,11 @@ static AD5940Err AppBIOZSeqCfgGen(void)
   AD5940_SEQGpioCtrlS(0/*AGPIO_Pin6|AGPIO_Pin5|AGPIO_Pin1*/);        //GP6->endSeq, GP5 -> AD8233=OFF, GP1->RLD=OFF .
   
   /* Sequence end. */
-  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extral command to disable sequencer for initialization sequence because we only want it to run one time. */
+  AD5940_SEQGenInsert(SEQ_STOP()); /* Add one extra command to disable sequencer for initialization sequence because we only want it to run one time. */
 
   /* Stop here */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
   if(error == AD5940ERR_OK)
   {
     AppBIOZCfg.InitSeqInfo.SeqId = SEQID_1;
@@ -331,7 +329,7 @@ static AD5940Err AppBIOZSeqMeasureGen(void)
   AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   if(error == AD5940ERR_OK)
   {
@@ -426,7 +424,7 @@ AD5940Err AppBIOZInit(uint32_t *pBuffer, uint32_t BufferSize)
   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
   fifo_cfg.FIFOSize = FIFOSIZE_4KB;                       /* 4kB for FIFO, The reset 2kB for sequencer */
   fifo_cfg.FIFOSrc = FIFOSRC_DFT;
-  fifo_cfg.FIFOThresh = AppBIOZCfg.FifoThresh;              /* DFT result. One pair for RCAL, another for Rz. One DFT result have real part and imaginary part */
+  fifo_cfg.FIFOThresh = AppBIOZCfg.FifoThresh;            /* DFT result. One pair for RCAL, another for Rz. One DFT result have real part and imaginary part */
   AD5940_FIFOCfg(&fifo_cfg);
 
   AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
@@ -461,7 +459,7 @@ AD5940Err AppBIOZInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
 	/* Manually configure system bandwidth and power mode before measuring excitation voltage. */
   AD5940_AFEPwrBW(AppBIOZCfg.PwrMod, AFEBW_250KHZ);
-  /* Measurment sequence  */
+  /* Measurement sequence  */
   AppBIOZCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppBIOZCfg.MeasureSeqInfo);
   

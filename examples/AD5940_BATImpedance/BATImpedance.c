@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    BATImpedance.c
- @author:  $Author: nxu2 $
- @brief:   BAT measurement sequences.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Battery impedance measurement sequences.
  -----------------------------------------------------------------------------
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
 This software is proprietary to Analog Devices, Inc. and its licensors.
@@ -13,8 +11,6 @@ Analog Devices Software License Agreement.
  
 *****************************************************************************/
 #include "BATImpedance.h"
-
-/* This file contains auto generated source code that user defined */
 
 /* 
   Application configuration structure. Specified by user from template.
@@ -344,7 +340,7 @@ static AD5940Err AppBATSeqMeasureGen(void)
   //AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
   error = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
-  AD5940_SEQGenCtrl(bFALSE); /* Stop seuqncer generator */
+  AD5940_SEQGenCtrl(bFALSE); /* Stop sequencer generator */
 
   AppBATCfg.MeasSeqCycleCount = AD5940_SEQCycleTime();
   AppBATCfg.MaxODR = 1/(((AppBATCfg.MeasSeqCycleCount + 10) / 16.0)* 1E-6)  ;
@@ -472,7 +468,7 @@ AD5940Err AppBATCheckFreq(float freq)
   dsp_cfg.ADCBaseCfg.ADCMuxP = ADCMUXP_AIN3;
   dsp_cfg.ADCBaseCfg.ADCPga = ADCPGA_1P5;
   memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care becase it's disabled */
+  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
   dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;
   dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
@@ -489,7 +485,7 @@ AD5940Err AppBATCheckFreq(float freq)
   memset(&dsp_cfg.StatCfg, 0, sizeof(dsp_cfg.StatCfg)); /* Don't care about Statistic */
   AD5940_DSPCfgS(&dsp_cfg);
 	
-	/* Step 3: Calculate clocks needed toget result to FIFO and update sequencer wait command */
+	/* Step 3: Calculate clocks needed to get result to FIFO and update sequencer wait command */
 	clks_cal.DataType = DATATYPE_DFT;
   clks_cal.DftSrc = AppBATCfg.DftSrc;
   clks_cal.DataCount = 1L<<(AppBATCfg.DftNum+2); /* 2^(DFTNUMBER+2) */

@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
- @file:    ImpSeqs.h
- @author:  $Author: nxu2 $
- @brief:   4-wire EDA measurement header file.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @file:    ElectrodermalActivity.h
+ @author:  Neo Xu
+ @brief:   skin impedance measurement header file.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.

@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940Main.c
- @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Used to control specific application and process data.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -204,7 +202,7 @@ void AD5940BIAStructInit(void)
   
   pBIACfg->RcalVal = 10000.0;
   pBIACfg->DftNum = DFTNUM_8192;
-  pBIACfg->NumOfData = -1;      /* Never stop until you stop it mannually by AppBIACtrl() function */
+  pBIACfg->NumOfData = -1;      /* Never stop until you stop it manually by AppBIACtrl() function */
   pBIACfg->BiaODR = 20;         /* ODR(Sample Rate) 20Hz */
   pBIACfg->FifoThresh = 4;      /* 4 */
   pBIACfg->ADCSinc3Osr = ADCSINC3OSR_2;
@@ -275,7 +273,7 @@ void AD5940_Main(void)
         }
       }
     }
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag())
     {
       AD5940_ClrMCUIntFlag(); /* Clear this flag */

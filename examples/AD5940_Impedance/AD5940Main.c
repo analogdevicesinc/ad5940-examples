@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940Main.c
- @author:  $Author: nxu2 $
- @brief:   Used to control specific application and futhur process data.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   Standard 4-wire or 2-wire impedance measurement example.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -128,7 +126,7 @@ void AD5940_Main(void)
   AD5940ImpedanceStructInit();
   
   AppIMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize IMP application. Provide a buffer, which is used to store sequencer commands */
-  AppIMPCtrl(IMPCTRL_START, 0);          /* Control IMP measurment to start. Second parameter has no meaning with this command. */
+  AppIMPCtrl(IMPCTRL_START, 0);          /* Control IMP measurement to start. Second parameter has no meaning with this command. */
  
   while(1)
   {

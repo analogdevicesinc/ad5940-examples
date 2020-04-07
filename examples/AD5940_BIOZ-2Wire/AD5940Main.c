@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940Main.c
- @author:  $Author: nxu2 $
+ @author:  Neo Xu
  @brief:   Used to control specific application and further process data.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -43,7 +41,7 @@ int32_t BIOZShowResult(uint32_t *pData, uint32_t DataCount)
   {
 		printf("Freq:%.2f ", freq);
     //printf("RzMag: %f Ohm , RzPhase: %f \n",AD5940_ComplexMag(&pImp[i]), AD5940_ComplexPhase(&pImp[i])*180/MATH_PI);
-		printf("Impedande:(Real,Image) = (%f,%f)\n", pImp[i].Real, pImp[i].Image);
+		printf("Impedance:(Real,Image) = (%f,%f)\n", pImp[i].Real, pImp[i].Image);
   }
   return 0;
 }
@@ -111,7 +109,7 @@ void AD5940BIOZStructInit(void)
   pBIOZCfg->RcalVal = 10000.0;
   pBIOZCfg->DftNum = DFTNUM_2048;
   pBIOZCfg->BIOZODR = 20;         /* ODR(Sample Rate) 20Hz */
-  pBIOZCfg->NumOfData = -1;      	/* Never stop until you stop it mannually by AppBIOZCtrl() function */
+  pBIOZCfg->NumOfData = -1;      	/* Never stop until you stop it manually by AppBIOZCtrl() function */
   pBIOZCfg->FifoThresh = 16;      /* 4 */
   pBIOZCfg->ADCSinc3Osr = ADCSINC3OSR_2;
   pBIOZCfg->SweepCfg.SweepEn = bFALSE;
@@ -126,11 +124,11 @@ void AD5940_Main(void)
   AD5940BIOZStructInit(); /* Configure your parameters in this function */
   
   AppBIOZInit(AppBuff, APPBUFF_SIZE);    /* Initialize BIOZ application. Provide a buffer, which is used to store sequencer commands */
-  AppBIOZCtrl(BIOZCTRL_START, 0);         /* Control BIOZ measurment to start. Second parameter has no meaning with this command. */
+  AppBIOZCtrl(BIOZCTRL_START, 0);         /* Control BIOZ measurement to start. Second parameter has no meaning with this command. */
  
   while(1)
   {
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag())
     {
       AD5940_ClrMCUIntFlag(); /* Clear this flag */

@@ -355,7 +355,7 @@ static AD5940Err AppEDASeqMeasureGen(void)
   lpdac_cfg.LpDacVzeroMux = LPDACVZERO_6BIT;   /* Use 6bit LPDAC for Vzero */
   lpdac_cfg.PowerEn = bTRUE;                   /* Enable LPDAC */
   lpdac_cfg.DacData12Bit = 0;                  /* Don't care, 12bit DAC data is from WG */
-  lpdac_cfg.DacData6Bit = 32;                  /* Set it to middle scale of LPDAC. Vzero is the bias voltage of LPTIA amplifire */ 
+  lpdac_cfg.DacData6Bit = 32;                  /* Set it to middle scale of LPDAC. Vzero is the bias voltage of LPTIA amplifier */
   AD5940_LPDACCfgS(&lpdac_cfg);
 
   /* Voltage and current measurement need different switch settings, record the difference and only modify this part for different purpose */
@@ -865,12 +865,10 @@ AD5940Err AppEDAISR(void *pBuff, uint32_t *pCount)
     /* Process data */ 
     AppEDADataProcess((int32_t*)pBuff,&FifoCnt); 
     *pCount = FifoCnt;
-    return 0;
+    return AD5940ERR_OK;
   }
-  //printf("Leave Int.\n");
-  
-  return 0;
-} 
+  return AD5940ERR_WAKEUP;
+}
 
 /**
  * @}

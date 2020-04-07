@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    AD5940_DFTPolling.c
- @author:  $Author: nxu2 $
- @brief:   DFT Polling mode example
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @author:  Neo Xu
+ @brief:   DFT Polling mode example.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -19,7 +17,7 @@ Analog Devices Software License Agreement.
 #include "math.h"
 
 /**
- * Note: In order to use onchip DFT engine, WG must be set to SIN wave generator and enable it.
+ * Note: In order to use on-chip DFT engine, WG must be set to SIN wave generator and enable it.
 */
 
 void AD5940_Main(void)

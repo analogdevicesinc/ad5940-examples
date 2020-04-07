@@ -127,11 +127,11 @@ void AD5940_Main(void)
   AD5940PlatformCfg();
   AD5940AMPStructInit(); /* Configure your parameters in this function */ 
   AppAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize AMP application. Provide a buffer, which is used to store sequencer commands */
-  AppAMPCtrl(AMPCTRL_START, 0);         /* Control AMP measurment to start. Second parameter has no meaning with this command. */
+  AppAMPCtrl(AMPCTRL_START, 0);         /* Control AMP measurement to start. Second parameter has no meaning with this command. */
 
   while(1)
   {
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag())
     {
       AD5940_ClrMCUIntFlag(); /* Clear this flag */

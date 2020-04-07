@@ -1,7 +1,7 @@
 /*!
 *****************************************************************************
 @file:    AD5940_Temperature.c
-@author:  $Author: nxu2 $
+@author:  Neo Xu
 @brief:   AD5940 internal temperature sensor example with sequencer support.
 -----------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ static int32_t AD5940PlatformCfg(void){
   /* Step2. Configure FIFO and Sequencer*/
   fifo_cfg.FIFOEn = bFALSE;
   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
-  fifo_cfg.FIFOSize = FIFOSIZE_4KB;                       /* 4kB for FIFO, The reset 2kB for sequencer */
+  fifo_cfg.FIFOSize = FIFOSIZE_4KB;                      /* 4kB for FIFO, The reset 2kB for sequencer */
   fifo_cfg.FIFOSrc = FIFOSRC_SINC2NOTCH;
   fifo_cfg.FIFOThresh = FIFO_THRESHOLD;
   AD5940_FIFOCfg(&fifo_cfg);                             /* Disable to reset FIFO. */
@@ -91,7 +91,7 @@ void _ad5940_analog_init(void){
   AFERefCfg_Type aferef_cfg;
   ADCBaseCfg_Type adc_base;
   ADCFilterCfg_Type adc_filter;
-  //init ad5940 for temeprature measurement.
+  //init ad5940 for temperature measurement.
   AD5940_AFECtrlS(AFECTRL_ALL, bFALSE);  /* Init all to disable state */
   aferef_cfg.HpBandgapEn = bTRUE;
   aferef_cfg.Hp1V1BuffEn = bTRUE;
@@ -102,7 +102,7 @@ void _ad5940_analog_init(void){
   aferef_cfg.Hp1V8Ilimit = bFALSE;
   aferef_cfg.Lp1V1BuffEn = bFALSE;
   aferef_cfg.Lp1V8BuffEn = bFALSE;
-  /* LP reference control - turn off them to save powr*/
+  /* LP reference control - turn off them to save power*/
   aferef_cfg.LpBandgapEn = bFALSE;
   aferef_cfg.LpRefBufEn = bFALSE;
   aferef_cfg.LpRefBoostEn = bFALSE;
@@ -151,7 +151,7 @@ void AD5940_TemperatureInit(void){
   AD5940_SEQGenInit(buff, BUFF_SIZE); //init sequence generator
   AD5940_SEQGenCtrl(bTRUE); //from now on, record all register operations rather than write them to AD5940 through SPI.
 
-  AD5940_SEQGpioCtrlS(AGPIO_Pin1);  //pull high AGPIO1 so we know the sequencer is running by observing pin status with ossilloscope etc.
+  AD5940_SEQGpioCtrlS(AGPIO_Pin1);  //pull high AGPIO1 so we know the sequencer is running by observing pin status with oscilloscope etc.
   AD5940_SEQGenInsert(SEQ_WAIT(16*200));  /* Time for reference settling(if ad5940 is just wake up from hibernate mode) */
   AD5940_AFECtrlS(AFECTRL_ADCPWR, bTRUE); /* Turn ON ADC power */
   AD5940_SEQGenInsert(SEQ_WAIT(16*50));   /* wait another 50us for ADC to settle. */
@@ -180,7 +180,7 @@ void AD5940_TemperatureInit(void){
   wupt_cfg.SeqxWakeupTime[SEQID_0] = (uint32_t)(32e3f/MEASURE_FREQ)-4-1;
   AD5940_WUPTCfg(&wupt_cfg);
   //enable sequencer
-  AD5940_SEQCtrlS(bTRUE); //now sequencer is ready to be triggerd.
+  AD5940_SEQCtrlS(bTRUE); //now sequencer is ready to be triggered.
 }
 
 void AD5940_TemperatureISR(void){
@@ -198,7 +198,7 @@ void AD5940_TemperatureISR(void){
     data_count = FifoCnt;
     AD5940_FIFORd(buff, FifoCnt);
     AD5940_INTCClrFlag(AFEINTSRC_DATAFIFOTHRESH);
-    AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);    /* Allow AFE to enter sleep mode. AFE will stay at active mode untill sequencer trigger sleep */
+    AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);    /* Allow AFE to enter sleep mode. AFE will stay at active mode until sequencer trigger sleep */
     AD5940_EnterSleepS();	//If MCU is too slow, comment this line, otherwise there is chance the sequencer is running at this point.
   }
 }
@@ -218,7 +218,7 @@ void AD5940_Main(void){
   AD5940_TemperatureInit();
   AD5940_WUPTCtrl(bTRUE); //start wupt, so the sequence will be run periodically.
   while(1){
-    /* Check if interrupt flag which will be set when interrupt occured. */
+    /* Check if interrupt flag which will be set when interrupt occurred. */
     if(AD5940_GetMCUIntFlag()){
       AD5940_ClrMCUIntFlag(); /* Clear this flag */
       AD5940_TemperatureISR();

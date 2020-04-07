@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
- @file:    RampTest.H
- @author:  $Author: nxu2 $
+ @file:    RampTest.h
+ @author:  Neo Xu
  @brief:   Ramp Test header file.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -70,7 +68,7 @@ typedef struct
   float     CurrRampCode;         /**<  */   
   uint32_t  CurrVzeroCode;        
   BoolFlag  bDACCodeInc;          /**< Increase DAC code.  */
-  BoolFlag  StopRequired;         /**< After FIFO is ready, stop the measurment sequence */
+  BoolFlag  StopRequired;         /**< After FIFO is ready, stop the measurement sequence */
   enum _RampState{RAMP_STATE0 = 0, RAMP_STATE1, RAMP_STATE2, RAMP_STATE3, RAMP_STATE4, RAMP_STOP} RampState;
   BoolFlag  bRampOneDir;          /**< Ramp in a single direction, no return to start */
 }AppRAMPCfg_Type;

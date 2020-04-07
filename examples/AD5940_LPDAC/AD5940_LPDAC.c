@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
- @file:    AD5940_WG.c
- @author:  $Author: nxu2 $
- @brief:   Waveform generator example include switch matrix.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
+ @file:    AD5940_LPDAC.c
+ @author:  Neo Xu
+ @brief:   Low power DAC example.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -43,7 +41,7 @@ void AD5940_Main(void)
 
   AD5940_StructInit(&lp_cfg, sizeof(lp_cfg));         /* Reset everything to zero(OFF) */
   /* Configure what we need below */
-  lp_cfg.LpDacCfg.LpdacSel = LPDAC0;                  /* Slect LPDAC0. Note LPDAC1 is available on ADuCM355 */
+  lp_cfg.LpDacCfg.LpdacSel = LPDAC0;                  /* Select LPDAC0. Note LPDAC1 is available on ADuCM355 */
   lp_cfg.LpDacCfg.DacData12Bit = 0x800;               /* Output midscale voltage (0.2V + 2.4V)/2 = 1.3V */
   lp_cfg.LpDacCfg.DacData6Bit = 0;                    /* 6Bit DAC data */
   lp_cfg.LpDacCfg.DataRst =bFALSE;                    /* Do not keep DATA registers at reset status */
@@ -58,7 +56,7 @@ void AD5940_Main(void)
   lp_cfg.LpAmpCfg.LpPaPwrEn = bTRUE;                  /* Enable LP PA(potentialstat amplifier) power */
   lp_cfg.LpAmpCfg.LpTiaPwrEn = bTRUE;                /* Leave LPTIA power off */
   lp_cfg.LpAmpCfg.LpTiaSW = LPTIASW(12)|LPTIASW(13)|LPTIASW(2)|LPTIASW(10)\
-          |LPTIASW(5)|LPTIASW(9); /* Close these switches to make sure LP PA amplifire is closed loop */
+          |LPTIASW(5)|LPTIASW(9); /* Close these switches to make sure LP PA amplifier is closed loop */
   lp_cfg.LpAmpCfg.LpTiaRf = LPTIARF_SHORT;
   lp_cfg.LpAmpCfg.LpTiaRtia = LPTIARTIA_200R;
   lp_cfg.LpAmpCfg.LpTiaRload = LPTIARLOAD_100R;
