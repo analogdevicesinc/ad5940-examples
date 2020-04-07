@@ -2,7 +2,7 @@
  *****************************************************************************
  @file:    Electrocardiograph.h
  @author:  $Author: nxu2 $
- @brief:   ECG measurment.
+ @brief:   ECG measurement.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -45,18 +45,20 @@ typedef struct
   uint32_t ADCSinc2Osr;  
 /* Private variables for internal usage */
   BoolFlag ECGInited;           /* If the program run firstly, generated sequence commands */
-  BoolFlag StopRequired;        /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;        /* After FIFO is ready, stop the measurement sequence */
+  BoolFlag bRunning;            /**< status of if app is running. Useful when send STOP_SYNC to detect if it's actually stopped. */
   uint32_t FifoDataCount;       /* How many data we have got from start. */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
 }AppECGCfg_Type;
 
 #ifndef APPCTRL_START
-#define APPCTRL_START          0
-#define APPCTRL_STOPNOW        1
-#define APPCTRL_STOPSYNC       2
-//#define APPCTRL_GETFREQ        3 
-#define APPCTRL_SHUTDOWN       4   /* Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
+#define APPCTRL_START          0      /**< Start the measurement by starting Wakeup Timer */
+#define APPCTRL_STOPNOW        1      /**< Stop immediately by stop Wakeup Timer*/
+#define APPCTRL_STOPSYNC       2      /**< Stop the measurement when interrupt occurred */
+#define APPCTRL_SHUTDOWN       3      /**< Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
+#define APPCTRL_RUNNING        4      /**< Is application running? */
+
 #endif
 
 AD5940Err AppECGGetCfg(void *pCfg);

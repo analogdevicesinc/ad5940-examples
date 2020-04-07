@@ -50,6 +50,7 @@ AppECGCfg_Type AppECGCfg =
 
   .ECGInited = bFALSE,
   .StopRequired = bFALSE,
+  .bRunning = bFALSE,
   .FifoDataCount = 0,
 };
 
@@ -88,6 +89,7 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
       AD5940_WUPTCfg(&wupt_cfg);
       
       AppECGCfg.FifoDataCount = 0;  /* restart */
+      AppECGCfg.bRunning = bTRUE;
       break;
     }
     case APPCTRL_STOPNOW:
@@ -99,6 +101,7 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
       /* There is chance this operation will fail because sequencer could put AFE back 
         to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
+      AppECGCfg.bRunning = bFALSE;
       break;
     }
     case APPCTRL_STOPSYNC:
@@ -108,7 +111,7 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
     }
     case APPCTRL_SHUTDOWN:
     {
-      AppECGCtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppECGCtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by hibernate operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -119,6 +122,11 @@ int32_t AppECGCtrl(int32_t Command, void *pPara)
       AD5940_EnterSleepS();  /* Enter Hibernate */
     }
     break;
+    case APPCTRL_RUNNING:
+      if(pPara == NULL)
+        return AD5940ERR_NULLP; /* Null pointer */
+      *(BoolFlag*)pPara = AppECGCfg.bRunning;
+      break;
     default: break;
   }
   return AD5940ERR_OK;
@@ -331,6 +339,8 @@ int32_t AppECGRegModify(int32_t * const pData, uint32_t *pDataCount)
   if(AppECGCfg.StopRequired == bTRUE)
   {
     AD5940_WUPTCtrl(bFALSE);
+    AppECGCfg.StopRequired = bFALSE;
+    AppECGCfg.bRunning = bFALSE;
     return AD5940ERR_OK;
   }
   return AD5940ERR_OK;
@@ -379,7 +389,7 @@ AD5940Err AppECGISR(void *pBuff, uint32_t *pCount)
     AD5940_INTCClrFlag(AFEINTSRC_DATAFIFOTHRESH);
     AppECGRegModify(pBuff, &FifoCnt);   /* If there is need to do AFE re-configure, do it here when AFE is in active state */
     AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);    /* Allow AFE to enter sleep mode. AFE will stay at active mode untill sequencer trigger sleep */
-    /* AD5940_EnterSleepS(); // We cannot mannually put AFE to hibernate because it's possible sequencer is running to take measurments */
+    /* AD5940_EnterSleepS(); // We cannot mannually put AFE to hibernate because it's possible sequencer is running to take measurements */
     /* Process data */ 
     AppECGDataProcess(pBuff,&FifoCnt); 
     *pCount = FifoCnt;

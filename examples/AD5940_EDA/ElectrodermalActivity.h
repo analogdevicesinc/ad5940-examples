@@ -119,6 +119,7 @@ typedef struct
 #define APPCTRL_STOPNOW        1      /**< Stop immediately by stop Wakeup Timer*/
 #define APPCTRL_STOPSYNC       2      /**< Stop the measurement when interrupt occurred */
 #define APPCTRL_SHUTDOWN       3      /**< Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
+#define APPCTRL_RUNNING        4      /**< Is application running? */
 
 #define EDACTRL_MEASVOLT       100    /**< Measure Excitation voltage now */
 #define EDACTRL_GETRTIAMAG     101    /**< Get the rtia magnitude for current measured data */

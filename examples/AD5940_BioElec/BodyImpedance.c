@@ -2,7 +2,7 @@
  *****************************************************************************
  @file:    BodyComposition.c
  @author:  $Author: nxu2 $
- @brief:   BIA measurment sequences.
+ @brief:   BIA measurement sequences.
  @version: $Revision: 766 $
  @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
@@ -68,6 +68,7 @@ AppBIACfg_Type AppBIACfg =
   .FifoThresh = 4,
   .BIAInited = bFALSE,
   .StopRequired = bFALSE,
+  .bRunning = bFALSE,
   .MeasSeqCycleCount = 0,
 };
 
@@ -104,6 +105,7 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
       AD5940_WUPTCfg(&wupt_cfg);
       
       AppBIACfg.FifoDataCount = 0;  /* restart */
+      AppBIACfg.bRunning = bTRUE;
 #ifdef ADI_DEBUG
       ADI_Print("BIA Start...\n");
 #endif
@@ -118,6 +120,7 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
       /* There is chance this operation will fail because sequencer could put AFE back 
         to hibernate mode just after waking up. Use STOPSYNC is better. */
       AD5940_WUPTCtrl(bFALSE);
+      AppBIACfg.bRunning = bFALSE;
 #ifdef ADI_DEBUG
       ADI_Print("BIA Stop Now...\n");
 #endif
@@ -142,7 +145,7 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
     break;
     case APPCTRL_SHUTDOWN:
     {
-      AppBIACtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurment if it's running. */
+      AppBIACtrl(APPCTRL_STOPNOW, 0);  /* Stop the measurement if it's running. */
       /* Turn off LPloop related blocks which are not controlled automatically by hibernate operation */
       AFERefCfg_Type aferef_cfg;
       LPLoopCfg_Type lp_loop;
@@ -156,6 +159,11 @@ AD5940Err AppBIACtrl(int32_t BcmCtrl, void *pPara)
 #endif
     }
     break;
+    case APPCTRL_RUNNING:
+      if(pPara == NULL)
+        return AD5940ERR_NULLP; /* Null pointer */
+      *(BoolFlag*)pPara = AppBIACfg.bRunning;
+      break;
     default:
     break;
   }
@@ -528,6 +536,8 @@ static AD5940Err AppBIARegModify(int32_t * const pData, uint32_t *pDataCount)
   if(AppBIACfg.StopRequired == bTRUE)
   {
     AD5940_WUPTCtrl(bFALSE);
+    AppBIACfg.StopRequired = bFALSE;
+    AppBIACfg.bRunning = bFALSE;
     return AD5940ERR_OK;
   }
   if(AppBIACfg.SweepCfg.SweepEn) /* Need to set new frequency and set power mode */

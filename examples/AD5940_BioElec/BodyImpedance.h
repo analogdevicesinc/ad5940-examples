@@ -24,7 +24,7 @@ Analog Devices Software License Agreement.
 #define MAXSWEEP_POINTS   100           /* Need to know how much buffer is needed to save RTIA calibration result */
 
 /* 
-  Note: this example will use SEQID_0 as measurment sequence, and use SEQID_1 as init sequence. 
+  Note: this example will use SEQID_0 as measurement sequence, and use SEQID_1 as init sequence. 
   SEQID_3 is used for calibration.
 */
 
@@ -73,7 +73,8 @@ typedef struct
   BoolFlag BIAInited;                       /* If the program run firstly, generated sequence commands */
   SEQInfo_Type InitSeqInfo;
   SEQInfo_Type MeasureSeqInfo;
-  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurment sequence */
+  BoolFlag StopRequired;          /* After FIFO is ready, stop the measurement sequence */
+  BoolFlag bRunning;              /**< status of if app is running. Useful when send STOP_SYNC to detect if it's actually stopped. */
   uint32_t FifoDataCount;         /* Count how many times impedance have been measured */
   uint32_t MeasSeqCycleCount;     /* How long the measurement sequence will take */
   float MaxODR;                   /* Max ODR for sampling in this config */       
@@ -82,10 +83,11 @@ typedef struct
 
 #ifndef APPCTRL_START
 /* Common application control message */
-#define APPCTRL_START          0
-#define APPCTRL_STOPNOW        1
-#define APPCTRL_STOPSYNC       2
-#define APPCTRL_SHUTDOWN       3    /* Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
+#define APPCTRL_START          0      /**< Start the measurement by starting Wakeup Timer */
+#define APPCTRL_STOPNOW        1      /**< Stop immediately by stop Wakeup Timer*/
+#define APPCTRL_STOPSYNC       2      /**< Stop the measurement when interrupt occurred */
+#define APPCTRL_SHUTDOWN       3      /**< Note: shutdown here means turn off everything and put AFE to hibernate mode. The word 'SHUT DOWN' is only used here. */
+#define APPCTRL_RUNNING        4      /**< Is application running? */
 #endif
 
 #define BIACTRL_GETFREQ        100   /* Get Current frequency of returned data from ISR */

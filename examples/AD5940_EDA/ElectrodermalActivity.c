@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    ElectrodermalActivity.c
- @author:  $Author: nxu2 $
+ @author:  Neo Xu
  @brief:   EDA measurement sequences.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -101,12 +99,12 @@ AD5940Err AppEDAGetCfg(void *pCfg)
 
 /**
  * @brief Control application like start, stop.
- * @param Command: The command for this applicaiton, select from below paramters
- *        - APPCTRL_START: start the measurment. Note: the ramp test need firslty call function AppRAMPInit() every time before start it.
- *        - APPCTRL_STOPNOW: Stop the measurment immediately.
+ * @param Command: The command for this application, select from below paramters
+ *        - APPCTRL_START: start the measurement. Note: the ramp test need firstly call function AppRAMPInit() every time before start it.
+ *        - APPCTRL_STOPNOW: Stop the measurement immediately.
  *        - APPCTRL_STOPSYNC: Stop the measuremnt when current measured data is read back.
- *        - APPCTRL_SHUTDOWN: Stop the measurment immediately and put AFE to shut down mode(turn off LP loop and enter hibernate).
- *        - EDACTRL_MEASVOLT: Measure voltage once current measurment is done(Interrupt occured).
+ *        - APPCTRL_SHUTDOWN: Stop the measurement immediately and put AFE to shut down mode(turn off LP loop and enter hibernate).
+ *        - EDACTRL_MEASVOLT: Measure voltage once current measurement is done(Interrupt occurred).
  *        - EDACTRL_GETRTIAMAG: Get current RTIA value.
  * @return none.
 */
@@ -192,10 +190,12 @@ AD5940Err AppEDACtrl(int32_t EDACtrl, void *pPara)
       pImpAVR->Image = AppEDACfg.ImpSum.Image/AppEDACfg.ImpSumCount;
       break;
     }
+    case APPCTRL_RUNNING:
     case EDACTRL_STATUS:
       if(pPara == NULL)
         return AD5940ERR_NULLP; /* Null pointer */
       *(BoolFlag*)pPara = AppEDACfg.bRunning;
+      break;
     default:
     break;
   }
@@ -225,7 +225,7 @@ static AD5940Err AppEDASeqCfgGen(void)
   AD5940_StructInit(&aferef_cfg, sizeof(aferef_cfg));
   AD5940_REFCfgS(&aferef_cfg);  /* Turn off all references, we only enable it when we need it. */
   
-  AD5940_StructInit(&lp_loop, sizeof(lp_loop)); /* Disable everything, configure them during measurment */
+  AD5940_StructInit(&lp_loop, sizeof(lp_loop)); /* Disable everything, configure them during measurement */
   AD5940_LPLoopCfgS(&lp_loop);
 
   AD5940_StructInit(&wg_cfg, sizeof(wg_cfg));
@@ -291,8 +291,8 @@ static AD5940Err AppEDASeqCfgGen(void)
 
 /**
  * @brief Generate patch sequence according to current measurement type(Voltage or Current). 
- * @details The patch is used to adjust sequencer commands already stored in SRAM of AD5940 in order to perform different measurments. 
- *          The reason is that the sequences need to be adjusted. Using the patch method will make things easiy and we won't need to modify 
+ * @details The patch is used to adjust sequencer commands already stored in SRAM of AD5940 in order to perform different measurements. 
+ *          The reason is that the sequences need to be adjusted. Using the patch method will make things easily and we won't need to modify 
  *          sequences in register level.
  * @param pPatch: pointer to patch information include the measurement type, Rtia selection and buffers.
  * @return return error code.
@@ -311,11 +311,11 @@ static AD5940Err ApPEDASeqPatchGen(SeqPatchInfo_Type *pPatch)
   lpamp_cfg.LpTiaPwrEn = bTRUE;                /* Enable TIA amplifier */
   lpamp_cfg.LpTiaRf = LPF_RF;                  /* Rf resistor controls cut off frequency. */
   lpamp_cfg.LpTiaRload = LPTIARLOAD_100R;      /** @note Use 100Ohm Rload. */
-  lpamp_cfg.LpTiaRtia = pPatch->RtiaSel;  /* If autoscaling is enabled, use seleted value. */
+  lpamp_cfg.LpTiaRtia = pPatch->RtiaSel;  /* If autoscaling is enabled, use selected value. */
   if(pPatch->Type == PATCHTYPE_VOLT)
-    lpamp_cfg.LpTiaSW = LPTIASW_VOLT;            /* Swtich settings for voltage measurement */
+    lpamp_cfg.LpTiaSW = LPTIASW_VOLT;            /* Switch settings for voltage measurement */
   else if(pPatch->Type == PATCHTYPE_CURR)
-    lpamp_cfg.LpTiaSW = LPTIASW_CURR;            /* Swtich settings for current measurement */
+    lpamp_cfg.LpTiaSW = LPTIASW_CURR;            /* Switch settings for current measurement */
   AD5940_LPAMPCfgS(&lpamp_cfg);
   AD5940_SEQGenCtrl(bFALSE);
   err = AD5940_SEQGenFetchSeq(&pSeqCmd, &SeqLen);
@@ -358,7 +358,7 @@ static AD5940Err AppEDASeqMeasureGen(void)
   lpdac_cfg.DacData6Bit = 32;                  /* Set it to middle scale of LPDAC. Vzero is the bias voltage of LPTIA amplifire */ 
   AD5940_LPDACCfgS(&lpdac_cfg);
 
-  /* Voltage and current measurment need different switch settings, record the difference and only modify this part for different purpose */
+  /* Voltage and current measurement need different switch settings, record the difference and only modify this part for different purpose */
   error = AD5940_SEQGenFetchSeq(NULL, &AppEDACfg.SeqPatchInfo.SRAMAddr); /* Record the start address of below commands */
   if(error != AD5940ERR_OK)
     return error;
@@ -535,7 +535,7 @@ AD5940Err AppEDAInit(uint32_t *pBuffer, uint32_t BufferSize)
   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
   fifo_cfg.FIFOSize = FIFOSIZE_4KB;                       /* 4kB for FIFO, The reset 2kB for sequencer */
   fifo_cfg.FIFOSrc = FIFOSRC_DFT;
-  fifo_cfg.FIFOThresh = AppEDACfg.VoltCalPoints*2;       /* The first measurment is for excitation voltage. */
+  fifo_cfg.FIFOThresh = AppEDACfg.VoltCalPoints*2;       /* The first measurement is for excitation voltage. */
   AD5940_FIFOCfg(&fifo_cfg);
 
   AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
@@ -565,7 +565,7 @@ AD5940Err AppEDAInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppEDACfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-  /* Apply patch for voltage measurment */
+  /* Apply patch for voltage measurement */
   AppEDACfg.EDAStateCurr = EDASTATE_VOLT; /* After initialization, the first thing is to measure excitation voltage */
   AppEDACfg.RtiaIndexCurr = AppEDACfg.RtiaIndexNext = AppEDACfg.LptiaRtiaSel;   /* Init with a value */
   AppEDACfg.SeqPatchInfo.RtiaSel = LPTIARTIA_OPEN;//AppEDACfg.RtiaIndexCurr;
@@ -620,7 +620,7 @@ static AD5940Err AppEDARegModify(int32_t * const pData, uint32_t *pDataCount)
     sw_cfg.Nswitch = SWN_OPEN;
     sw_cfg.Tswitch = SWT_AIN0|SWT_AFE3LOAD;    /* This switch is for ECG. */
     AD5940_SWMatrixCfgS(&sw_cfg);
-    /* Apply patch for current measurment */
+    /* Apply patch for current measurement */
     //AppEDACfg.SeqPatchInfo.bMeasureVolt = bFALSE;
     AppEDACfg.SeqPatchInfo.Type = PATCHTYPE_CURR;
     AppEDACfg.SeqPatchInfo.RtiaSel = AppEDACfg.RtiaIndexNext;
@@ -668,7 +668,7 @@ static AD5940Err AppEDARegModify(int32_t * const pData, uint32_t *pDataCount)
     AD5940_FIFOThrshSet(AppEDACfg.VoltCalPoints*2);
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bTRUE);     /* Enable FIFO. */
 
-    /* Apply patch for current measurment */
+    /* Apply patch for current measurement */
     AppEDACfg.SeqPatchInfo.Type = PATCHTYPE_VOLT;
     AppEDACfg.SeqPatchInfo.RtiaSel = LPTIARTIA_OPEN;//AppEDACfg.RtiaIndexNext;
     error = ApPEDASeqPatchGen(&AppEDACfg.SeqPatchInfo);
@@ -692,6 +692,7 @@ static AD5940Err AppEDARegModify(int32_t * const pData, uint32_t *pDataCount)
   if(AppEDACfg.StopRequired == bTRUE)
   {
     AD5940_WUPTCtrl(bFALSE);
+    AppEDACfg.StopRequired = bFALSE;
     AppEDACfg.bRunning = bFALSE;
     return AD5940ERR_OK;
   }

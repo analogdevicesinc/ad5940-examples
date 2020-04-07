@@ -244,7 +244,7 @@ void AD5940EDAStructInit(void)
 }
 
 BioElecApp_Type *pCurrApp;
-uint8_t bSwitchApp = 1;
+uint8_t bSwitchingApp = 1;
 uint8_t toApp = APP_ID_BIA;
 
 void AD5940_Main(void)
@@ -256,17 +256,24 @@ void AD5940_Main(void)
   AD5940BIAStructInit();  /* Configure your parameters in this function */
   AD5940ECGStructInit();  /*  */
   AD5940EDAStructInit();  /*  */
+  pCurrApp = &BioElecAppList[toApp];
   while(1)
   {
-    if(bSwitchApp)
+    if(bSwitchingApp)
     {
-      bSwitchApp = 0;
-      pCurrApp = &BioElecAppList[toApp];
-      /* Initialize registers that fit to all measurements */
-      AD5940PlatformCfg();
-      pCurrApp->pAppInit(AppBuff, APPBUFF_SIZE);
-      AD5940_ClrMCUIntFlag(); /* Clear the interrupts happened during initialization */
-      pCurrApp->pAppCtrl(APPCTRL_START, 0);         /* Control BIA measurment to start. Second parameter has no meaning with this command. */
+      //if the 'old' app stopped?
+      BoolFlag running;
+      if(pCurrApp->pAppCtrl(APPCTRL_RUNNING, &running) == AD5940ERR_OK){
+        if(running == bFALSE){
+          bSwitchingApp = 0;
+          pCurrApp = &BioElecAppList[toApp];
+          /* Initialize registers that fit to all measurements */
+          AD5940PlatformCfg();
+          pCurrApp->pAppInit(AppBuff, APPBUFF_SIZE);
+          AD5940_ClrMCUIntFlag(); /* Clear the interrupts happened during initialization */
+          pCurrApp->pAppCtrl(APPCTRL_START, 0);
+        }
+      }
     }
     /* Check if interrupt flag which will be set when interrupt occured. */
     if(AD5940_GetMCUIntFlag())
@@ -290,13 +297,13 @@ void AD5940_Main(void)
 }
 
 
-uint32_t command_start_measurment(uint32_t para1, uint32_t para2)
+uint32_t command_start_measurement(uint32_t para1, uint32_t para2)
 {
   pCurrApp->pAppCtrl(APPCTRL_START, 0);
   return 0;
 }
 
-uint32_t command_stop_measurment(uint32_t para1, uint32_t para2)
+uint32_t command_stop_measurement(uint32_t para1, uint32_t para2)
 {
   pCurrApp->pAppCtrl(APPCTRL_STOPNOW, 0);
   return 0;
@@ -325,8 +332,8 @@ uint32_t command_switch_app(uint32_t AppID, uint32_t para2)
   }
 
   if(pCurrApp)
-    pCurrApp->pAppCtrl(APPCTRL_STOPNOW, 0);
-  bSwitchApp = 1;
+    pCurrApp->pAppCtrl(APPCTRL_STOPSYNC, 0);
+  bSwitchingApp = 1;
   toApp = AppID;
   return 0;
 }
