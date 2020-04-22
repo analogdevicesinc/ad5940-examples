@@ -22,7 +22,26 @@ Analog Devices Software License Agreement.
 
 #include "ad5940.h"
 #include <stdio.h>
-  
+
+#define ADCPGA_GAIN_SEL   ADCPGA_1P5
+static void AD5940_PGA_Calibration(void){
+  AD5940Err err;
+  ADCPGACal_Type pgacal;
+  pgacal.AdcClkFreq = 16e6;
+  pgacal.ADCSinc2Osr = ADCSINC2OSR_178;
+  pgacal.ADCSinc3Osr = ADCSINC3OSR_4;
+  pgacal.SysClkFreq = 16e6;
+  pgacal.TimeOut10us = 1000;
+  pgacal.VRef1p11 = 1.11f;
+  pgacal.VRef1p82 = 1.82f;
+  pgacal.PGACalType = PGACALTYPE_OFFSETGAIN;
+  pgacal.ADCPga = ADCPGA_GAIN_SEL;
+  err = AD5940_ADCPGACal(&pgacal);
+  if(err != AD5940ERR_OK){
+    printf("AD5940 PGA calibration failed.");
+  }
+}
+
 void AD5940_Main(void)
 {
   ADCBaseCfg_Type adc_base;
@@ -34,13 +53,15 @@ void AD5940_Main(void)
   /* Firstly call this function after reset to initialize AFE registers. */
   AD5940_Initialize();
   
+  AD5940_PGA_Calibration();
   /* Configure AFE power mode and bandwidth */
   AD5940_AFEPwrBW(AFEPWR_LP, AFEBW_250KHZ);
   
   /* Initialize ADC basic function */
-  adc_base.ADCMuxP = ADCMUXP_AVDD_2;
+  AD5940_AFECtrlS(AFECTRL_DACREFPWR|AFECTRL_HSDACPWR, bTRUE); //We are going to measure DAC 1.82V reference.
+  adc_base.ADCMuxP = ADCMUXP_VREF1P8DAC;
   adc_base.ADCMuxN = ADCMUXN_VSET1P1;
-  adc_base.ADCPga = ADCPGA_1;
+  adc_base.ADCPga = ADCPGA_GAIN_SEL;
   AD5940_ADCBaseCfgS(&adc_base);
   
   /* Initialize ADC filters ADCRawData-->SINC3-->SINC2+NOTCH */
@@ -80,7 +101,8 @@ void AD5940_Main(void)
       if(count == 150) /* Print data @1Hz */
       {
         count = 0;
-        printf("ADC Code:%d\n",rd);
+        float diff_volt = AD5940_ADCCode2Volt(rd, ADCPGA_GAIN_SEL, 1.82);
+        printf("ADC Code:%d, diff-volt: %.4f, volt:%.4f\n",rd, diff_volt, diff_volt+1.11);
       }
     }
   }
