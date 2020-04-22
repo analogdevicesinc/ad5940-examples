@@ -1,10 +1,8 @@
 /*!
  *****************************************************************************
  @file:    ADICUP3029Port.c
- @author:  $Author: ADI $
+ @author:  Neo Xu
  @brief:   The port for ADI's ADICUP3029 board.
- @version: $Revision: 766 $
- @date:    $Date: 2017-08-21 14:09:35 +0100 (Mon, 21 Aug 2017) $
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -24,7 +22,7 @@ volatile static uint32_t ucInterrupted = 0;       /* Flag to indicate interrupt 
 
 /**
 	@brief Using SPI to transmit N bytes and return the received bytes. This function targets to 
-                     provide a more efficent way to transmit/receive data.
+         provide a more efficient way to transmit/receive data.
 	@param pSendBuffer :{0 - 0xFFFFFFFF}
       - Pointer to the data to be sent.
 	@param pRecvBuff :{0 - 0xFFFFFFFF}
@@ -35,20 +33,26 @@ volatile static uint32_t ucInterrupted = 0;       /* Flag to indicate interrupt 
 **/
 void AD5940_ReadWriteNBytes(unsigned char *pSendBuffer,unsigned char *pRecvBuff,unsigned long length)
 {
-  ///@todo optimize FIFO operation for ADUCM3029.
-  while(length--)
-  {
-    // Flush Tx FIFO
-    pADI_SPI0->CTL |= BITM_SPI_CTL_TFLUSH;
-    pADI_SPI0->CTL &=~BITM_SPI_CTL_TFLUSH;
-    //do spi read and write
-    pADI_SPI0->CNT = 1;
-    pADI_SPI0->TX = *pSendBuffer++;
-    while((pADI_SPI0->STAT&BITM_SPI_STAT_XFRDONE) == 0);
-    while((pADI_SPI0->STAT&BITM_SPI_STAT_TXIRQ) == 0);
-    pADI_SPI0->STAT = BITM_SPI_STAT_TXIRQ|BITM_SPI_STAT_XFRDONE;
-    *pRecvBuff++ = pADI_SPI0->RX;
+  uint32_t tx_count=0, rx_count=0;
+  pADI_SPI0->CNT = length;
+  while(1){
+    uint32_t fifo_sta = pADI_SPI0->FIFO_STAT;
+    if(rx_count < length){
+      if(fifo_sta&0xf00){//there is data in RX FIFO.
+        *pRecvBuff++ = pADI_SPI0->RX;
+        rx_count ++;
+      }
+    }
+    if(tx_count < length){
+      if((fifo_sta&0xf) < 8){// there is space in TX FIFO.
+        pADI_SPI0->TX = *pSendBuffer++;
+        tx_count ++;
+      }
+    }
+    if(rx_count == length && tx_count==length)
+      break;  //done
   }
+  while((pADI_SPI0->STAT&BITM_SPI_STAT_XFRDONE) == 0);//wait for transfer done.
 }
 
 void AD5940_CsClr(void)
@@ -93,6 +97,7 @@ uint32_t AD5940_GetMCUIntFlag(void)
 
 uint32_t AD5940_ClrMCUIntFlag(void)
 {
+   pADI_XINT0->CLR = BITM_XINT_CLR_IRQ0;
    ucInterrupted = 0;
    return 1;
 }
