@@ -35,7 +35,7 @@ static int32_t RampShowResult(float *pData, uint32_t DataCount)
   /* Print data*/
   for(int i=0;i<DataCount;i++)
   {
-    printf("index:%d, %.3fuA\n", index++, pData[i]);
+    printf("index:%d, %.3f\n", index++, pData[i]);
     //i += 10;  /* Print though UART consumes too much time. */
   }
   return 0;
@@ -124,16 +124,18 @@ void AD5940RampStructInit(void)
   pRampCfg->SysClkFreq = 16000000.0f;           /* System clock is 16MHz by default */
   pRampCfg->LFOSCClkFreq = LFOSCFreq;           /* LFOSC frequency */
   /* Configure ramp signal parameters */
-  pRampCfg->RampStartVolt = -1000.0f;           /* -1V */
-  pRampCfg->RampPeakVolt = +300.0f;             /* +1V */
+  pRampCfg->RampStartVolt =  -1000.0f;           /* -1V */
+  pRampCfg->RampPeakVolt = +1000.0f;           /* +1V */
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
-  pRampCfg->StepNumber = 866;                   /* Total steps. Equals to ADC sample number */
-  pRampCfg->RampDuration = 240*1000;            /* 240s. Total duration of ramp signal. unit is ms. */
+  pRampCfg->StepNumber = 800;                   /* Total steps. Equals to ADC sample number */
+  pRampCfg->RampDuration = 24*1000;            /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
-  pRampCfg->LPTIARtiaSel = LPTIARTIA_20K;       /* Maximum current decides RTIA value */
-  //pRampCfg->LPTIARtiaSel = LPTIARTIA_OPEN;      /* Maximum current decides RTIA value */
-  //pRampCfg->ExternalRtiaValue = 20000.0f;       /* If we use external RTIA resistor... */
+  pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
+	pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
+	pRampCfg->AdcPgaGain = ADCPGA_1P5;
+	
+
 }
 
 void AD5940_Main(void)
