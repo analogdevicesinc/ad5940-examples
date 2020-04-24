@@ -331,7 +331,7 @@ static AD5940Err AppRAMPSeqInitGen(void)
     lploop_cfg.LpAmpCfg.LpPaPwrEn = bTRUE;
     lploop_cfg.LpAmpCfg.LpTiaPwrEn = bTRUE;
     lploop_cfg.LpAmpCfg.LpTiaRf = LPTIARF_20K;
-    lploop_cfg.LpAmpCfg.LpTiaRload = LPTIARLOAD_100R;
+    lploop_cfg.LpAmpCfg.LpTiaRload = AppRAMPCfg.LPTIARloadSel;
     lploop_cfg.LpAmpCfg.LpTiaRtia = AppRAMPCfg.LPTIARtiaSel;
     if(AppRAMPCfg.LPTIARtiaSel == LPTIARTIA_OPEN) /* User want to use external RTIA */
         lploop_cfg.LpAmpCfg.LpTiaSW = LPTIASW(2) | LPTIASW(4) | LPTIASW(5) | LPTIASW(9)/*|LPTIASW(10)*/; /* SW5/9 is closed to support external RTIA resistor */
@@ -855,9 +855,8 @@ static int32_t AppRAMPDataProcess(int32_t *const pData, uint32_t *pDataCount)
     float temp;
     for(i = 0; i < datacount; i++)
         {
-        pData[i] &= 0xffff;
-        temp = 32768 - pData[i];  /* Positive value means current flow into SE0. */
-        temp = temp / 32768 * AppRAMPCfg.ADCRefVolt; /* Convert code to voltage in mV */
+        pData[i] &= 0xffff;	
+				temp = -AD5940_ADCCode2Volt(pData[i], AppRAMPCfg.AdcPgaGain, AppRAMPCfg.ADCRefVolt);	
         pOut[i] = temp / AppRAMPCfg.RtiaValue.Magnitude * 1e3f; /* Result unit is uA. */
         }
     return 0;

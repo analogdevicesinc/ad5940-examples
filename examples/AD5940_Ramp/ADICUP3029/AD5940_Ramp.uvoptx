@@ -140,7 +140,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>CMSIS_AGDI</Key>
-          <Name>-X"Any" -UAny -O198 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP20 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC1000 -FN1 -FF0ADuCM302x.FLM -FS00 -FL040000 -FP0($$Device:ADuCM3029$Flash\ADuCM302x.FLM)</Name>
+          <Name>-X"Any" -UAny -O198 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO65554 -TC10000000 -TT10000000 -TP20 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC1000 -FN1 -FF0ADuCM302x.FLM -FS00 -FL040000 -FP0($$Device:ADuCM3029$Flash\ADuCM302x.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -163,60 +163,50 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AppRAMPCfg.DACVoltPerStep</ItemText>
+          <ItemText>AppRAMPCfg.StepNumber,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AppRAMPCfg.StepNumber,0x0A</ItemText>
+          <ItemText>AppRAMPCfg.CurrStepPos,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AppRAMPCfg.CurrStepPos,0x0A</ItemText>
+          <ItemText>DACSeqLenMax,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>DACSeqLenMax,0x0A</ItemText>
+          <ItemText>StepsThisBlock,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AppRAMPCfg.StepsPerBlock,0x0A</ItemText>
+          <ItemText>SeqLen,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>StepsThisBlock,0x0A</ItemText>
+          <ItemText>AppBuff</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SeqLen,0x0A</ItemText>
+          <ItemText>bIsFinalBlk</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AppBuff</ItemText>
+          <ItemText>StepsThisBlock,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>bIsFinalBlk</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>StepsThisBlock,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
           <ItemText>BlockStartSRAMAddr,0x0A</ItemText>
         </Ww>
         <Ww>
-          <count>12</count>
+          <count>10</count>
           <WinNumber>1</WinNumber>
           <ItemText>SRAMAddr,0x0A</ItemText>
         </Ww>
@@ -227,7 +217,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -332,7 +322,7 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>5</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\RampTest.c</PathWithFileName>

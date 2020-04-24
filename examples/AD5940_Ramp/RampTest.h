@@ -51,6 +51,7 @@ typedef struct
   /* Receive path configuration */
   float     SampleDelay;          /**< The time delay between update DAC and start ADC */
   uint32_t  LPTIARtiaSel;         /**< Select RTIA */
+	uint32_t LPTIARloadSel;				/**< Select Rload */
   float     ExternalRtiaValue;    /**< The optional external RTIA value in Ohm. Disconnect internal RTIA to use external RTIA. When using internal RTIA, this value is ignored. */
   uint32_t  AdcPgaGain;           /**< PGA Gain select from GNPGA_1, GNPGA_1_5, GNPGA_2, GNPGA_4, GNPGA_9 !!! We must ensure signal is in range of +-1.5V which is limited by ADC input stage */   
   uint8_t   ADCSinc3Osr;          /**< We use data from SINC3 filter. */
