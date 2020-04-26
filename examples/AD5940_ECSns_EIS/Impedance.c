@@ -276,11 +276,7 @@ static AD5940Err AppIMPSeqCfgGen(void)
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppIMPCfg.ADCSinc3Osr;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;
   dsp_cfg.DftCfg.DftNum = AppIMPCfg.DftNum;
   dsp_cfg.DftCfg.DftSrc = AppIMPCfg.DftSrc;
   dsp_cfg.DftCfg.HanWinEn = AppIMPCfg.HanWinEn;

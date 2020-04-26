@@ -279,10 +279,6 @@ static AD5940Err AppBATSeqCfgGen(void)
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
   dsp_cfg.DftCfg.DftNum = AppBATCfg.DftNum;
   dsp_cfg.DftCfg.DftSrc = AppBATCfg.DftSrc;
   dsp_cfg.DftCfg.HanWinEn = AppBATCfg.HanWinEn;
@@ -475,10 +471,6 @@ AD5940Err AppBATCheckFreq(float freq)
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
   dsp_cfg.DftCfg.DftNum = AppBATCfg.DftNum;
   dsp_cfg.DftCfg.DftSrc = AppBATCfg.DftSrc;
   dsp_cfg.DftCfg.HanWinEn = AppBATCfg.HanWinEn;

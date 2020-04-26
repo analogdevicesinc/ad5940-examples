@@ -46,11 +46,7 @@ void AD5940_Main(void)
   dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;        /* If ADC clock is 32MHz, then set it to ADCRATE_1P6MHZ. Default is 16MHz, use ADCRATE_800KHZ. */
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;                 /* SINC2+Notch is one block, when bypass notch filter, we can get fresh data from SINC2 filter. */
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;                /* We use SINC3 filter. */
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;          /* Enable SINC3 clock.  */
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;     
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;        /* Enable the SINC2+Notch block. You can also use function AD5940_AFECtrlS */
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;  
   dsp_cfg.DftCfg.DftNum = DFTNUM_16384;
   dsp_cfg.DftCfg.DftSrc = DFTSRC_SINC3;
   AD5940_DSPCfgS(&dsp_cfg);

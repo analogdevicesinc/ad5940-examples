@@ -244,10 +244,6 @@ static AD5940Err AppBIOZSeqCfgGen(void)
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
   dsp_cfg.DftCfg.DftNum = AppBIOZCfg.DftNum;
   dsp_cfg.DftCfg.DftSrc = AppBIOZCfg.DftSrc;
   dsp_cfg.DftCfg.HanWinEn = AppBIOZCfg.HanWinEn;

@@ -253,11 +253,7 @@ static AD5940Err AppEDASeqCfgGen(void)
   dsp_cfg.ADCFilterCfg.ADCSinc3Osr = ADCSINC3OSR_5;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bFALSE;  /* disable SINC2 since we don't need it. */
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bFALSE;
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bTRUE;
   dsp_cfg.DftCfg.DftNum = AppEDACfg.DftNum;
   dsp_cfg.DftCfg.DftSrc = DFTSRC_AVG; /* Use averaged SINC3 data */
   dsp_cfg.DftCfg.HanWinEn = AppEDACfg.HanWinEn;

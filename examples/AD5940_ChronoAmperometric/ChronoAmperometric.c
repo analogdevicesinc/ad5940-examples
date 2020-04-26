@@ -238,10 +238,6 @@ static AD5940Err AppCHRONOAMPSeqCfgGen(void)
   dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
   dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
   dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc3ClkEnable = bTRUE;
-  dsp_cfg.ADCFilterCfg.WGClkEnable = bFALSE;
-  dsp_cfg.ADCFilterCfg.DFTClkEnable = bFALSE;
   
   memset(&dsp_cfg.StatCfg, 0, sizeof(dsp_cfg.StatCfg)); /* Don't care about Statistic */
   AD5940_DSPCfgS(&dsp_cfg);

@@ -174,11 +174,7 @@ static AD5940Err AppECGSeqCfgGen(void)
   adc_filter.ADCRate = ADCRATE_800KHZ;        /* If ADC clock is 32MHz, then set it to ADCRATE_1P6MHZ. Default is 16MHz, use ADCRATE_800KHZ. */
   adc_filter.BpNotch = bTRUE;                 /* SINC2+Notch is one block, when bypass notch filter, we can get fresh data from SINC2 filter. */
   adc_filter.BpSinc3 = bFALSE;                /* We use SINC3 filter. */
-  adc_filter.Sinc3ClkEnable = bTRUE;          /* Enable SINC3 clock.  */
-  adc_filter.Sinc2NotchClkEnable = bTRUE;     
   adc_filter.Sinc2NotchEnable = bTRUE;        /* Enable the SINC2+Notch block. You can also use function AD5940_AFECtrlS */
-  adc_filter.DFTClkEnable = bTRUE;
-  adc_filter.WGClkEnable = bTRUE;  
   AD5940_ADCFilterCfgS(&adc_filter);
 
   sw_matrix.Dswitch = SWD_OPEN;
