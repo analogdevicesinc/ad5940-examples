@@ -140,7 +140,8 @@ void AD5940RampStructInit(void)
 
 void AD5940_Main(void)
 {
-  uint32_t temp;  
+  uint32_t temp; 
+  AppRAMPCfg_Type *pRampCfg;	
   AD5940PlatformCfg();
   AD5940RampStructInit();
 
@@ -149,6 +150,7 @@ void AD5940_Main(void)
 
   while(1)
   {
+		AppRAMPGetCfg(&pRampCfg);
     if(AD5940_GetMCUIntFlag())
     {
       AD5940_ClrMCUIntFlag();
@@ -156,7 +158,14 @@ void AD5940_Main(void)
       AppRAMPISR(AppBuff, &temp);
       RampShowResult((float*)AppBuff, temp);
     }
-
+		/* Repeat Measurement continuously*/
+		if(pRampCfg->bTestFinished ==bTRUE)
+		{
+			AD5940_Delay10us(200000);
+			pRampCfg->bTestFinished = bFALSE;
+			AD5940_SEQCtrlS(bTRUE);   /* Enable sequencer, and wait for trigger */
+			AppRAMPCtrl(APPCTRL_START, 0);  
+		}
   }
 }
 

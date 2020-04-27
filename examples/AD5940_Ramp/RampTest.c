@@ -176,6 +176,7 @@ AppRAMPCfg_Type AppRAMPCfg =
     .AdcClkFreq = 16000000.0,
     .RcalVal = 10000.0,
     .ADCRefVolt = 1820.0f,              /* 1.8V or 1.82V? */
+		.bTestFinished = bFALSE,
     /* Describe Ramp signal */
     .RampStartVolt = -1000.0f,          /* -1V */
     .RampPeakVolt = +1000.0f,           /* +1V */
@@ -912,6 +913,13 @@ AD5940Err AppRAMPISR(void *pBuff, uint32_t *pCount)
         AppRAMPDataProcess((int32_t *)pBuff, &FifoCnt);
         *pCount = FifoCnt;
         AppRAMPCtrl(APPCTRL_STOPNOW, 0);    /* Stop the Wakeup Timer. */
+					
+					/* Reset variables so measurement can be restarted*/
+				AppRAMPCfg.bTestFinished = bTRUE;
+        AppRAMPCfg.RampState = RAMP_STATE0;
+        AppRAMPCfg.bFirstDACSeq = bTRUE;
+        AppRAMPCfg.bDACCodeInc = bTRUE;
+        AppRAMPSeqDACCtrlGen();
         }
     return 0;
     }

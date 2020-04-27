@@ -210,6 +210,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>SRAMAddr,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AppRAMPCfg</ItemText>
+        </Ww>
       </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>

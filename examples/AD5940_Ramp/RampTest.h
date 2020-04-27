@@ -41,6 +41,7 @@ typedef struct
   float     AdcClkFreq;           /**< The real frequency of ADC clock */
   float     RcalVal;              /**< Rcal value in Ohm */
   float     ADCRefVolt;           /**< The real ADC voltage in mV. */
+	BoolFlag bTestFinished;			/**< Variable to indicate ramt test has finished >*/
   /* Describe Ramp signal */
   float     RampStartVolt;        /**< The start voltage of ramp signal in mV */
   float     RampPeakVolt;         /**< The maximum or minimum voltage of ramp in mV */
