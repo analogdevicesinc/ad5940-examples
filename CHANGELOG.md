@@ -1,5 +1,32 @@
 AD5940 Examples Change Log
 ==========================
+## 0.3.0(onging)
+
+### Added
+* Add notch filter example in AD5940_ADC.
+
+### Changed
+* EDA:
+  - Fix bug in ISR that count is not cleared when there is error.
+  - Added method to check if EDA is stopped.
+* Update ADC example to include PGA calibration.
+* Ramp example update.
+  - Update default gain to 1.5.
+  - Update current calculation equation.
+  - Add control to restart test.
+* Update ad5940lib submodule.
+* Improve SPI speed of ADuCM3029 by using FIFO.
+  - Remove clock enable/disable option in ADCFilterCfg.
+  - Added clock calculator for notch filter data.
+  - Fix error of LPTIA RTIA ideal value table.
+  - Fix bug the HSTIA RTIA calibration result is not steady.
+  - Fix bug in PGACal, function rewrited.
+
+### Removed
+* Remove ADCFILTERCON bit[18:16] which should be reserved as value zero.
+  - Existing examples are updated to remove related code.
+
+
 ## 0.2.1(2019-11-7)
 
 ### Added
