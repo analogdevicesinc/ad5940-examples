@@ -1,5 +1,5 @@
 # AD5940 Examples
-[AD5940](https://www.analog.com/en/products/ad5940.html) is the latest high precision impedance and electrochemical front end. It communicates with external MCU via SPI bus. 
+[AD5940/AD5941](https://www.analog.com/en/products/ad5940.html) is the latest high precision impedance and electrochemical front end. It communicates with external MCU via SPI bus. 
 
 This repository targets to provide rich examples for you to get start with and provide system level examples like EDA(electrodermal activity), BIA(Body Impedance Analysis) which you can use directly in your project.
 
@@ -13,6 +13,9 @@ This repository targets to provide rich examples for you to get start with and p
   - [EVAL-AD5940ELEC](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/EVAL-AD5940ELCZ.html) Board information: [Wiki](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/hardware/eval-ad5940elcz)
 
 # How to Use it
+
+If MCU is not ADuCM3029, you need to port the the code by re-writing seral simple functions in file YOURMCUPort.c, ADICUP3029Port.c for example. Follow guide [here](https://wiki.analog.com/resources/eval/user-guides/eval-ad5940/tools/porting_source_code) from AD5940 Wiki.
+
 Firstly, checkout the repository using below command. Make sure you have cloned the [ad5940lib](https://github.com/analogdevicesinc/ad5940lib) submodule which these examples are based on.
 
 > git clone --recursive https://github.com/analogdevicesinc/ad5940-examples.git
