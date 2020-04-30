@@ -214,7 +214,7 @@ static AD5940Err AppIMPSeqCfgGen(void)
   lploop_cfg.LpDacCfg.DataRst = bFALSE;
   lploop_cfg.LpDacCfg.PowerEn = bTRUE;
   lploop_cfg.LpDacCfg.DacData6Bit = (uint32_t)((AppIMPCfg.Vzero-200)/DAC6BITVOLT_1LSB);
-	lploop_cfg.LpDacCfg.DacData12Bit =(int32_t)((AppIMPCfg.SensorBias)/DAC12BITVOLT_1LSB) + lploop_cfg.LpDacCfg.DacData6Bit*64;
+	lploop_cfg.LpDacCfg.DacData12Bit =(int32_t)((AppIMPCfg.BiasVolt)/DAC12BITVOLT_1LSB) + lploop_cfg.LpDacCfg.DacData6Bit*64;
 	if(lploop_cfg.LpDacCfg.DacData12Bit>lploop_cfg.LpDacCfg.DacData6Bit*64)
 		lploop_cfg.LpDacCfg.DacData12Bit--;
   lploop_cfg.LpAmpCfg.LpAmpPwrMod = LPAMPPWR_NORM;
@@ -259,7 +259,7 @@ static AD5940Err AppIMPSeqCfgGen(void)
     AppIMPCfg.FreqofData = sin_freq;
   }
   HsLoopCfg.WgCfg.SinCfg.SinFreqWord = AD5940_WGFreqWordCal(sin_freq, AppIMPCfg.SysClkFreq);
-  HsLoopCfg.WgCfg.SinCfg.SinAmplitudeWord = (uint16_t)(15*20/0.19753+0.5);//(uint32_t)(AppIMPCfg.DacVoltPP/800.0f*2047 + 0.5f);
+	HsLoopCfg.WgCfg.SinCfg.SinAmplitudeWord = (uint32_t)(AppIMPCfg.DacVoltPP/800.0f*2047 + 0.5f);
   HsLoopCfg.WgCfg.SinCfg.SinOffsetWord = 0;
   HsLoopCfg.WgCfg.SinCfg.SinPhaseWord = 0;
   AD5940_HSLoopCfgS(&HsLoopCfg);
@@ -526,6 +526,7 @@ int32_t AppIMPRegModify(int32_t * const pData, uint32_t *pDataCount)
   }
   if(AppIMPCfg.SweepCfg.SweepEn) /* Need to set new frequency and set power mode */
   {
+		/* Check frequency and update FIlter settings */
     AD5940_WGFreqCtrlS(AppIMPCfg.SweepNextFreq, AppIMPCfg.SysClkFreq);
   }
   return AD5940ERR_OK;

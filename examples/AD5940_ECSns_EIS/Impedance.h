@@ -44,7 +44,7 @@ typedef struct
   uint32_t ExcitBufGain;        /* Select from  EXCTBUFGAIN_2, EXCTBUFGAIN_0P25 */     
   uint32_t HsDacGain;           /* Select from  HSDACGAIN_1, HSDACGAIN_0P2 */
   uint32_t HsDacUpdateRate;
-  float DacVoltPP;              /* DAC output voltage in mV peak to peak. Maximum value is 800mVpp. Peak to peak voltage  */
+  float DacVoltPP;              /* DAC output voltage in mV peak to peak. Maximum value is 600mVpp. Peak to peak voltage  */
   float BiasVolt;               /* The excitation signal is DC+AC. This parameter decides the DC value in mV unit. 0.0mV means no DC bias.*/
   float SinFreq;                /* Frequency of excitation signal */
   uint32_t DftNum;              /* DFT number */
@@ -61,7 +61,6 @@ typedef struct
   uint32_t LpTiaRl;             /* SE0 Rload select */
 	float Vzero;                  /* Voltage on SE0 pin and Vzero, optimumly 1100mV*/
   float Vbias;                  /* Voltage on CE0 and PA */
-  float SensorBias;
   /* Sweep Function Control */
   SoftSweepCfg_Type SweepCfg;
   uint32_t FifoThresh;           /* FIFO threshold. Should be N*4 */

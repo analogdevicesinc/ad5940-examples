@@ -3,6 +3,9 @@
  @file:    AD5940Main.c
  @author:  Neo Xu
  @brief:   Electrochemical impedance spectroscopy based on example AD5940_Impedance
+							This project is optomized for 3-lead electrochemical sensors that typically have 
+							an impedance <200ohm. For optimum performance RCAL should be close to 
+							impedance of the sensor.
  -----------------------------------------------------------------------------
 
 Copyright (c) 2017-2019 Analog Devices, Inc. All Rights Reserved.
@@ -89,8 +92,19 @@ void AD5940ImpedanceStructInit(void)
   pImpedanceCfg->MaxSeqLen = 512; /* @todo add checker in function */
 
   pImpedanceCfg->RcalVal = 200.0;
-  pImpedanceCfg->SinFreq = 60000.0;
-  pImpedanceCfg->FifoThresh = 6;
+	pImpedanceCfg->FifoThresh = 6;
+  pImpedanceCfg->SinFreq = 1000.0;
+	
+	/* Configure Excitation Waveform 
+	*
+  *	 Output waveform = DacVoltPP * ExcitBufGain * HsDacGain 
+	* 	
+	*		= 300 * 0.25 * 0.2 = 15mV pk-pk
+	*
+	*/
+	pImpedanceCfg->DacVoltPP = 300;	/* Maximum value is 600mV*/
+	pImpedanceCfg->ExcitBufGain = EXCITBUFGAIN_0P25;
+	pImpedanceCfg->HsDacGain = HSDACGAIN_0P2;
 	
 	/* Set switch matrix to onboard(EVAL-AD5940ELECZ) gas sensor. */
 	pImpedanceCfg->DswitchSel = SWD_CE0;
@@ -98,8 +112,8 @@ void AD5940ImpedanceStructInit(void)
 	pImpedanceCfg->NswitchSel = SWN_SE0LOAD;
 	pImpedanceCfg->TswitchSel = SWT_SE0LOAD;
 	/* The dummy sensor is as low as 5kOhm. We need to make sure RTIA is small enough that HSTIA won't be saturated. */
-	pImpedanceCfg->HstiaRtiaSel = HSTIARTIA_1K;	
-	
+	pImpedanceCfg->HstiaRtiaSel = HSTIARTIA_200;	
+	pImpedanceCfg->BiasVolt = 0.0;
 	/* Configure the sweep function. */
 	pImpedanceCfg->SweepCfg.SweepEn = bFALSE;
 	pImpedanceCfg->SweepCfg.SweepStart = 100.0f;	/* Start from 1kHz */
