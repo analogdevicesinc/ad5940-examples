@@ -14,6 +14,10 @@ AD5940 Examples Change Log
   - Update default gain to 1.5.
   - Update current calculation equation.
   - Add control to restart test.
+* ECSNS_EIS example update
+  - Remove redundant variable SensorBias
+  - Modified initialization sequence to use BiasVolt parameter to set DC bias
+  - Fixed bug in setting ac pk-pk voltage
 * Update ad5940lib submodule.
 * Improve SPI speed of ADuCM3029 by using FIFO.
   - Remove clock enable/disable option in ADCFilterCfg.
