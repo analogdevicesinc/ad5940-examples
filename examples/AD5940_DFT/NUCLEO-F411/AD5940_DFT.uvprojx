@@ -325,7 +325,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,STM32F411xE,CHIPSEL_594X</Define>
+              <Define>USE_STDPERIPH_DRIVER,STM32F411xE,CHIPSEL_594X, ADI_DEBUG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\AD5940Lib;..\..\STM32F4StdLib\CMSIS\Device\ST\STM32F4xx\Include;..\..\STM32F4StdLib\STM32F4xx_StdPeriph_Driver\inc;..\..\STM32F4StdLib\CMSIS\Include;..\;.\</IncludePath>
             </VariousControls>
