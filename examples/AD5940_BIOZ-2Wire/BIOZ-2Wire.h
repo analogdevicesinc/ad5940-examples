@@ -87,5 +87,6 @@ AD5940Err AppBIOZGetCfg(void *pCfg);
 AD5940Err AppBIOZInit(uint32_t *pBuffer, uint32_t BufferSize);
 AD5940Err AppBIOZISR(void *pBuff, uint32_t *pCount);
 AD5940Err AppBIOZCtrl(int32_t BcmCtrl, void *pPara);
+AD5940Err AppBIOZCheckFreq(float freq);
 
 #endif
