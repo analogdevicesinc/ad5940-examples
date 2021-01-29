@@ -1,8 +1,8 @@
-20180628-LWSCIARS-CTSLA  Page 1 of 3 
+﻿20180628-LWSCIARS-CTSLA  Page 1 of 3 
  
 Analog Devices, Inc. (“ADI”) 
 Source Code Software License Agreement 
-20180628-LWSCIARS-CTSLA 
+20200217-LWSCIARS-CTSLA 
 BEFORE YOU SELECT THE "I ACCEPT" BUTTON AT THE BOTTOM OF THIS WINDOW, CAREFULLY 
 READ THE TERMS AND CONDITIONS SET FORTH BELOW.  BY SELECTING THE “I ACCEPT” 
 BUTTON BELOW, OR DOWNLOADING, REPRODUCING, DISTRIBUTING OR OTHERWISE USING 
@@ -26,7 +26,7 @@ and other proprietary notices.  The software that is distributed (including modi
 software) shall be subject to the terms and conditions of this license.   
 (b) The software may not be combined or merged with other software in any manner that would cause the 
 software to become subject to terms and conditions which differ from those of this license. 
-(c) The software is licensed solely and exclusively for use with processors manufactured by or for ADI. 
+(c) The software is licensed solely and exclusively for use with processors / products manufactured by or for ADI. 
 (d) Licensee shall not use the name or any trademark of ADI (including those of its licensors) or any 
 contributor to endorse or promote products without prior written consent of the owner of the name or 
 trademark.  The term “contributor” means any person or entity that modifies or distributes the software.   
@@ -39,16 +39,15 @@ rules.  The software shall only be used in compliance with all applicable laws a
 without limitation export control laws.   
  
 3. WARRANTY DISCLAIMER: THE SOFTWARE AND ANY RELATED INFORMATION AND/OR ADVICE 
-IS PROVIDED ON AN “AS IS” BASIS, WITHOUT REPRESENTATIONS, GUARANTEES OR 
-WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, ORAL OR WRITTEN, INCLUDING WITHOUT 
-LIMITATION, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, 
+IS PROVIDED ON AN “AS IS” BASIS, WITHOUT REPRESENTATIONS, GUARANTEES OR
+WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, ORAL OR WRITTEN, INCLUDING WITHOUT
+LIMITATION, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
 TITLE AND NON-INFRINGEMENT. There is no obligation to provide software support or updates.  The 
 Software is not fault-tolerant and is not intended for use in high risk applications, including without 
 limitation in the operation of nuclear facilities, aircraft navigation or control systems, air traffic control, life 
-support machines, weapons systems or any other application in which the failure of the software could 20180628-LWSCIARS-CTSLA  Page 2 of 3 
- 
-lead to death, personal injury, or severe physical or environmental damages.  The software is not 
-authorized to be used under such circumstances. 
+support machines, weapons systems, autonomous driving or other safety critical automotive applications, or any other 
+application in which the failure of the software could lead to death, personal injury, or severe physical or 
+environmental damages.  The software is not authorized to be used under such circumstances.
  
 4. LIMITATION OF LIABILITY: TO THE MAXIMUM EXTENT PERMITTED BY LAW ADI (INCLUDING ITS 
 LICENSORS) AND CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM OR 
