@@ -59,12 +59,12 @@ static int32_t AD5940PlatformCfg(void)
   AD5940_Initialize();
   /* Step1. Configure clock */
   clk_cfg.ADCClkDiv = ADCCLKDIV_1;
-  clk_cfg.ADCCLkSrc = ADCCLKSRC_HFOSC;
+  clk_cfg.ADCCLkSrc = ADCCLKSRC_XTAL;
   clk_cfg.SysClkDiv = SYSCLKDIV_1;
-  clk_cfg.SysClkSrc = SYSCLKSRC_HFOSC;
+  clk_cfg.SysClkSrc = SYSCLKSRC_XTAL;
   clk_cfg.HfOSC32MHzMode = bFALSE;
-  clk_cfg.HFOSCEn = bTRUE;
-  clk_cfg.HFXTALEn = bFALSE;
+  clk_cfg.HFOSCEn = bFALSE;
+  clk_cfg.HFXTALEn = bTRUE;
   clk_cfg.LFOSCEn = bTRUE;
   AD5940_CLKCfg(&clk_cfg);
   /* Step2. Configure FIFO and Sequencer*/
@@ -72,7 +72,7 @@ static int32_t AD5940PlatformCfg(void)
   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
   fifo_cfg.FIFOSize = FIFOSIZE_4KB;                       /* 4kB for FIFO, The reset 2kB for sequencer */
   fifo_cfg.FIFOSrc = FIFOSRC_DFT;
-  fifo_cfg.FIFOThresh = 2;//AppBIOZCfg.FifoThresh;        /* DFT result. One pair for RCAL, another for Rz. One DFT result have real part and imaginary part */
+  fifo_cfg.FIFOThresh = 4;
   AD5940_FIFOCfg(&fifo_cfg);                             /* Disable to reset FIFO. */
   fifo_cfg.FIFOEn = bTRUE;  
   AD5940_FIFOCfg(&fifo_cfg);                             /* Enable FIFO here */
@@ -96,24 +96,33 @@ static int32_t AD5940PlatformCfg(void)
 /* !!Change the application parameters here if you want to change it to none-default value */
 void AD5940BIOZStructInit(void)
 {
-  AppBIOZCfg_Type *pBIOZCfg;
-  
+  AppBIOZCfg_Type *pBIOZCfg; 
   AppBIOZGetCfg(&pBIOZCfg);
   
   pBIOZCfg->SeqStartAddr = 0;
-  pBIOZCfg->MaxSeqLen = 512; /** @todo add checker in function */
+  pBIOZCfg->MaxSeqLen = 512; 
   
-	pBIOZCfg->SinFreq = 10000;			/* 10kHz. */
-	pBIOZCfg->HstiaRtiaSel = HSTIARTIA_1K;
-	pBIOZCfg->PwrMod = AFEPWR_LP;		
-  pBIOZCfg->RcalVal = 10000.0;
-  pBIOZCfg->DftNum = DFTNUM_2048;
-  pBIOZCfg->BIOZODR = 20;         /* ODR(Sample Rate) 20Hz */
-  pBIOZCfg->NumOfData = -1;      	/* Never stop until you stop it manually by AppBIOZCtrl() function */
-  pBIOZCfg->FifoThresh = 16;      /* 4 */
-  pBIOZCfg->ADCSinc3Osr = ADCSINC3OSR_2;
-  pBIOZCfg->SweepCfg.SweepEn = bFALSE;
+	pBIOZCfg->SinFreq = 20e3;			/* 20kHz. This value is ignored if SweepEn = bTRUE */
+	pBIOZCfg->RcalVal = 200.0;	/* Value of RCAl on the evaluaiton board */
+	pBIOZCfg->HstiaRtiaSel = HSTIARTIA_200;	
+  
+	/* Configure Switch matrix */
+	pBIOZCfg->DswitchSel = SWD_CE0;
+  pBIOZCfg->PswitchSel = SWP_CE0;
+  pBIOZCfg->NswitchSel = SWN_AIN2;
+  pBIOZCfg->TswitchSel = SWN_AIN2;
+	
+  /* Configure Sweep Parameters */
+  pBIOZCfg->SweepCfg.SweepEn = bTRUE;
+  pBIOZCfg->SweepCfg.SweepStart = 1000;
+  pBIOZCfg->SweepCfg.SweepStop = 200000.0;
+  pBIOZCfg->SweepCfg.SweepPoints = 40;	/* Maximum is 100 */
+  pBIOZCfg->SweepCfg.SweepLog = bFALSE;
+	
+	pBIOZCfg->BIOZODR = 5;         /* ODR(Sample Rate) 5Hz */
+	pBIOZCfg->NumOfData = -1;      	/* Never stop until you stop it manually by AppBIOZCtrl() function */
 }
+
 
 void AD5940_Main(void)
 {

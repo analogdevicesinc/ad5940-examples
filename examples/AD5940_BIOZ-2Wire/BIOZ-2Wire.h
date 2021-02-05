@@ -46,7 +46,7 @@ typedef struct
   float SinFreq;                /* Frequency of excitation signal */
   float RcalVal;                /* Rcal value in Ohm */
   uint32_t PwrMod;              /* Control Chip power mode(LP/HP) */
-  float DacVoltPP;              /* Final excitation voltage is DAC_VOLTpp*DAC_PGA*EXCIT_GAIN, DAC_PGA= 1 or 0.2, EXCIT_GAIN=2 or 0.25. DAC output voltage in mV peak to peak. Maximum value is 800mVpp. Peak to peak voltage  */
+  float DacVoltPP;              /* Final excitation voltage is DacVoltPP*DAC_PGA*EXCIT_GAIN, DAC_PGA= 1 or 0.2, EXCIT_GAIN=2 or 0.25. DAC output voltage in mV peak to peak. Maximum value is 800mVpp. Peak to peak voltage  */
   uint32_t ExcitBufGain;        /* Select from  EXCITBUFGAIN_2, EXCITBUFGAIN_0P25 */     
   uint32_t HsDacGain;           /* Select from  HSDACGAIN_1, HSDACGAIN_0P2 */  
   uint32_t HsDacUpdateRate;     /* DAC update rate is SystemCLoock/Divider. The available value is 7 to 255. Set to 7 for better performance */
@@ -59,11 +59,16 @@ typedef struct
   uint32_t DftNum;              /* DFT number */
   uint32_t DftSrc;              /* DFT Source */
   BoolFlag HanWinEn;            /* Enable Hanning window */
+	
+	/* Switch Configuration */
+  uint32_t DswitchSel;
+  uint32_t PswitchSel;
+  uint32_t NswitchSel;
+  uint32_t TswitchSel;
 
   /* Sweep Function Control */
   SoftSweepCfg_Type SweepCfg;
 /* Private variables for internal usage */
-  fImpCar_Type  ExcitVolt;      /* Measured excitation voltage */
   float SweepCurrFreq;
   float SweepNextFreq;
   fImpCar_Type RtiaCurrValue;                   /* Calibrated Rtia value at current frequency */
