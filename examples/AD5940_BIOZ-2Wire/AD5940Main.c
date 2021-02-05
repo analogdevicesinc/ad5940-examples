@@ -103,7 +103,7 @@ void AD5940BIOZStructInit(void)
   pBIOZCfg->MaxSeqLen = 512; 
   
 	pBIOZCfg->SinFreq = 20e3;			/* 20kHz. This value is ignored if SweepEn = bTRUE */
-	pBIOZCfg->RcalVal = 200.0;	/* Value of RCAl on the evaluaiton board */
+	pBIOZCfg->RcalVal = 10000.0;	/* Value of RCAl on the evaluaiton board */
 	pBIOZCfg->HstiaRtiaSel = HSTIARTIA_200;	
   
 	/* Configure Switch matrix */
