@@ -171,6 +171,10 @@ AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bFALSE);
 		AD5940_FIFOThrshSet(2);
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bTRUE); //enable FIFO
+		AD5940_AFECtrlS(AFECTRL_HPREFPWR|AFECTRL_INAMPPWR|AFECTRL_EXTBUFPWR|\
+                AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
+                AFECTRL_SINC2NOTCH, bTRUE);
+		AD5940_Delay10us(10000);
 		AppBATMeasureRCAL();
     break;
     default:
@@ -329,7 +333,7 @@ static AD5940Err AppBATSeqMeasureGen(void)
   AD5940_SEQGenCtrl(bTRUE);
   AD5940_SEQGenInsert(SEQ_WAIT(16*250));  /* wait 250us for reference power up from hibernate mode. */
   AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bTRUE);  /* Enable Waveform generator, ADC power */
-  AD5940_SEQGenInsert(SEQ_WAIT(16*50));   /* Wait for ADC ready. */
+  AD5940_SEQGenInsert(SEQ_WAIT(16*50000));   /* Wait for ADC ready. */
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */  
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT/*|AFECTRL_WG*/|AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bFALSE);  /* Stop ADC convert and DFT */
@@ -416,7 +420,10 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppBATCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-	AppBATCheckFreq(AppBATCfg.SweepCfg.SweepStart);
+	if(AppBATCfg.SweepCfg.SweepEn == bTRUE)
+		AppBATCheckFreq(AppBATCfg.SweepCfg.SweepStart);
+	else
+		AppBATCheckFreq(AppBATCfg.SinFreq);
   /* Measurement sequence  */
   AppBATCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppBATCfg.MeasureSeqInfo);
