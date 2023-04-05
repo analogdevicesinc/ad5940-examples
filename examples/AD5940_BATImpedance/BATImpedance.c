@@ -24,7 +24,7 @@ AppBATCfg_Type AppBATCfg =
   .SeqStartAddr = 0,
   .MaxSeqLen = 0,
   
-  .SeqStartAddrCal = 0,
+  .SeqStartAddrCal = 1,
   .MaxSeqLenCal = 0,
 
   .SysClkFreq = 16000000.0,
