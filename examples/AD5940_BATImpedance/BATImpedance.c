@@ -171,10 +171,6 @@ AD5940Err AppBATCtrl(int32_t BatCtrl, void *pPara)
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bFALSE);
 		AD5940_FIFOThrshSet(2);
     AD5940_FIFOCtrlS(FIFOSRC_DFT, bTRUE); //enable FIFO
-		AD5940_AFECtrlS(AFECTRL_HPREFPWR|AFECTRL_INAMPPWR|AFECTRL_EXTBUFPWR|\
-                AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
-                AFECTRL_SINC2NOTCH, bTRUE);
-		AD5940_Delay10us(10000);
 		AppBATMeasureRCAL();
     break;
     default:
@@ -333,9 +329,12 @@ static AD5940Err AppBATSeqMeasureGen(void)
   AD5940_SEQGenCtrl(bTRUE);
   AD5940_SEQGenInsert(SEQ_WAIT(16*250));  /* wait 250us for reference power up from hibernate mode. */
   AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bTRUE);  /* Enable Waveform generator, ADC power */
-  AD5940_SEQGenInsert(SEQ_WAIT(16*50000));   /* Wait for ADC ready. */
+  AD5940_SEQGenInsert(SEQ_WAIT(16*50));   /* Wait for ADC ready. */
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
-  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */  
+  AD5940_SEQGenFetchSeq(NULL, &AppBATCfg.SeqWaitAddr[0]); /* Record the start address of the next command. */
+
+  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
+   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));  
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT/*|AFECTRL_WG*/|AFECTRL_ADCPWR|AFECTRL_SINC2NOTCH, bFALSE);  /* Stop ADC convert and DFT */
   //AD5940_EnterSleepS();/* Goto hibernate */
   /* Sequence end. */
@@ -420,10 +419,7 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQMmrTrig(AppBATCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
   
-	if(AppBATCfg.SweepCfg.SweepEn == bTRUE)
-		AppBATCheckFreq(AppBATCfg.SweepCfg.SweepStart);
-	else
-		AppBATCheckFreq(AppBATCfg.SinFreq);
+	AppBATCheckFreq(AppBATCfg.SweepCfg.SweepStart);
   /* Measurement sequence  */
   AppBATCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppBATCfg.MeasureSeqInfo);
@@ -439,69 +435,126 @@ AD5940Err AppBATInit(uint32_t *pBuffer, uint32_t BufferSize)
 /* Depending on frequency of Sin wave set optimum filter settings */
 AD5940Err AppBATCheckFreq(float freq)
 {
-	DSPCfg_Type dsp_cfg;
-	uint32_t WaitClks;
+	ADCFilterCfg_Type filter_cfg;
+  DFTCfg_Type dft_cfg;
+  HSDACCfg_Type hsdac_cfg;
+  uint32_t WaitClks;
   ClksCalInfo_Type clks_cal;
-	uint32_t SeqCmdBuff[2];
-	uint32_t SRAMAddr = 0;;
-	/* Step 1: Check Frequency */
-	if(freq < 0.51)
+  FreqParams_Type freq_params;
+  uint32_t SeqCmdBuff[32];
+  uint32_t SRAMAddr = 0;;
+  /* Step 1: Check Frequency */
+  freq_params = AD5940_GetFreqParameters(freq);
+  
+       if(freq < 0.51)
 	{
-		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_1067;
-		AppBATCfg.ADCSinc3Osr = ADCSINC3OSR_4;
-		AppBATCfg.DftSrc = DFTSRC_SINC2NOTCH;
-	}else if(freq < 5 )
-	{
-		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_640;
-		AppBATCfg.ADCSinc3Osr= ADCSINC3OSR_4;
-		AppBATCfg.DftSrc = DFTSRC_SINC2NOTCH;
-	}else if(freq <450)
-	{
-		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_178;
-		AppBATCfg.ADCSinc3Osr = ADCSINC3OSR_4;
-		AppBATCfg.DftSrc = DFTSRC_SINC2NOTCH;
-	}else if(freq < 80000)
-	{
-		AppBATCfg.ADCSinc3Osr = ADCSINC3OSR_4;
-		AppBATCfg.ADCSinc2Osr = ADCSINC2OSR_178;
-		AppBATCfg.DftSrc = DFTSRC_SINC3;
+	hsdac_cfg.ExcitBufGain = EXCITBUFGAIN_2;
+    hsdac_cfg.HsDacGain = HSDACGAIN_1;
+    hsdac_cfg.HsDacUpdateRate = 0x1B;
+    AD5940_HSDacCfgS(&hsdac_cfg);
+    AD5940_HSRTIACfgS(HSTIARTIA_40K);
+    
+    /*Update ADC rate */
+    filter_cfg.ADCRate = ADCRATE_800KHZ;
+    AppBATCfg.AdcClkFreq = 16e6;
+    
+    /* Change clock to 16MHz oscillator */
+    AD5940_HPModeEn(bFALSE);
 	}
-	/* Step 2: Adjust ADCFILTERCON  */
-	dsp_cfg.ADCBaseCfg.ADCMuxN = ADCMUXN_AIN2;
-  dsp_cfg.ADCBaseCfg.ADCMuxP = ADCMUXP_AIN3;
-  dsp_cfg.ADCBaseCfg.ADCPga = ADCPGA_1P5;
-  memset(&dsp_cfg.ADCDigCompCfg, 0, sizeof(dsp_cfg.ADCDigCompCfg));
-  dsp_cfg.ADCFilterCfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */
-  dsp_cfg.ADCFilterCfg.ADCRate = ADCRATE_800KHZ;
-  dsp_cfg.ADCFilterCfg.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
-  dsp_cfg.ADCFilterCfg.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
-  dsp_cfg.ADCFilterCfg.BpSinc3 = bFALSE;
-  dsp_cfg.ADCFilterCfg.BpNotch = bTRUE;
-  dsp_cfg.ADCFilterCfg.Sinc2NotchEnable = bTRUE;
-  dsp_cfg.DftCfg.DftNum = AppBATCfg.DftNum;
-  dsp_cfg.DftCfg.DftSrc = AppBATCfg.DftSrc;
-  dsp_cfg.DftCfg.HanWinEn = AppBATCfg.HanWinEn;
-  memset(&dsp_cfg.StatCfg, 0, sizeof(dsp_cfg.StatCfg)); /* Don't care about Statistic */
-  AD5940_DSPCfgS(&dsp_cfg);
-	
-	/* Step 3: Calculate clocks needed to get result to FIFO and update sequencer wait command */
-	clks_cal.DataType = DATATYPE_DFT;
-  clks_cal.DftSrc = AppBATCfg.DftSrc;
-  clks_cal.DataCount = 1L<<(AppBATCfg.DftNum+2); /* 2^(DFTNUMBER+2) */
-  clks_cal.ADCSinc2Osr = AppBATCfg.ADCSinc2Osr;
-  clks_cal.ADCSinc3Osr = AppBATCfg.ADCSinc3Osr;
+        else if(freq < 5 )
+	{
+	hsdac_cfg.ExcitBufGain = EXCITBUFGAIN_2;
+    hsdac_cfg.HsDacGain = HSDACGAIN_1;
+    hsdac_cfg.HsDacUpdateRate = 0x1B;
+    AD5940_HSDacCfgS(&hsdac_cfg);
+    AD5940_HSRTIACfgS(HSTIARTIA_40K);
+    
+    /*Update ADC rate */
+    filter_cfg.ADCRate = ADCRATE_800KHZ;
+    AppBATCfg.AdcClkFreq = 16e6;
+    
+    /* Change clock to 16MHz oscillator */
+    AD5940_HPModeEn(bFALSE);
+    
+	}else if(freq < 450)
+	{
+    hsdac_cfg.ExcitBufGain = EXCITBUFGAIN_2;
+    hsdac_cfg.HsDacGain = HSDACGAIN_1;
+    hsdac_cfg.HsDacUpdateRate = 0x1B;
+    AD5940_HSDacCfgS(&hsdac_cfg);
+    AD5940_HSRTIACfgS(HSTIARTIA_5K);
+    
+    /*Update ADC rate */
+    filter_cfg.ADCRate = ADCRATE_800KHZ;
+    AppBATCfg.AdcClkFreq = 16e6;
+    
+    /* Change clock to 16MHz oscillator */
+    AD5940_HPModeEn(bFALSE);
+	}
+       else if(freq<80000)
+       {
+	hsdac_cfg.ExcitBufGain = EXCITBUFGAIN_2;
+    hsdac_cfg.HsDacGain = HSDACGAIN_1;
+    hsdac_cfg.HsDacUpdateRate = 0x1B;
+    AD5940_HSDacCfgS(&hsdac_cfg);
+    AD5940_HSRTIACfgS(HSTIARTIA_5K);
+    
+    /*Update ADC rate */
+    filter_cfg.ADCRate = ADCRATE_800KHZ;
+    AppBATCfg.AdcClkFreq = 16e6;
+    
+    /* Change clock to 16MHz oscillator */
+    AD5940_HPModeEn(bFALSE);
+       }
+        /* High power mode */
+	if(freq >= 80000)
+	{
+	hsdac_cfg.ExcitBufGain = EXCITBUFGAIN_2;
+    hsdac_cfg.HsDacGain = HSDACGAIN_1;
+    hsdac_cfg.HsDacUpdateRate = 0x07;
+    AD5940_HSDacCfgS(&hsdac_cfg);
+    AD5940_HSRTIACfgS(HSTIARTIA_5K);
+    
+    /*Update ADC rate */
+    filter_cfg.ADCRate = ADCRATE_1P6MHZ;
+    AppBATCfg.AdcClkFreq = 32e6;
+    
+    /* Change clock to 32MHz oscillator */
+    AD5940_HPModeEn(bTRUE);
+	}
+  
+  /* Step 2: Adjust ADCFILTERCON and DFTCON to set optimumn SINC3, SINC2 and DFTNUM settings  */
+  filter_cfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */ 
+  filter_cfg.ADCSinc2Osr = freq_params.ADCSinc2Osr;
+  filter_cfg.ADCSinc3Osr = freq_params.ADCSinc3Osr;
+  filter_cfg.BpSinc3 = bFALSE;
+  filter_cfg.BpNotch = bTRUE;
+  filter_cfg.Sinc2NotchEnable = bTRUE;
+  dft_cfg.DftNum = freq_params.DftNum;
+  dft_cfg.DftSrc = freq_params.DftSrc;
+  dft_cfg.HanWinEn = AppBATCfg.HanWinEn;
+  AD5940_ADCFilterCfgS(&filter_cfg);
+  AD5940_DFTCfgS(&dft_cfg);
+  
+  /* Step 3: Calculate clocks needed to get result to FIFO and update sequencer wait command */
+  clks_cal.DataType = DATATYPE_DFT;
+  clks_cal.DftSrc = freq_params.DftSrc;
+  clks_cal.DataCount = 1L<<(freq_params.DftNum+2); /* 2^(DFTNUMBER+2) */
+  clks_cal.ADCSinc2Osr = freq_params.ADCSinc2Osr;
+  clks_cal.ADCSinc3Osr = freq_params.ADCSinc3Osr;
   clks_cal.ADCAvgNum = 0;
   clks_cal.RatioSys2AdcClk = AppBATCfg.SysClkFreq/AppBATCfg.AdcClkFreq;
-  AD5940_ClksCalculate(&clks_cal, &WaitClks);	
+  AD5940_ClksCalculate(&clks_cal, &WaitClks);		
+	
+	
+	  SRAMAddr = AppBATCfg.MeasureSeqInfo.SeqRamAddr + AppBATCfg.SeqWaitAddr[0];
+	   
+           SeqCmdBuff[0] =SEQ_WAIT(WaitClks/2);
+           SeqCmdBuff[1] =SEQ_WAIT(WaitClks/2);
+      
+		AD5940_SEQCmdWrite(SRAMAddr, SeqCmdBuff, 2);
 		
-	/* Find start address of sequence in SRAM 
-		Update WaitClks */
-	SRAMAddr = AppBATCfg.MeasureSeqInfo.SeqRamAddr;
-	SeqCmdBuff[0] = SEQ_WAIT(WaitClks);
-	AD5940_SEQCmdWrite(SRAMAddr+4, SeqCmdBuff, 1);
-	
-	
-	return AD5940ERR_OK;
+  return AD5940ERR_OK;
 }
 
 /* Modify registers when AFE wakeup */
