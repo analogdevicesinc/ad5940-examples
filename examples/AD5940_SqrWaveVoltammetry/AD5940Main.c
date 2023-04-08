@@ -38,6 +38,8 @@ static int32_t RampShowResult(float *pData, uint32_t DataCount)
   for(int i=0;i<DataCount;i++)
   {
     printf("index:%d, %.3f\n", index++, pData[i]);
+    //printf("%.3f\n",pData[i]);
+    //index++;
     //i += 10;  /* Print though UART consumes too much time. */
   }
   return 0;
@@ -74,11 +76,11 @@ static int32_t AD5940PlatformCfg(void)
   /* Step2. Configure FIFO and Sequencer*/
   fifo_cfg.FIFOEn = bTRUE;           /* We will enable FIFO after all parameters configured */
   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
-  fifo_cfg.FIFOSize = FIFOSIZE_2KB;   /* 2kB for FIFO, The reset 4kB for sequencer */
+  fifo_cfg.FIFOSize = FIFOSIZE_4KB;   /* 2kB for FIFO, The reset 4kB for sequencer */
   fifo_cfg.FIFOSrc = FIFOSRC_SINC3;   /* */
   fifo_cfg.FIFOThresh = 4;            /*  Don't care, set it by application paramter */
   AD5940_FIFOCfg(&fifo_cfg);
-  seq_cfg.SeqMemSize = SEQMEMSIZE_4KB;  /* 4kB SRAM is used for sequencer, others for data FIFO */
+  seq_cfg.SeqMemSize = SEQMEMSIZE_2KB;  /* 4kB SRAM is used for sequencer, others for data FIFO */
   seq_cfg.SeqBreakEn = bFALSE;
   seq_cfg.SeqIgnoreEn = bTRUE;
   seq_cfg.SeqCntCRCClr = bTRUE;
@@ -104,7 +106,7 @@ static int32_t AD5940PlatformCfg(void)
   LfoscMeasure.SystemClkFreq = 16000000.0f; /* 16MHz in this firmware. */
   AD5940_LFOSCMeasure(&LfoscMeasure, &LFOSCFreq);
   printf("LFOSC Freq:%f\n", LFOSCFreq);
-  AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);         /*  */
+ // AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);         /*  */
   return 0;
 }
 
@@ -119,23 +121,26 @@ void AD5940RampStructInit(void)
   AppSWVGetCfg(&pRampCfg);
   /* Step1: configure general parmaters */
   pRampCfg->SeqStartAddr = 0x10;                /* leave 16 commands for LFOSC calibration.  */
-  pRampCfg->MaxSeqLen = 1024-0x10;              /* 4kB/4 = 1024  */
+  pRampCfg->MaxSeqLen = 512-0x10;              /* 4kB/4 = 1024  */
   pRampCfg->RcalVal = 10000.0;                  /* 10kOhm RCAL */
-  pRampCfg->ADCRefVolt = 1820.0f;               /* The real ADC reference voltage. Measure it from capacitor C12 with DMM. */
-  pRampCfg->FifoThresh = 480;                   /* Maximum value is 2kB/4-1 = 512-1. Set it to higher value to save power. */
+  pRampCfg->ADCRefVolt = 1.820f;               /* The real ADC reference voltage. Measure it from capacitor C12 with DMM. */
+  pRampCfg->FifoThresh = 1023;                   /* Maximum value is 2kB/4-1 = 512-1. Set it to higher value to save power. */
   pRampCfg->SysClkFreq = 16000000.0f;           /* System clock is 16MHz by default */
   pRampCfg->LFOSCClkFreq = LFOSCFreq;           /* LFOSC frequency */
+	pRampCfg->AdcPgaGain = ADCPGA_1P5;
+	pRampCfg->ADCSinc3Osr = ADCSINC3OSR_4;
   
 	/* Step 2:Configure square wave signal parameters */
-  pRampCfg->RampStartVolt = -1400.0f;           /* -1.4V */
-  pRampCfg->RampPeakVolt = -500.0f;             /* -0.1V */
-  pRampCfg->VzeroStart = 1700.0f;               /* 1.3V */
-  pRampCfg->VzeroPeak = 1700.0f;                /* 1.3V */
-  pRampCfg->Frequency = 25;                     /* Frequency of square wave in Hz */
-  pRampCfg->SqrWvAmplitude = 50;                /* Amplitude of square wave in mV */
-  pRampCfg->SqrWvRampIncrement = 5;             /* Increment in mV*/
-  pRampCfg->SampleDelay = 10.0f;                /* 10ms. Time between update DAC and ADC sample. Unit is ms. */
-  pRampCfg->LPTIARtiaSel = LPTIARTIA_200R;      /* Maximum current decides RTIA value */
+  pRampCfg->RampStartVolt = -400.0f;     /* Measurement starts at 0V*/
+  pRampCfg->RampPeakVolt = 0.0f;     		 /* Measurement finishes at -0.4V */
+  pRampCfg->VzeroStart = 1300.0f;           /* Vzero is voltage on SE0 pin: 1.3V */
+  pRampCfg->VzeroPeak = 1300.0f;          /* Vzero is voltage on SE0 pin: 1.3V */
+  pRampCfg->Frequency = 750;                 /* Frequency of square wave in Hz */
+  pRampCfg->SqrWvAmplitude = 150;       /* Amplitude of square wave in mV */
+  pRampCfg->SqrWvRampIncrement = 5; /* Increment in mV*/
+  pRampCfg->SampleDelay = 0.2f;             /* Time between update DAC and ADC sample. Unit is ms and must be < (1/Frequency)/2 - 0.2*/
+  pRampCfg->LPTIARtiaSel = LPTIARTIA_1K;      /* Maximum current decides RTIA value */
+	pRampCfg->bRampOneDir = bFALSE;//bTRUE;			/* Only measure ramp in one direction */
 }
 
 void AD5940_Main(void)
@@ -143,8 +148,12 @@ void AD5940_Main(void)
   uint32_t temp;  
   AD5940PlatformCfg();
   AD5940RampStructInit();
-
+	
+	//AD5940_McuSetLow();
   AppSWVInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
+	
+	
+	AD5940_Delay10us(100000);		/* Add a delay to allow sensor reach equilibrium befor starting the measurement */
   AppSWVCtrl(APPCTRL_START, 0);          /* Control IMP measurement to start. Second parameter has no meaning with this command. */
 
   while(1)

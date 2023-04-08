@@ -74,9 +74,9 @@ typedef struct
   uint32_t  CurrVzeroCode;        
   BoolFlag  bDACCodeInc;          /**< Increase DAC code.  */
   BoolFlag  bSqrWaveHiLevel;			/**< Flag to indicate square wave high level */
-  float     floor;
+	BoolFlag bRampOneDir;						/**< Ramp in one direction only */
   BoolFlag  StopRequired;         /**< After FIFO is ready, stop the measurement sequence */
-  enum _RampState{SWV_STATE0 = 0, SWV_STATE1, SWV_STATE2, SWV_STOP} RampState;
+  enum _RampState{SWV_STATE0 = 0, SWV_STATE1, SWV_STATE2, SWV_STATE3, SWV_STATE4, SWV_STOP} RampState;
 }AppSWVCfg_Type;
 
 #define APPCTRL_START          0
@@ -88,5 +88,7 @@ AD5940Err AppSWVInit(uint32_t *pBuffer, uint32_t BufferSize);
 AD5940Err AppSWVGetCfg(void *pCfg);
 AD5940Err AppSWVISR(void *pBuff, uint32_t *pCount);
 AD5940Err AppSWVCtrl(uint32_t Command, void *pPara);
+void AD5940_McuSetLow(void);
+void AD5940_McuSetHigh(void);
 
 #endif

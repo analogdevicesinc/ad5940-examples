@@ -166,11 +166,16 @@ static AD5940Err AppECGSeqCfgGen(void)
   adc_filter.ADCRate = ADCRATE_800KHZ;        /* If ADC clock is 32MHz, then set it to ADCRATE_1P6MHZ. Default is 16MHz, use ADCRATE_800KHZ. */
   adc_filter.BpNotch = bTRUE;                 /* SINC2+Notch is one block, when bypass notch filter, we can get fresh data from SINC2 filter. */
   adc_filter.BpSinc3 = bFALSE;                /* We use SINC3 filter. */
+  adc_filter.Sinc3ClkEnable = bTRUE;          /* Enable SINC3 clock.  */
+  adc_filter.Sinc2NotchClkEnable = bTRUE;     
   adc_filter.Sinc2NotchEnable = bTRUE;        /* Enable the SINC2+Notch block. You can also use function AD5940_AFECtrlS */
+  adc_filter.DFTClkEnable = bTRUE;
+  adc_filter.WGClkEnable = bTRUE;  
   AD5940_ADCFilterCfgS(&adc_filter);
 
   sw_matrix.Dswitch = SWD_OPEN;
-  sw_matrix.Pswitch = SWP_RE0|SWP_RE1|SWP_DE0;
+  /* Performing a three wire ECG measurement */
+  sw_matrix.Pswitch = SWP_RE1|SWP_DE0;
   sw_matrix.Nswitch = SWN_AIN2|SWN_SE0;
   sw_matrix.Tswitch = SWT_AIN0|SWT_AFE3LOAD;
   AD5940_SWMatrixCfgS(&sw_matrix);
