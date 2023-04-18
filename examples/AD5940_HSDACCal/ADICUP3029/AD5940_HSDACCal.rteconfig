@@ -2,8 +2,6 @@
 
 <configuration xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
 
-  <packages/>
-
   <device Dclock="26000000" Dcore="Cortex-M3" DcoreVersion="r2p1" Dendian="Little-endian" Dfamily="ADuCM302x Series" Dfpu="NO_FPU" Dmpu="NO_MPU" Dname="ADuCM3029" Dvendor="Analog Devices:1" Pname="">
 
     <url>http://www.keil.com/dd2/analogdevices/aducm3029</url>
@@ -51,6 +49,8 @@
   </components>
 
   <apis/>
+  
+  <packages useAllLatestPacks="1"/>
 
 </configuration>
 
