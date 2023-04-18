@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
-<packages useAllLatestPacks="1"/>
+<packages/>
 <device Dclock="26000000" Dcore="Cortex-M3" DcoreVersion="r2p1" Dendian="Little-endian" Dfamily="ADuCM302x Series" Dfpu="NO_FPU" Dmpu="NO_MPU" Dname="ADuCM3029" Dvendor="Analog Devices:1" Pname="">
 <url>http://www.keil.com/dd2/analogdevices/aducm3029</url>
 <package name="ADuCM302x_DFP" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
