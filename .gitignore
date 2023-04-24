@@ -24,3 +24,5 @@ Objects/
 *.ewt
 *.custom_argvars
 *.project
+*.ewd
+*.ewp
