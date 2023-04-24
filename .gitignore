@@ -26,3 +26,5 @@ Objects/
 *.project
 *.ewd
 *.ewp
+*.uvoptx
+*.uvprojx
