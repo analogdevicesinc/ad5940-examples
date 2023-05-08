@@ -36,6 +36,8 @@ To run the example code, you need the AD5940 evaluation board, and the software 
 
 **Keil is verified on all examples and it's recommended.**
 
+Be aware if you are using Keil with ADuCM3029 that ADuCM3029 requires the ARM Compiler version 5, which does not come with a standard Keil install. This issue is similar to what is documented in [this article from ARM's documentation](https://developer.arm.com/documentation/ka005073/latest). To resolve this, download the ARM Compiler version 5.06, update 7 from the [ARM Compiler Index](https://developer.arm.com/documentation/ka005198/latest). Then register and add the installed Arm Compiler 5 release by following the steps in the "Manage Arm Compiler Versions" section of the [Keil MDK documentation](https://developer.arm.com/documentation/101407/0538/Creating-Applications/Tips-and-Tricks/Manage-Arm-Compiler-Versions).
+
 If you want to use IAR, do not forget to manually install ADuCM3029 Device Support Pack(ADuCM302x_DFP) from IAR CMSIS-Pack-Manager, under tab 'Packs/AnalogDevices.ADuCM302x_DFP'.
 
 ## Hardware
