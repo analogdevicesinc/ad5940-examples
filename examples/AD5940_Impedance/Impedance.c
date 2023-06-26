@@ -425,6 +425,7 @@ AD5940Err AppIMPCheckFreq(float freq)
      hsdac_cfg.HsDacUpdateRate = 0x1B;
     AD5940_HSDacCfgS(&hsdac_cfg);
     AD5940_HSRTIACfgS(HSTIARTIA_40K);
+	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
     
     /*Update ADC rate */
     filter_cfg.ADCRate = ADCRATE_800KHZ;
@@ -441,6 +442,7 @@ AD5940Err AppIMPCheckFreq(float freq)
     hsdac_cfg.HsDacUpdateRate = 0x1B;
     AD5940_HSDacCfgS(&hsdac_cfg);
     AD5940_HSRTIACfgS(HSTIARTIA_40K);
+	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
     
     /*Update ADC rate */
     filter_cfg.ADCRate = ADCRATE_800KHZ;
@@ -458,6 +460,7 @@ AD5940Err AppIMPCheckFreq(float freq)
      hsdac_cfg.HsDacUpdateRate = 0x1B;
     AD5940_HSDacCfgS(&hsdac_cfg);
     AD5940_HSRTIACfgS(HSTIARTIA_5K);
+	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
     
     /*Update ADC rate */
     filter_cfg.ADCRate = ADCRATE_800KHZ;
@@ -474,6 +477,7 @@ AD5940Err AppIMPCheckFreq(float freq)
     hsdac_cfg.HsDacUpdateRate = 0x1B;
     AD5940_HSDacCfgS(&hsdac_cfg);
     AD5940_HSRTIACfgS(HSTIARTIA_5K);
+	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
     
     /*Update ADC rate */
     filter_cfg.ADCRate = ADCRATE_800KHZ;
@@ -491,6 +495,7 @@ AD5940Err AppIMPCheckFreq(float freq)
     hsdac_cfg.HsDacUpdateRate = 0x07;
     AD5940_HSDacCfgS(&hsdac_cfg);
     AD5940_HSRTIACfgS(HSTIARTIA_5K);
+	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
     
     /*Update ADC rate */
     filter_cfg.ADCRate = ADCRATE_1P6MHZ;
