@@ -512,25 +512,7 @@ AD5940Err AppIMPCheckFreq(float freq)
 
 		AD5940_SEQCmdWrite(SRAMAddr, SeqCmdBuff, 2);
 
-		
-//	/* Maximum number of clocks is 0x3FFFFFFF. More are needed if the frequency is low */
-//	if(WaitClks > 0x3FFFFFFF)
-//	{
-//		WaitClks /=2;
-//		SRAMAddr = AppBIACfg.MeasureSeqInfo.SeqRamAddr;
-//		SeqCmdBuff[0] = SEQ_WAIT(WaitClks);
-//		AD5940_SEQCmdWrite(SRAMAddr+11, SeqCmdBuff, 1);
-//		AD5940_SEQCmdWrite(SRAMAddr+12, SeqCmdBuff, 1);
-//		AD5940_SEQCmdWrite(SRAMAddr+18, SeqCmdBuff, 1);
-//		AD5940_SEQCmdWrite(SRAMAddr+19, SeqCmdBuff, 1);
-//	}
-//	else
-//	{
-//		SRAMAddr = AppBIACfg.MeasureSeqInfo.SeqRamAddr;
-//		SeqCmdBuff[0] = SEQ_WAIT(WaitClks);
-//		AD5940_SEQCmdWrite(SRAMAddr+11, SeqCmdBuff, 1);
-//		AD5940_SEQCmdWrite(SRAMAddr+18, SeqCmdBuff, 1);
-//	}
+	
  
   return AD5940ERR_OK;
 }
