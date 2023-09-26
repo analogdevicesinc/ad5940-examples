@@ -79,6 +79,11 @@
   </project>
 
   <project>
+    <PathAndName>.\AD5940_BIA_HiZ_Electrodes\NUCLEO-F411\AD5940_BIA_HiZ_Electrodes.uvprojx</PathAndName>
+    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
+  </project>
+
+  <project>
     <PathAndName>.\AD5940_BioElec\NUCLEO-F411\AD5940_BioElec.uvprojx</PathAndName>
     <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
