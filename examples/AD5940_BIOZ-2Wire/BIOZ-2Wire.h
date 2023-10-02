@@ -33,7 +33,6 @@ typedef struct
   uint32_t SeqStartAddr;        /* Initialaztion sequence start address in SRAM of AD5940  */
   uint32_t MaxSeqLen;           /* Limit the maximum sequence.   */
   uint32_t SeqStartAddrCal;     /* Measurement sequence start address in SRAM of AD5940 */
-  uint32_t SeqWaitAddr[3];
   uint32_t MaxSeqLenCal;
 /* Application related parameters */ 
   //BoolFlag bBioElecBoard;     /* The code is same for BioElec board and AD5941Sens1 board. No changes are needed */

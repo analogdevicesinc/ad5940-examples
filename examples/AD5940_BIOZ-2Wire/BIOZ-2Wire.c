@@ -307,12 +307,8 @@ static AD5940Err AppBIOZSeqMeasureGen(void)
   AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR, bTRUE);  /* Enable Waveform generator, ADC power */
   AD5940_SEQGenInsert(SEQ_WAIT(16*50));
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
-  //AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */  
-  AD5940_SEQGenFetchSeq(NULL, &AppBIOZCfg.SeqWaitAddr[0]); /* Record the start address of the next command. */
-
-  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
-   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
-   
+  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */  
+	AD5940_SEQGenInsert(SEQ_WAIT(1));
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT|AFECTRL_WG|AFECTRL_ADCPWR, bFALSE);  /* Stop ADC convert and DFT */
   
   /* Step 2: Measure Voltage */
@@ -320,10 +316,8 @@ static AD5940Err AppBIOZSeqMeasureGen(void)
   AD5940_AFECtrlS(AFECTRL_WG|AFECTRL_ADCPWR, bTRUE);  /* Enable Waveform generator, ADC power */
   AD5940_SEQGenInsert(SEQ_WAIT(16*50));
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
-   AD5940_SEQGenFetchSeq(NULL, &AppBIOZCfg.SeqWaitAddr[1]); /* Record the start address of next command */
-       
-  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
-   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
+  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */  
+	AD5940_SEQGenInsert(SEQ_WAIT(1));
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT|AFECTRL_WG|AFECTRL_ADCPWR, bFALSE);  /* Stop ADC convert and DFT */
   
   sw_cfg.Dswitch = SWD_OPEN;
@@ -511,7 +505,7 @@ AD5940Err AppBIOZInit(uint32_t *pBuffer, uint32_t BufferSize)
   return AD5940ERR_OK;
 }
 
-//* Depending on frequency of Sin wave set optimum filter settings */
+/* Depending on frequency of Sin wave set optimum filter settings */
 AD5940Err AppBIOZCheckFreq(float freq)
 {
   ADCFilterCfg_Type filter_cfg;
@@ -520,90 +514,19 @@ AD5940Err AppBIOZCheckFreq(float freq)
   uint32_t WaitClks;
   ClksCalInfo_Type clks_cal;
   FreqParams_Type freq_params;
-  uint32_t SeqCmdBuff[32];
+  uint32_t SeqCmdBuff[2];
   uint32_t SRAMAddr = 0;;
   /* Step 1: Check Frequency */
   freq_params = AD5940_GetFreqParameters(freq);
   
-       if(freq < 0.51)
-	{
-            /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =EXCITBUFGAIN_2;// AppBIACfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = HSDACGAIN_1;//AppBIACfg.HsDacGain;
-     hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_40K);
-	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppBIOZCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-	}
-        else if(freq < 5 )
-	{
-       /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =EXCITBUFGAIN_2;// AppBIOZCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = HSDACGAIN_1;//AppBIOZCfg.HsDacGain;
-    hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_40K);
-	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppBIOZCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-    
-	}else if(freq < 450)
-	{
-       /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =AppBIOZCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = AppBIOZCfg.HsDacGain;  
-    
-     hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_5K);
-	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppBIOZCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-	}
-       else if(freq<80000)
-       {
-           /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =AppBIOZCfg.ExcitBufGain;
+	/* Set power mode */
+  if(freq_params.HighPwrMode == bTRUE)
+  {
+    /* Update HSDAC update rate */     
+    hsdac_cfg.ExcitBufGain = AppBIOZCfg.ExcitBufGain;
     hsdac_cfg.HsDacGain = AppBIOZCfg.HsDacGain;
-    hsdac_cfg.HsDacUpdateRate = 0x1B;
+    hsdac_cfg.HsDacUpdateRate = 0x7;
     AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_5K);
-	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppBIOZCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-       }
-        /* High power mode */
-	if(freq >= 80000)
-	{
-		  /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =AppBIOZCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = AppBIOZCfg.HsDacGain;
-    hsdac_cfg.HsDacUpdateRate = 0x07;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_5K);
-	__AD5940_SetDExRTIA(0, HSTIADERTIA_OPEN, HSTIADERLOAD_0R);
     
     /*Update ADC rate */
     filter_cfg.ADCRate = ADCRATE_1P6MHZ;
@@ -611,7 +534,20 @@ AD5940Err AppBIOZCheckFreq(float freq)
     
     /* Change clock to 32MHz oscillator */
     AD5940_HPModeEn(bTRUE);
-	}
+  }else
+	{
+    /* Update HSDAC update rate */
+    hsdac_cfg.ExcitBufGain = AppBIOZCfg.ExcitBufGain;
+    hsdac_cfg.HsDacGain = AppBIOZCfg.HsDacGain;
+    hsdac_cfg.HsDacUpdateRate = 0x1B;
+    AD5940_HSDacCfgS(&hsdac_cfg);
+    /* Update ADC rate */
+    filter_cfg.ADCRate = ADCRATE_800KHZ;
+    AppBIOZCfg.AdcClkFreq = 16e6;
+    
+		/* Change clock to 16MHz oscillator */
+    AD5940_HPModeEn(bFALSE);
+  }
   
   /* Step 2: Adjust ADCFILTERCON and DFTCON to set optimumn SINC3, SINC2 and DFTNUM settings  */
   filter_cfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */ 
@@ -636,25 +572,27 @@ AD5940Err AppBIOZCheckFreq(float freq)
   clks_cal.RatioSys2AdcClk = AppBIOZCfg.SysClkFreq/AppBIOZCfg.AdcClkFreq;
   AD5940_ClksCalculate(&clks_cal, &WaitClks);		
 	
-	
-	  SRAMAddr = AppBIOZCfg.MeasureSeqInfo.SeqRamAddr + AppBIOZCfg.SeqWaitAddr[0];
-	   
-           SeqCmdBuff[0] =SEQ_WAIT(WaitClks/2);
-           SeqCmdBuff[1] =SEQ_WAIT(WaitClks/2);
-      
-		AD5940_SEQCmdWrite(SRAMAddr, SeqCmdBuff, 2);
-		
-		SRAMAddr = AppBIOZCfg.MeasureSeqInfo.SeqRamAddr + AppBIOZCfg.SeqWaitAddr[1];
-		  
-           SeqCmdBuff[0] =SEQ_WAIT(WaitClks/2);
-           SeqCmdBuff[1] =SEQ_WAIT(WaitClks/2);
-
-		AD5940_SEQCmdWrite(SRAMAddr, SeqCmdBuff, 2);
-
+	/* Maximum number of clocks is 0x3FFFFFFF. More are needed if the frequency is low */
+	if(WaitClks > 0x3FFFFFFF)
+	{
+		WaitClks /=2;
+		SRAMAddr = AppBIOZCfg.MeasureSeqInfo.SeqRamAddr;
+		SeqCmdBuff[0] = SEQ_WAIT(WaitClks);
+		AD5940_SEQCmdWrite(SRAMAddr+11, SeqCmdBuff, 1);
+		AD5940_SEQCmdWrite(SRAMAddr+12, SeqCmdBuff, 1);
+		AD5940_SEQCmdWrite(SRAMAddr+18, SeqCmdBuff, 1);
+		AD5940_SEQCmdWrite(SRAMAddr+19, SeqCmdBuff, 1);
+	}
+	else
+	{
+		SRAMAddr = AppBIOZCfg.MeasureSeqInfo.SeqRamAddr;
+		SeqCmdBuff[0] = SEQ_WAIT(WaitClks);
+		AD5940_SEQCmdWrite(SRAMAddr+11, SeqCmdBuff, 1);
+		AD5940_SEQCmdWrite(SRAMAddr+18, SeqCmdBuff, 1);
+	}
  
   return AD5940ERR_OK;
 }
-
 
 /* Modify registers when AFE wakeup */
 static AD5940Err AppBIOZRegModify(int32_t * const pData, uint32_t *pDataCount)
