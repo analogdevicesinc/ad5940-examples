@@ -10,13 +10,13 @@
       <TargetName>ADICUP3029</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::..\..\Program Files (x86)\ARM_Compiler_5.06u7</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>ADuCM3029</Device>
           <Vendor>Analog Devices</Vendor>
-          <PackID>AnalogDevices.ADuCM302x_DFP.3.2.0</PackID>
+          <PackID>AnalogDevices.ADuCM302x_DFP.3.2.1</PackID>
           <PackURL>http://download.analog.com/tools/EZBoards/CM302x/Releases/</PackURL>
           <Cpu>IRAM(0x20000000,0x04000) IRAM2(0x20040000,0x04000) IROM(0x00000000,0x40000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -185,6 +185,8 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -351,7 +353,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -456,7 +458,7 @@
       <file attr="config" category="header" name="Include\config\adi_cycle_counting_config.h" version="3.2.0">
         <instance index="0">RTE\Device\ADuCM3029\adi_cycle_counting_config.h</instance>
         <component Cclass="Device" Cgroup="Global Configuration" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x"/>
-        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+        <package name="ADuCM302x_DFP" schemaVersion="1.2" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.1"/>
         <targetInfos>
           <targetInfo name="ADICUP3029"/>
         </targetInfos>
@@ -464,7 +466,7 @@
       <file attr="config" category="header" name="Include\config\adi_global_config.h" version="3.2.0">
         <instance index="0">RTE\Device\ADuCM3029\adi_global_config.h</instance>
         <component Cclass="Device" Cgroup="Global Configuration" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x"/>
-        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+        <package name="ADuCM302x_DFP" schemaVersion="1.2" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.1"/>
         <targetInfos>
           <targetInfo name="ADICUP3029"/>
         </targetInfos>
@@ -484,7 +486,7 @@
       <file attr="config" category="source" condition="ADuCM3029_ARM" name="Source\ARM\startup_ADuCM3029.s" version="3.2.0">
         <instance index="0">RTE\Device\ADuCM3029\startup_ADuCM3029.s</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x Driver"/>
-        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+        <package name="ADuCM302x_DFP" schemaVersion="1.2" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.1"/>
         <targetInfos>
           <targetInfo name="ADICUP3029"/>
         </targetInfos>
@@ -492,7 +494,7 @@
       <file attr="config" category="source" condition="ADuCM3029" name="Source\system_ADuCM3029.c" version="3.2.0">
         <instance index="0">RTE\Device\ADuCM3029\system_ADuCM3029.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="AnalogDevices" Cversion="3.2.0" condition="ADuCM302x Driver"/>
-        <package license="License/2017-05-17-CM302xEZDFP Click Thru SLA.txt" name="ADuCM302x_DFP" schemaVersion="1.2" supportContact="http://www.analog.com/en/support/technical-support.html" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.0"/>
+        <package name="ADuCM302x_DFP" schemaVersion="1.2" url="http://download.analog.com/tools/EZBoards/CM302x/Releases/" vendor="AnalogDevices" version="3.2.1"/>
         <targetInfos>
           <targetInfo name="ADICUP3029"/>
         </targetInfos>
