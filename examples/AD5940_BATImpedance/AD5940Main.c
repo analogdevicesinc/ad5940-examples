@@ -101,8 +101,8 @@ void AD5940BATStructInit(void)
 	
 	pBATCfg->SweepCfg.SweepEn = bTRUE;			/* Set to bTRUE to enable sweep function */
 	pBATCfg->SweepCfg.SweepStart = 1.0f;		/* Start sweep at 1Hz  */
-	pBATCfg->SweepCfg.SweepStop = 50000.0f;	/* Finish sweep at 1000Hz */
-	pBATCfg->SweepCfg.SweepPoints = 50;			/* 100 frequencies in the sweep */
+	pBATCfg->SweepCfg.SweepStop = 1000.0f;	/* Finish sweep at 1000Hz */
+	pBATCfg->SweepCfg.SweepPoints = 20;			/* 100 frequencies in the sweep */
 	pBATCfg->SweepCfg.SweepLog = bTRUE;			/* Set to bTRUE to use LOG scale. Set bFALSE to use linear scale */
 	
 }

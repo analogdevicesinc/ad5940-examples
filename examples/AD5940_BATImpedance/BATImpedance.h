@@ -65,7 +65,6 @@ typedef struct
   uint32_t DftNum;              /* DFT number */
   uint32_t DftSrc;              /* DFT Source */
   BoolFlag HanWinEn;            /* Enable Hanning window */
-  uint32_t SeqWaitAddr[3];    
 /* Sweep Function Control */
   SoftSweepCfg_Type SweepCfg;
 /* Private variables for internal usage */
