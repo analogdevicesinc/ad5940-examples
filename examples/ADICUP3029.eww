@@ -13,9 +13,6 @@
         <path>$WS_DIR$\AD5940_BIA\ADICUP3029\AD5940_BIA.ewp</path>
     </project>
     <project>
-        <path>$WS_DIR$\AD5940_BIA_HiZ_Electrodes\ADICUP3029\AD5940_BIA_HiZ_Electrodes.ewp</path>
-    </project>
-    <project>
         <path>$WS_DIR$\AD5940_BioElec\ADICUP3029\AD5940_BioElec.ewp</path>
     </project>
     <project>
@@ -32,6 +29,9 @@
     </project>
     <project>
         <path>$WS_DIR$\AD5940_ECSns_EIS\ADICUP3029\AD5940_ECSensEIS.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\AD5940_ECSns_EIS_WIP_2\ADICUP3029\AD5940_ECSensEIS_WIP2.ewp</path>
     </project>
     <project>
         <path>$WS_DIR$\AD5940_EDA\ADICUP3029\AD5940_EDA.ewp</path>
