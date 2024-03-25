@@ -2086,7 +2086,7 @@
     <group>
         <name>AD5940Lib</name>
         <file>
-            <name>$PROJ_DIR$\..\..\ad5940lib\ad5940.c</name>
+            <name>$PROJ_DIR$\..\ad5940.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\ADICUP3029Port.c</name>
