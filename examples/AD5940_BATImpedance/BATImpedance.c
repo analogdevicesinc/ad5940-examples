@@ -642,7 +642,7 @@ AD5940Err AppBATMeasureRCAL(void)
 			AppBATISR(buff, &temp);
 			AppBATCfg.RcalVoltTable[i][0] = AppBATCfg.RcalVolt.Real;
 			AppBATCfg.RcalVoltTable[i][1] = AppBATCfg.RcalVolt.Image;
-			printf(" RcalVolt:(%f,%f)\n",  AppBATCfg.RcalVoltTable[i][0], AppBATCfg.RcalVoltTable[i][1]);
+			printf(" RcalVolt (bits_real,bits_imag),%.0f,%.0f,\n",  AppBATCfg.RcalVoltTable[i][0], AppBATCfg.RcalVoltTable[i][1]);
 			AD5940_Delay10us(10000);
     }
 		AppBATCfg.RcalVolt.Real = AppBATCfg.RcalVoltTable[0][0];
