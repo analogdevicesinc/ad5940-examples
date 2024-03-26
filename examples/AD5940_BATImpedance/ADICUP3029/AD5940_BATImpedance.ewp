@@ -352,6 +352,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\</state>
+                    <state>$PROJ_DIR$\..\</state>
                     <state>$PROJ_DIR$\..\..\ad5940lib</state>
                     <state>$CMSIS_PACK_DEVICE_INCLUDES$</state>
                     <state>$CMSIS_PACK_INCLUDES$</state>
