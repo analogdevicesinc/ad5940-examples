@@ -352,6 +352,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\</state>
+                    <state>$PROJ_DIR$\..\</state>
                     <state>$PROJ_DIR$\..\..\ad5940lib</state>
                     <state>$CMSIS_PACK_DEVICE_INCLUDES$</state>
                     <state>$CMSIS_PACK_INCLUDES$</state>
@@ -2086,7 +2087,7 @@
     <group>
         <name>AD5940Lib</name>
         <file>
-            <name>$PROJ_DIR$\..\..\ad5940lib\ad5940.c</name>
+            <name>$PROJ_DIR$\..\ad5940.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\ADICUP3029Port.c</name>
