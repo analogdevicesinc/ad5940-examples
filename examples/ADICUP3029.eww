@@ -13,9 +13,6 @@
         <path>$WS_DIR$\AD5940_BIA\ADICUP3029\AD5940_BIA.ewp</path>
     </project>
     <project>
-        <path>$WS_DIR$\AD5940_BIA_HiZ_Electrodes\ADICUP3029\AD5940_BIA_HiZ_Electrodes.ewp</path>
-    </project>
-    <project>
         <path>$WS_DIR$\AD5940_BioElec\ADICUP3029\AD5940_BioElec.ewp</path>
     </project>
     <project>
@@ -41,6 +38,9 @@
     </project>
     <project>
         <path>$WS_DIR$\AD5940_Impedance\ADICUP3029\AD5940_Impedance.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\AD5940_Impedance_Adjustable_with_frequency\ADICUP3029\AD5940_Impedance_Adjustable_with_frequency.ewp</path>
     </project>
     <project>
         <path>$WS_DIR$\AD5940_LPDAC\ADICUP3029\AD5940_LPDAC.ewp</path>
