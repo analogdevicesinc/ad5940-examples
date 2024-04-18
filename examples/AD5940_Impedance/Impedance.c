@@ -36,7 +36,7 @@ AppIMPCfg_Type AppIMPCfg =
   .SeqStartAddrCal = 0,
   .MaxSeqLenCal = 0,
 
-  .ImpODR = 0.0001,           /* 20.0 Hz*/
+  .ImpODR = 20.0,           /* 20.0 Hz*/
   .NumOfData = -1,
   .SysClkFreq = 16000000.0,
   .WuptClkFreq = 32000.0,
@@ -51,9 +51,8 @@ AppIMPCfg_Type AppIMPCfg =
   .PwrMod = AFEPWR_HP,
 
   .HstiaRtiaSel = HSTIARTIA_5K,
-  .ExtRtia = 0,  //set only when HstiaRtiaSel = HSTIARTIA_OPEN
-  .ExcitBufGain = EXCITBUFGAIN_0P25,//EXCITBUFGAIN_2,
-  .HsDacGain = HSDACGAIN_0P2,//HSDACGAIN_1,
+  .ExcitBufGain = EXCITBUFGAIN_2,
+  .HsDacGain = HSDACGAIN_1,
   .HsDacUpdateRate = 7,
   .DacVoltPP = 800.0,
   .BiasVolt = -0.0f,
@@ -64,7 +63,7 @@ AppIMPCfg_Type AppIMPCfg =
   .DftSrc = DFTSRC_SINC3,
   .HanWinEn = bTRUE,
 
-  .AdcPgaGain = ADCPGA_4,//ADCPGA_1,
+  .AdcPgaGain = ADCPGA_1,
   .ADCSinc3Osr = ADCSINC3OSR_2,
   .ADCSinc2Osr = ADCSINC2OSR_22,
 
@@ -346,7 +345,6 @@ static AD5940Err AppIMPSeqMeasureGen(void)
   sw_cfg.Nswitch = SWN_RCAL1;
   sw_cfg.Tswitch = SWT_RCAL1|SWT_TRTIA;
   AD5940_SWMatrixCfgS(&sw_cfg);
-	
 	AD5940_AFECtrlS(AFECTRL_HSTIAPWR|AFECTRL_INAMPPWR|AFECTRL_EXTBUFPWR|\
                 AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
                 AFECTRL_SINC2NOTCH, bTRUE);
@@ -354,12 +352,7 @@ static AD5940Err AppIMPSeqMeasureGen(void)
   //delay for signal settling DFT_WAIT
   AD5940_SEQGenInsert(SEQ_WAIT(16*10));
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
-	
-	AD5940_SEQGenFetchSeq(NULL, &AppIMPCfg.SeqWaitAddr[0]); /* Record the start address of the next command. */
-
-  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
-   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
- 
+  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));
   //wait for first data ready
   AD5940_AFECtrlS(AFECTRL_ADCPWR|AFECTRL_ADCCNV|AFECTRL_DFT|AFECTRL_WG, bFALSE);  /* Stop ADC convert and DFT */
 
@@ -372,12 +365,7 @@ static AD5940Err AppIMPSeqMeasureGen(void)
   AD5940_AFECtrlS(AFECTRL_ADCPWR|AFECTRL_WG, bTRUE);  /* Enable Waveform generator */
   AD5940_SEQGenInsert(SEQ_WAIT(16*10));  //delay for signal settling DFT_WAIT
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT, bTRUE);  /* Start ADC convert and DFT */
-	
-	AD5940_SEQGenFetchSeq(NULL, &AppIMPCfg.SeqWaitAddr[1]); /* Record the start address of next command */
-       
-  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
-   AD5940_SEQGenInsert(SEQ_WAIT(WaitClks/2));
-
+  AD5940_SEQGenInsert(SEQ_WAIT(WaitClks));  /* wait for first data ready */
   AD5940_AFECtrlS(AFECTRL_ADCCNV|AFECTRL_DFT|AFECTRL_WG|AFECTRL_ADCPWR, bFALSE);  /* Stop ADC convert and DFT */
     AD5940_AFECtrlS(AFECTRL_HSTIAPWR|AFECTRL_INAMPPWR|AFECTRL_EXTBUFPWR|\
                 AFECTRL_WG|AFECTRL_DACREFPWR|AFECTRL_HSDACPWR|\
@@ -404,145 +392,6 @@ static AD5940Err AppIMPSeqMeasureGen(void)
   return AD5940ERR_OK;
 }
 
-/* Depending on frequency of Sin wave set optimum filter settings */
-AD5940Err AppIMPCheckFreq(float freq)
-{
-  ADCFilterCfg_Type filter_cfg;
-  DFTCfg_Type dft_cfg;
-  HSDACCfg_Type hsdac_cfg;
-  uint32_t WaitClks;
-  ClksCalInfo_Type clks_cal;
-  FreqParams_Type freq_params;
-  uint32_t SeqCmdBuff[32];
-  uint32_t SRAMAddr = 0;;
-  /* Step 1: Check Frequency */
-  freq_params = AD5940_GetFreqParameters(freq);
-  
-       if(freq < 0.51)
-	{
-            /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =EXCITBUFGAIN_2;// AppIMPCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = HSDACGAIN_1;//AppIMPCfg.HsDacGain;
-     hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_40K); //set as per load current range
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppIMPCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-	}
-        else if(freq < 5 )
-	{
-       /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =EXCITBUFGAIN_2;// AppIMPCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = HSDACGAIN_1;//AppIMPCfg.HsDacGain;
-    hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_40K); //set as per load current range
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppIMPCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-    
-	}else if(freq < 450)
-	{
-       /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =AppIMPCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = AppIMPCfg.HsDacGain;  
-    
-     hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_5K); //set as per load current range
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppIMPCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-	}
-       else if(freq<80000)
-       {
-           /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =AppIMPCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = AppIMPCfg.HsDacGain;
-    hsdac_cfg.HsDacUpdateRate = 0x1B;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_5K); //set as per load current range
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_800KHZ;
-    AppIMPCfg.AdcClkFreq = 16e6;
-    
-    /* Change clock to 16MHz oscillator */
-    AD5940_HPModeEn(bFALSE);
-       }
-        /* High power mode */
-	if(freq >= 80000)
-	{
-		  /* Update HSDAC update rate */
-    hsdac_cfg.ExcitBufGain =AppIMPCfg.ExcitBufGain;
-    hsdac_cfg.HsDacGain = AppIMPCfg.HsDacGain;
-    hsdac_cfg.HsDacUpdateRate = 0x07;
-    AD5940_HSDacCfgS(&hsdac_cfg);
-    AD5940_HSRTIACfgS(HSTIARTIA_5K); //set as per load current range
-    
-    /*Update ADC rate */
-    filter_cfg.ADCRate = ADCRATE_1P6MHZ;
-    AppIMPCfg.AdcClkFreq = 32e6;
-    
-    /* Change clock to 32MHz oscillator */
-    AD5940_HPModeEn(bTRUE);
-	}
-  
-  /* Step 2: Adjust ADCFILTERCON and DFTCON to set optimumn SINC3, SINC2 and DFTNUM settings  */
-  filter_cfg.ADCAvgNum = ADCAVGNUM_16;  /* Don't care because it's disabled */ 
-  filter_cfg.ADCSinc2Osr = freq_params.ADCSinc2Osr;
-  filter_cfg.ADCSinc3Osr = freq_params.ADCSinc3Osr;
-  filter_cfg.BpSinc3 = bFALSE;
-  filter_cfg.BpNotch = bTRUE;
-  filter_cfg.Sinc2NotchEnable = bTRUE;
-  dft_cfg.DftNum = freq_params.DftNum;
-  dft_cfg.DftSrc = freq_params.DftSrc;
-  dft_cfg.HanWinEn = AppIMPCfg.HanWinEn;
-  AD5940_ADCFilterCfgS(&filter_cfg);
-  AD5940_DFTCfgS(&dft_cfg);
-  
-  /* Step 3: Calculate clocks needed to get result to FIFO and update sequencer wait command */
-  clks_cal.DataType = DATATYPE_DFT;
-  clks_cal.DftSrc = freq_params.DftSrc;
-  clks_cal.DataCount = 1L<<(freq_params.DftNum+2); /* 2^(DFTNUMBER+2) */
-  clks_cal.ADCSinc2Osr = freq_params.ADCSinc2Osr;
-  clks_cal.ADCSinc3Osr = freq_params.ADCSinc3Osr;
-  clks_cal.ADCAvgNum = 0;
-  clks_cal.RatioSys2AdcClk = AppIMPCfg.SysClkFreq/AppIMPCfg.AdcClkFreq;
-  AD5940_ClksCalculate(&clks_cal, &WaitClks);		
-	
-	
-	  SRAMAddr = AppIMPCfg.MeasureSeqInfo.SeqRamAddr + AppIMPCfg.SeqWaitAddr[0];
-	   
-           SeqCmdBuff[0] =SEQ_WAIT(WaitClks/2);
-           SeqCmdBuff[1] =SEQ_WAIT(WaitClks/2);
-      
-		AD5940_SEQCmdWrite(SRAMAddr, SeqCmdBuff, 2);
-		
-		SRAMAddr = AppIMPCfg.MeasureSeqInfo.SeqRamAddr + AppIMPCfg.SeqWaitAddr[1];
-		  
-           SeqCmdBuff[0] =SEQ_WAIT(WaitClks/2);
-           SeqCmdBuff[1] =SEQ_WAIT(WaitClks/2);
-
-		AD5940_SEQCmdWrite(SRAMAddr, SeqCmdBuff, 2);
-
-		
-  return AD5940ERR_OK;
-}
-
 
 /* This function provide application initialize. It can also enable Wupt that will automatically trigger sequence. Or it can configure  */
 int32_t AppIMPInit(uint32_t *pBuffer, uint32_t BufferSize)
@@ -562,7 +411,6 @@ int32_t AppIMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   seq_cfg.SeqEnable = bFALSE;
   seq_cfg.SeqWrTimer = 0;
   AD5940_SEQCfg(&seq_cfg);
-  
   
   /* Reconfigure FIFO */
   AD5940_FIFOCtrlS(FIFOSRC_DFT, bFALSE);									/* Disable FIFO firstly */
@@ -601,18 +449,16 @@ int32_t AppIMPInit(uint32_t *pBuffer, uint32_t BufferSize)
   AD5940_SEQCfg(&seq_cfg);  /* Enable sequencer */
   AD5940_SEQMmrTrig(AppIMPCfg.InitSeqInfo.SeqId);
   while(AD5940_INTCTestFlag(AFEINTC_1, AFEINTSRC_ENDSEQ) == bFALSE);
-  AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
+  
   /* Measurement sequence  */
   AppIMPCfg.MeasureSeqInfo.WriteSRAM = bFALSE;
   AD5940_SEQInfoCfg(&AppIMPCfg.MeasureSeqInfo);
-  
-  AppIMPCheckFreq(AppIMPCfg.FreqofData);
 
   seq_cfg.SeqEnable = bTRUE;
   AD5940_SEQCfg(&seq_cfg);  /* Enable sequencer, and wait for trigger */
   AD5940_ClrMCUIntFlag();   /* Clear interrupt flag generated before */
 
-  //AD5940_AFEPwrBW(AppIMPCfg.PwrMod, AFEBW_250KHZ);
+  AD5940_AFEPwrBW(AppIMPCfg.PwrMod, AFEBW_250KHZ);
 
   AppIMPCfg.IMPInited = bTRUE;  /* IMP application has been initialized. */
   return AD5940ERR_OK;
@@ -638,7 +484,6 @@ int32_t AppIMPRegModify(int32_t * const pData, uint32_t *pDataCount)
   if(AppIMPCfg.SweepCfg.SweepEn) /* Need to set new frequency and set power mode */
   {
     AD5940_WGFreqCtrlS(AppIMPCfg.SweepNextFreq, AppIMPCfg.SysClkFreq);
-		AppIMPCheckFreq(AppIMPCfg.SweepNextFreq);
   }
   return AD5940ERR_OK;
 }
