@@ -107,12 +107,12 @@ void AD5940ImpedanceStructInit(void)
 	
 	/* Configure the sweep function. */
 	pImpedanceCfg->SweepCfg.SweepEn = bTRUE;
-	pImpedanceCfg->SweepCfg.SweepStart = 100.0f;	/* Start from 1kHz */
-	pImpedanceCfg->SweepCfg.SweepStop = 100e3f;		/* Stop at 100kHz */
+	pImpedanceCfg->SweepCfg.SweepStart = 1.0f;	/* Start from 1kHz */
+	pImpedanceCfg->SweepCfg.SweepStop = 200e3f;		/* Stop at 100kHz */
 	pImpedanceCfg->SweepCfg.SweepPoints = 101;		/* Points is 101 */
 	pImpedanceCfg->SweepCfg.SweepLog = bTRUE;
 	/* Configure Power Mode. Use HP mode if frequency is higher than 80kHz. */
-	pImpedanceCfg->PwrMod = AFEPWR_HP;
+	pImpedanceCfg->PwrMod = AFEPWR_LP;
 	/* Configure filters if necessary */
 	pImpedanceCfg->ADCSinc3Osr = ADCSINC3OSR_2;		/* Sample rate is 800kSPS/2 = 400kSPS */
   pImpedanceCfg->DftNum = DFTNUM_16384;
