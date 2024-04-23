@@ -11,7 +11,7 @@ This software is proprietary to Analog Devices, Inc. and its licensors.
 By using this software you agree to the terms of the associated
 Analog Devices Software License Agreement.
  
-*****************************************************************************/
+******************************************************************************/
 #include "ad5940.h"
 #include <stdio.h>
 #include "string.h"
